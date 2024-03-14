@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="APOMaui.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:APOMaui"
+    Shell.FlyoutBehavior="Disabled"
+    Title="APOMaui">
+
+    <TabBar Route="File">
+        <ShellContent
+            Title="Plik"
+            ContentTemplate="{DataTemplate local:MainPage}"
+            Route="MainPage" />
+        <ShellContent
+            Title="Operacje"
+            ContentTemplate="{DataTemplate local:Operations}"
+            Route="Operations" />
+        <ShellContent
+            Title="Wykresy"
+            ContentTemplate="{DataTemplate local:Charts}"
+            Route="Charts" />
+    </TabBar>
+</Shell>

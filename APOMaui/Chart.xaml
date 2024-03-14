@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="APOMaui.Chart"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:APOMaui;assembly=APOMaui"
+             xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.Maui;assembly=LiveChartsCore.SkiaSharpView.Maui">
+
+    <Grid>
+        <lvc:CartesianChart
+                Series="{Binding Series}" x:Name="myChart">
+        </lvc:CartesianChart>
+    </Grid>
+</ContentPage>

@@ -1,0 +1,27 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34622.214
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "APOMaui", "APOMaui\APOMaui.csproj", "{BDC9D764-5757-46AE-99F8-543AEA6E8686}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BDC9D764-5757-46AE-99F8-543AEA6E8686}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BDC9D764-5757-46AE-99F8-543AEA6E8686}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BDC9D764-5757-46AE-99F8-543AEA6E8686}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{BDC9D764-5757-46AE-99F8-543AEA6E8686}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BDC9D764-5757-46AE-99F8-543AEA6E8686}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BDC9D764-5757-46AE-99F8-543AEA6E8686}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {31AB3A72-FF6A-4732-B57F-94796D169CA2}
+	EndGlobalSection
+EndGlobal
