@@ -21,6 +21,11 @@ public partial class Charts : ContentPage
 			await DisplayAlert("Alert", "Selected image is RGB, Histogram is only supported for grayscale images", "Ok");
 			return;
 		}
+		if (Main.OpenedImagesWindowsList[index].chart != null)
+		{
+            await DisplayAlert("Alert", "Histogram is already displayed", "Ok");
+            return;
+        }
 		Main.CreateHistogramChart(index);
     }
     protected override void OnAppearing()

@@ -88,6 +88,27 @@ public partial class WinIMG : ContentPage
         }
             
     }
+    public Image<Lab, SByte> LabImage
+    {
+        get
+        {
+            if(labImage != null) return labImage;
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("WINImg.xaml.cs: Tried to get lab image while image type is different");
+                return new Image<Lab, SByte>(0, 0);
+            }
+        }
+        set
+        {
+            BindingContext = null;
+            if(colorImage != null) colorImage.Dispose();
+            labImage = value;
+            this.ImageSource = EmguImgToImageSource(labImage);
+            BindingContext = this;
+            Type = ImgType.Lab;
+        }
+    }
 
     public WinIMG(Image<Bgr, Byte> img, int index, int realWidth, int realHeight)
     {
@@ -144,6 +165,14 @@ public partial class WinIMG : ContentPage
         return ImageSource.FromStream(() => stream);
     }
     public static ImageSource EmguImgToImageSource(Image<Hsv, UInt16> img)
+    {
+        Bitmap bitmap = Emgu.CV.BitmapExtension.ToBitmap(img);
+        MemoryStream stream = new MemoryStream();
+        bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Bmp);
+        stream.Position = 0;
+        return ImageSource.FromStream(() => stream);
+    }
+    public static ImageSource EmguImgToImageSource(Image<Lab, SByte> img)
     {
         Bitmap bitmap = Emgu.CV.BitmapExtension.ToBitmap(img);
         MemoryStream stream = new MemoryStream();

@@ -42,7 +42,7 @@ namespace APOMaui
             }
             else if(DeviceInfo.Platform == DevicePlatform.Android)
             {
-
+                //TODO
             }
         }
 
@@ -85,17 +85,19 @@ namespace APOMaui
             byte[] rawData = img.Bytes;
             int[] GrayScaleHist = new int[256];
             foreach (byte b in rawData) GrayScaleHist[b]++;
-            //for(int i = 0; i < 256; i++)
-            //{
-            //    System.Diagnostics.Debug.WriteLine($"Wartosc: {i}: Ilosc: {GrayScaleHist[i]}");
-            //}
             var page = new Chart(GrayScaleHist, index);
             OpenedImagesWindowsList[index].chart = page;
+            int width = 830, height = 350;
             var newWindow = new Window
             {
                 Page = OpenedImagesWindowsList[index].chart,
-                Width = 700,
-                Height = 350
+                Width = width,
+                Height = height,
+                MinimumWidth = width,
+                MaximumWidth = width,
+                MinimumHeight = height,
+                MaximumHeight = height,
+                
             };
             page.window = newWindow;
 #pragma warning disable 8602
