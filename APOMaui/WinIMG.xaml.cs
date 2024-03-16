@@ -189,7 +189,7 @@ public partial class WinIMG : ContentPage
         base.OnDisappearing();
         System.Diagnostics.Debug.WriteLine("CloseEvent");
         Main.selectedWindow = null;
-        Main.OnCloseEventWINImg(index);
+        Main.OnCloseEventWinIMG(index);
     }
     public void ZoomIn(object sender, EventArgs e)
     {

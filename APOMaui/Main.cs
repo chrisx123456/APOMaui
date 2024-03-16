@@ -11,7 +11,7 @@ namespace APOMaui
         public static readonly int MaxWidth = 800;
         private static readonly int windowHeightFix = 80;
 
-        public static async void OpenPhotoInNewWindowEMGU()
+        public static async void OpenPhotoWinIMG()
         {
             if (DeviceInfo.Platform == DevicePlatform.WinUI)
             {
@@ -23,20 +23,7 @@ namespace APOMaui
                 if (result == null) return;
                 string FileFullPath = result.FullPath.ToString();
                 var img = ImageLoader.LoadImage(FileFullPath); // Important!! Type Image<Bgr, Byte> or Image<Gray, Byte> depends on file type detected in FileLoader              
-                var page = new WinIMG(img, OpenedImagesWindowsList.Count, img.Width, img.Height);
-                var newWindow = new Window
-                {
-                    Page = page,
-                    Width = InitWidth,
-                    Height = ((double)InitWidth/(double)img.Width)* (double)img.Height + windowHeightFix,
-                };
-
-                WindowImageObject windowImageObject = new WindowImageObject(page, newWindow);
-                OpenedImagesWindowsList.Add(windowImageObject);
-                selectedWindow = OpenedImagesWindowsList.Count - 1;
-#pragma warning disable 8602
-                Application.Current.OpenWindow(newWindow);
-#pragma warning restore 8602
+                OpenNewWindowWinIMG(img);
 
 
             }
@@ -45,13 +32,30 @@ namespace APOMaui
                 //TODO
             }
         }
+        public static void OpenNewWindowWinIMG(dynamic img) //Argument is dynamic cuz' dont want to make overload for GrayScale/Color.
+        {
+            var page = new WinIMG(img, OpenedImagesWindowsList.Count, img.Width, img.Height);
+            var newWindow = new Window
+            {
+                Page = page,
+                Width = InitWidth,
+                Height = ((double)InitWidth / (double)img.Width) * (double)img.Height + windowHeightFix,
+            };
+
+            WindowImageObject windowImageObject = new WindowImageObject(page, newWindow);
+            OpenedImagesWindowsList.Add(windowImageObject);
+            selectedWindow = OpenedImagesWindowsList.Count - 1;
+#pragma warning disable 8602
+            Application.Current.OpenWindow(newWindow);
+#pragma warning restore 8602
+        }
 
         public static void ResizeWindow(int index, double newwidth, double realwidth, double realheight)
         {
             OpenedImagesWindowsList[index].window.Width = newwidth;
             OpenedImagesWindowsList[index].window.Height = (((newwidth / realwidth) * realheight) + windowHeightFix);
         }
-        public static void OnCloseEventWINImg(int index)
+        public static void OnCloseEventWinIMG(int index)
         {
 #pragma warning disable 8602
             if (OpenedImagesWindowsList[index].chart != null)
@@ -111,30 +115,29 @@ namespace APOMaui
             OpenedImagesWindowsList[index].winImg.GrayImage = grayImage;
             OpenedImagesWindowsList[index].winImg.isRGB = false;
         }
-        public static void ConvertRgbToHsv(int index)
+        public static void ConvertRgbToHsv(int index) //Pytanie czy to musi byc HsvFull(0-360)(Uint16) czy git dla Hsv(0-180)(Byte)
         {
-            Image<Hsv,UInt16> hsvimg = new Image<Hsv, UInt16>(OpenedImagesWindowsList[index].winImg.ColorImage.Width, OpenedImagesWindowsList[index].winImg.ColorImage.Height);
-            CvInvoke.CvtColor(OpenedImagesWindowsList[index].winImg.ColorImage, hsvimg, ColorConversion.Bgr2HsvFull);
+            Image<Hsv, Byte> hsvimg = new Image<Hsv, Byte>(OpenedImagesWindowsList[index].winImg.ColorImage.Width, OpenedImagesWindowsList[index].winImg.ColorImage.Height);
+            CvInvoke.CvtColor(OpenedImagesWindowsList[index].winImg.ColorImage, hsvimg, ColorConversion.Bgr2Hsv);
+            Image<Gray, Byte>[] channels = hsvimg.Split();
+            OpenNewWindowWinIMG(channels[0]);
+            OpenNewWindowWinIMG(channels[1]);
+            OpenNewWindowWinIMG(channels[2]);
+
 
         }
         public static void ConvertRgbToLab(int index)
         {
             Image<Lab, SByte> labimg = new Image<Lab, SByte>(OpenedImagesWindowsList[index].winImg.ColorImage.Width, OpenedImagesWindowsList[index].winImg.ColorImage.Height);
             CvInvoke.CvtColor(OpenedImagesWindowsList[index].winImg.ColorImage, labimg, ColorConversion.Bgr2Lab);
+
         }
         public static void SplitChannels(int index)
         {
-            Mat img = OpenedImagesWindowsList[index].winImg.ColorImage.Mat; //Troche na odpierdo zrobione, zapytac roszkowiaka czy bedzie trzeba
-            Mat[] channels = img.Split();                                   //robic z tego histogram, bo jak tak to musze to sprowadzic do
-            CvInvoke.Imshow("Kanał B", channels[0]);                        //Img<Gray, Byte> itd, potem otworzyc jak zdj z pliku, przyklad na dole 
-            CvInvoke.Imshow("Kanał G", channels[1]);
-            CvInvoke.Imshow("Kanał R", channels[2]);
-            CvInvoke.WaitKey(0);
-
-            //Image<Gray, Byte> ch1 = channels[0].ToImage<Gray, Byte>();
-            //Image<Gray, Byte> ch2 = channels[1].ToImage<Gray, Byte>();
-            //Image<Gray, Byte> ch3 = channels[2].ToImage<Gray, Byte>();
-
+            Image<Gray, Byte>[] channels = OpenedImagesWindowsList[index].winImg.ColorImage.Split();
+            OpenNewWindowWinIMG(channels[0]);
+            OpenNewWindowWinIMG(channels[1]);
+            OpenNewWindowWinIMG(channels[2]);
         } 
     }
 }

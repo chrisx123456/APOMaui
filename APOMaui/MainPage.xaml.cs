@@ -26,7 +26,7 @@
 
         private void OnOpenButtonClicked(object sender, EventArgs e)
         {
-            Main.OpenPhotoInNewWindowEMGU();
+            Main.OpenPhotoWinIMG();
             //Main.OpenPhotoInNewWindow();
         }
 
