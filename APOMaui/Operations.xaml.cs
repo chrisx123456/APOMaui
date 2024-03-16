@@ -6,7 +6,7 @@ public partial class Operations : ContentPage
 	{
 		InitializeComponent();
 	}
-	public async void  OnButtonGrayScaleClick(object sender, EventArgs e)
+	public async void OnButtonGrayScaleClick(object sender, EventArgs e)
 	{
         if (Main.selectedWindow == null)
         {
@@ -14,9 +14,9 @@ public partial class Operations : ContentPage
             return;
         }
         int index = (int)Main.selectedWindow;
-        if (Main.OpenedImagesWindowsList[index].winImg.isRGB == false)
+        if (Main.OpenedImagesWindowsList[index].winImg.Type != ImgType.RGB)
         {
-            await DisplayAlert("Alert", "Selected image is already Grayscale", "Ok");
+            await DisplayAlert("Alert", "Selected image is not RGB", "Ok");
             return;
         }
         Main.ConvertRgbToGray(index);
@@ -29,9 +29,9 @@ public partial class Operations : ContentPage
             return;
         }
         int index = (int)Main.selectedWindow;
-        if (Main.OpenedImagesWindowsList[index].winImg.isRGB == false)
+        if (Main.OpenedImagesWindowsList[index].winImg.Type != ImgType.RGB)
         {
-            await DisplayAlert("Alert", "Selected image is Grayscale", "Ok");
+            await DisplayAlert("Alert", "Selected image is not RGB", "Ok");
             return;
         }
         Main.SplitChannels(index);
@@ -44,11 +44,42 @@ public partial class Operations : ContentPage
             return;
         }
         int index = (int)Main.selectedWindow;
-        if (Main.OpenedImagesWindowsList[index].winImg.isRGB == false)
+        if (Main.OpenedImagesWindowsList[index].winImg.Type != ImgType.RGB)
         {
-            await DisplayAlert("Alert", "Selected image is already HSV", "Ok"); //Tu musi byc kolejny warunek ze jest juz HSV, albo ze jest szary
+            await DisplayAlert("Alert", "Selected image is not RGB", "Ok"); //Tu musi byc kolejny warunek ze jest juz HSV, albo ze jest szary
             return;
         }
         Main.ConvertRgbToHsv(index);
+    }
+    public async void OnButtonLabClick(object sender, EventArgs e)
+    {
+        if (Main.selectedWindow == null)
+        {
+            await DisplayAlert("Alert", "None image is selected!", "Ok");
+            return;
+        }
+        int index = (int)Main.selectedWindow;
+        if (Main.OpenedImagesWindowsList[index].winImg.Type != ImgType.RGB)
+        {
+            await DisplayAlert("Alert", "Selected image is not RGB", "Ok"); //Tu musi byc kolejny warunek ze jest juz HSV, albo ze jest szary
+            return;
+        }
+        Main.ConvertRgbToLab(index);
+
+    }
+    public async void OnButtonEqualizationClick(object sender, EventArgs e)
+    {
+        if (Main.selectedWindow == null)
+        {
+            await DisplayAlert("Alert", "None image is selected!", "Ok");
+            return;
+        }
+        int index = (int)Main.selectedWindow;
+        if (Main.OpenedImagesWindowsList[index].winImg.Type != ImgType.Gray)
+        {
+            await DisplayAlert("Alert", "Selected image is not GrayScale", "Ok");
+            return;
+        }
+        Main.HistEqualization(index);
     }
 }

@@ -16,7 +16,7 @@ public partial class Charts : ContentPage
 			return;
 		}
 		int index = (int)Main.selectedWindow;
-		if (Main.OpenedImagesWindowsList[index].winImg.isRGB == true || Main.OpenedImagesWindowsList[index].winImg.GrayImage == null)
+		if (Main.OpenedImagesWindowsList[index].winImg.Type == ImgType.RGB || Main.OpenedImagesWindowsList[index].winImg.GrayImage == null)
 		{
 			await DisplayAlert("Alert", "Selected image is RGB, Histogram is only supported for grayscale images", "Ok");
 			return;

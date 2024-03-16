@@ -4,8 +4,10 @@
              x:Class="APOMaui.Operations"
              Title="Operations">
     <VerticalStackLayout>
-        <Button x:Name="ButtonGrayScale" Text="RGB->Grayscale" Clicked="OnButtonGrayScaleClick" StyleClass="MainPageButton"/>
-        <Button x:Name="ButtonHSV" Text="RGB->HSV" Clicked="OnButtonHSVClick" StyleClass="MainPageButton"/>
+        <Button x:Name="ButtonGrayScale" Text="RGB to Grayscale 8bit" Clicked="OnButtonGrayScaleClick" StyleClass="MainPageButton"/>
+        <Button x:Name="ButtonHSV" Text="RGB To HSV Channels" Clicked="OnButtonHSVClick" StyleClass="MainPageButton"/>
+        <Button x:Name="ButtonLab" Text="RGB To Lab Channels" Clicked="OnButtonLabClick" StyleClass="MainPageButton"/>
         <Button x:Name="ButtonSplit" Text="Split RGB" Clicked="OnButtonSplitClick" StyleClass="MainPageButton"/>
+        <Button x:Name="ButtonEqualization" Text="Equalize Histogram" Clicked="OnButtonEqualizationClick" StyleClass="MainPageButton"/>
     </VerticalStackLayout>
 </ContentPage>

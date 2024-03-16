@@ -12,15 +12,14 @@ public partial class WinIMG : ContentPage
 
     private Image<Bgr, Byte>? colorImage;
     private Image<Gray, Byte>? grayImage;
-    private Image<Hsv, UInt16>? hsvImage;
-    private Image<Lab, SByte>? labImage;
+
+
 
     public int index;
     public ImageSource ImageSource { get; set; }
     public double DesiredWidth { get; set; }
     public double ImgScale { get; set; }
 
-    public bool isRGB;
     public ImgType? Type;
 
     public Image<Bgr, Byte> ColorImage
@@ -63,63 +62,29 @@ public partial class WinIMG : ContentPage
             this.ImageSource = EmguImgToImageSource(grayImage);
             BindingContext = this;
             Type = ImgType.Gray;
+            if (Main.OpenedImagesWindowsList[index].chart != null)
+            {
+                byte[] bytes = grayImage.Bytes;
+                int[] hist = new int[256];
+                foreach (byte b in bytes) hist[b]++;
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+                Main.OpenedImagesWindowsList[index].chart.UpdateChart(hist);
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+            }
+            
         }
     }   // Setter&Getter to refresh content after RGB->Grayscale, Dispose other img, Set new ImageSource
-    public Image<Hsv, UInt16> HsvImage
-    {
-        get
-        {
-            if (hsvImage != null) return hsvImage;
-            else
-            {
-                System.Diagnostics.Debug.WriteLine("WINImg.xaml.cs: Tried to get hsv image while image type is different");
-                return new Image<Hsv, UInt16>(0, 0);
-            }
-        }
-        set
-        {
-            BindingContext = null;
-            if(colorImage!= null) colorImage.Dispose();
-            hsvImage = value;
-            this.ImageSource = EmguImgToImageSource(hsvImage);
-            BindingContext = this;
-            Type = ImgType.HSV;
-
-        }
-            
-    }
-    public Image<Lab, SByte> LabImage
-    {
-        get
-        {
-            if(labImage != null) return labImage;
-            else
-            {
-                System.Diagnostics.Debug.WriteLine("WINImg.xaml.cs: Tried to get lab image while image type is different");
-                return new Image<Lab, SByte>(0, 0);
-            }
-        }
-        set
-        {
-            BindingContext = null;
-            if(colorImage != null) colorImage.Dispose();
-            labImage = value;
-            this.ImageSource = EmguImgToImageSource(labImage);
-            BindingContext = this;
-            Type = ImgType.Lab;
-        }
-    }
 
     public WinIMG(Image<Bgr, Byte> img, int index, int realWidth, int realHeight)
     {
         InitializeComponent();
-        this.ColorImage = img;
+        this.Type = ImgType.RGB;
+        this.colorImage = img;
         this.realHeight = realHeight;
         this.realWidth = realWidth;
         this.index = index;
         this.DesiredWidth = Main.InitWidth;
-        this.isRGB = true;
-
+        this.ImageSource = EmguImgToImageSource(colorImage);
         this.ImgScale = CalcScale();
         this.scaleLabel.Text = new string(ImgScale.ToString() + "%");
 
@@ -132,13 +97,13 @@ public partial class WinIMG : ContentPage
     public WinIMG(Image<Gray, Byte> img, int index, int realWidth, int realHeight)
     {
         InitializeComponent();
-        this.GrayImage = img;
+        this.Type = ImgType.Gray;
+        this.grayImage = img;
         this.realHeight = realHeight;
         this.realWidth = realWidth;
         this.index = index;
         this.DesiredWidth = Main.InitWidth;
-        this.isRGB = false;
-
+        this.ImageSource = EmguImgToImageSource(grayImage);
         this.ImgScale = CalcScale();
         this.scaleLabel.Text = new string(ImgScale.ToString() + "%");
 
@@ -151,7 +116,7 @@ public partial class WinIMG : ContentPage
     public static ImageSource EmguImgToImageSource(Image<Bgr, Byte> img)
     {
         Bitmap bitmap = Emgu.CV.BitmapExtension.ToBitmap(img);
-        MemoryStream stream = new MemoryStream();
+        MemoryStream stream = new();
         bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Bmp);
         stream.Position = 0;
         return ImageSource.FromStream(() => stream);
@@ -159,23 +124,7 @@ public partial class WinIMG : ContentPage
     public static ImageSource EmguImgToImageSource(Image<Gray, Byte> img)
     {
         Bitmap bitmap = Emgu.CV.BitmapExtension.ToBitmap(img);
-        MemoryStream stream = new MemoryStream();
-        bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Bmp);
-        stream.Position = 0;
-        return ImageSource.FromStream(() => stream);
-    }
-    public static ImageSource EmguImgToImageSource(Image<Hsv, UInt16> img)
-    {
-        Bitmap bitmap = Emgu.CV.BitmapExtension.ToBitmap(img);
-        MemoryStream stream = new MemoryStream();
-        bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Bmp);
-        stream.Position = 0;
-        return ImageSource.FromStream(() => stream);
-    }
-    public static ImageSource EmguImgToImageSource(Image<Lab, SByte> img)
-    {
-        Bitmap bitmap = Emgu.CV.BitmapExtension.ToBitmap(img);
-        MemoryStream stream = new MemoryStream();
+        MemoryStream stream = new();
         bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Bmp);
         stream.Position = 0;
         return ImageSource.FromStream(() => stream);
@@ -197,7 +146,6 @@ public partial class WinIMG : ContentPage
         this.ImgScale = CalcScale();
         this.scaleLabel.Text = new string(ImgScale.ToString() + "%");
         Main.ResizeWindow(index, DesiredWidth, realWidth, realHeight);
-        System.Diagnostics.Debug.WriteLine(isRGB);
     }
     public void ZoomOut(object sender, EventArgs e)
     {

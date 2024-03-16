@@ -7,21 +7,10 @@ namespace APOMaui;
 
 public partial class Chart : ContentPage
 {
-    public Window window;
+    public Window? window;
     public int indexOfImg;
-    private ISeries[] series;
-    public ISeries[] Series
-    {
-        get { return series; }
-        set 
-        {
-            BindingContext = null;
-            series = value;
-            System.Diagnostics.Debug.WriteLine("Chart Set");
-            BindingContext = this;
+    public ISeries[] Series { get; set; }
 
-        }
-    }
 
     public Chart(int[] values, int indexOfImg)
 	{
@@ -32,7 +21,16 @@ public partial class Chart : ContentPage
         AddElementsToTableChart(values);
         BindingContext = this;
 	}
-    private ISeries[] CreateChart_HistGrayscale(int[] values)
+    public void UpdateChart(int[] values)
+    {
+        BindingContext = null;
+        this.Series = CreateChart_HistGrayscale(values);
+        TableHistogram.Children.Clear();
+        AddElementsToTableChart(values);
+        System.Diagnostics.Debug.WriteLine($"Chart of {Main.OpenedImagesWindowsList[indexOfImg].window.Title} Updated");
+        BindingContext = this;
+    }
+    private static ISeries[] CreateChart_HistGrayscale(int[] values)
     {
         ISeries[] series = new ISeries[] {
             new ColumnSeries<int>
@@ -52,7 +50,7 @@ public partial class Chart : ContentPage
     }
     public void AddElementsToTableChart(int[] tab)
     {
-        int elements = tab.Count();
+        int elements = tab.Length;
         TableHistogram.Children.Add(new HorizontalStackLayout{
             Children = {new Label{Text ="Value", Margin=2, Padding=2, FontSize=12}, new Label{Text ="Qt.", Margin=2, Padding=2, FontSize=12}}
         });     
@@ -82,10 +80,4 @@ public partial class Chart : ContentPage
 
         }
     }
-}
-
-public class Value_Quantity
-{
-    public string Value { get; set; }
-    public string Quantity { get; set; }
 }
