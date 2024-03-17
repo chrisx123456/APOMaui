@@ -10,5 +10,6 @@
         <Button x:Name="ButtonSplit" Text="Split RGB" Clicked="OnButtonSplitClick" StyleClass="MainPageButton"/>
         <Button x:Name="ButtonEqualization" Text="Equalize Histogram" Clicked="OnButtonEqualizationClick" StyleClass="MainPageButton"/>
         <Button x:Name="ButtonStretch" Text="Stretch Histogram" Clicked="OnButtonStretchClick" StyleClass="MainPageButton"/>
+        <Button x:Name="ButtonNegative" Text="Negative" Clicked="OnButtonNegativeClick" StyleClass="MainPageButton"/>
     </VerticalStackLayout>
 </ContentPage>

@@ -178,5 +178,14 @@ namespace APOMaui
             res.Bytes = rawData;
             Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
         }
+        public static void ImageNegative(int index)
+        {
+            Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage;
+            byte[] rawData = img.Bytes;
+            for (int i = 0; i < rawData.Length; i++) rawData[i] = (byte)(255 - rawData[i]);
+            Image<Gray, Byte> res = new(img.Width, img.Height);
+            res.Bytes = rawData;
+            Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
+        }
     }
 }
