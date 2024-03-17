@@ -10,8 +10,6 @@ public partial class Chart : ContentPage
     public Window? window;
     public int indexOfImg;
     public ISeries[] Series { get; set; }
-
-
     public Chart(int[] values, int indexOfImg)
 	{
 		InitializeComponent();
