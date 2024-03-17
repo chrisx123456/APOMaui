@@ -164,5 +164,19 @@ namespace APOMaui
             res.Bytes = rawData;
             Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
         }
+        public static void HistStretch(int index)
+        {
+            Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage;
+            byte[] rawData = img.Bytes;
+            byte max = rawData.Max();
+            byte min = rawData.Min();
+            for (int i = 0; i<rawData.Length; i++)
+            {
+                rawData[i] = (byte)((255 / (float)(max - min)) * (rawData[i] - min));
+            }
+            Image<Gray, Byte> res = new(img.Width, img.Height);
+            res.Bytes = rawData;
+            Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
+        }
     }
 }

@@ -82,4 +82,19 @@ public partial class Operations : ContentPage
         }
         Main.HistEqualization(index);
     }
+    public async void OnButtonStretchClick(object sender, EventArgs e)
+    {
+        if (Main.selectedWindow == null)
+        {
+            await DisplayAlert("Alert", "None image is selected!", "Ok");
+            return;
+        }
+        int index = (int)Main.selectedWindow;
+        if (Main.OpenedImagesWindowsList[index].winImg.Type != ImgType.Gray)
+        {
+            await DisplayAlert("Alert", "Selected image is not GrayScale", "Ok");
+            return;
+        }
+        Main.HistStretch(index);
+    }
 }

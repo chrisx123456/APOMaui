@@ -87,7 +87,6 @@ public partial class WinIMG : ContentPage
         this.ImageSource = EmguImgToImageSource(colorImage);
         this.ImgScale = CalcScale();
         this.scaleLabel.Text = new string(ImgScale.ToString() + "%");
-
         BindingContext = this;
         this.winImgBox.GestureRecognizers.Add(new TapGestureRecognizer
         {
