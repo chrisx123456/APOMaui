@@ -1,6 +1,7 @@
 ﻿using Emgu.CV;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
+using System.Drawing;
 namespace APOMaui
 {
     internal static class Main
@@ -167,6 +168,7 @@ namespace APOMaui
         public static void HistStretch(int index)
         {
             Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage;
+           
             byte[] rawData = img.Bytes;
             byte max = rawData.Max();
             byte min = rawData.Min();
@@ -186,6 +188,32 @@ namespace APOMaui
             Image<Gray, Byte> res = new(img.Width, img.Height);
             res.Bytes = rawData;
             Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
+        }
+        public static void HistStretchInRange(int index, int Lmin, int Lmax)
+        {
+            Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage;
+            byte[] rawData = img.Bytes;
+            byte min = rawData.Min();
+            byte max = rawData.Max();
+            for(int i=0; i < rawData.Length; i++)
+            {
+                if (rawData[i] < min)
+                {
+                    rawData[i] = (byte)Lmin;
+                } 
+                else if (rawData[i] <= max) 
+                {
+                    rawData[i] = (byte)((rawData[i] - min) * Lmax / (max - min));
+                }
+                else //rawdata[i] > max
+                {
+                    rawData[i] = (byte)Lmax;
+                }
+            }
+            Image<Gray, Byte> res = new(img.Width, img.Height);
+            res.Bytes = rawData;
+            Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
+
         }
     }
 }
