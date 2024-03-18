@@ -60,17 +60,19 @@ namespace APOMaui
         }
         public static void OnCloseEventWinIMG(int index)
         {
+            System.Diagnostics.Debug.WriteLine($"CloseEventWinIMG: {index}");
+            selectedWindow = null;
 #pragma warning disable 8602, 8604
             if (OpenedImagesWindowsList[index].chart != null && OpenedImagesWindowsList[index].chart.window != null)
             {
                 Application.Current.CloseWindow(OpenedImagesWindowsList[index].chart.window);
             }
 #pragma warning restore 8602, 8604
-            OpenedImagesWindowsList.RemoveAt(index);
-            for(int i = index; index<OpenedImagesWindowsList.Count; index++)
+            for(int i = index; i < OpenedImagesWindowsList.Count; i++)
             {
                 OpenedImagesWindowsList[i].winImg.index--;
             }
+            OpenedImagesWindowsList.RemoveAt(index);
         }
         public static void OnCloseEventChart(int index)
         {
@@ -189,7 +191,7 @@ namespace APOMaui
             res.Bytes = rawData;
             Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
         }
-        public static void HistStretchInRange(int index, int Lmin, int Lmax)
+        public static void HistStretchInRange(int index, int Lmin, int Lmax) //TODO: Optimize
         {
             Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage;
             byte[] rawData = img.Bytes;

@@ -90,7 +90,7 @@ public partial class WinIMG : ContentPage
         BindingContext = this;
         this.winImgBox.GestureRecognizers.Add(new TapGestureRecognizer
         {
-            Command = new Command(() => Main.ChangeSelectedtWinIMG(index))
+            Command = new Command(() => Main.ChangeSelectedtWinIMG(this.index))
         });
     }
     public WinIMG(Image<Gray, Byte> img, int index, int realWidth, int realHeight)
@@ -135,8 +135,6 @@ public partial class WinIMG : ContentPage
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
-        System.Diagnostics.Debug.WriteLine("CloseEvent");
-        Main.selectedWindow = null;
         Main.OnCloseEventWinIMG(index);
     }
     public void ZoomIn(object sender, EventArgs e)
