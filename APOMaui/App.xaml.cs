@@ -18,7 +18,7 @@ namespace APOMaui
             window.Destroying += Window_Destroying;
 
             const int newWidth = 400;
-            const int newHeight = 600;
+            const int newHeight = 700;
 
             window.Width = newWidth;
             window.Height = newHeight;

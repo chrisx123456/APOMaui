@@ -1,7 +1,8 @@
 ﻿namespace APOMaui
 {
-    internal class WindowImageObject
+    internal class WindowImageObject : IDisposable
     {
+        private bool disposed = false;
         public WinIMG winImg;
         public Window window;
         public Chart? chart;
@@ -10,5 +11,14 @@
             this.winImg = img;
             this.window = window;
         }
+        public void Dispose()
+        {
+            winImg = null;
+            window = null;
+            chart = null;
+            GC.Collect();
+        }
+
+
     }
 }

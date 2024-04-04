@@ -1,7 +1,7 @@
 ﻿using Emgu.CV;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
-using System.Drawing;
+using System.Runtime.InteropServices;
 namespace APOMaui
 {
     internal static class Main
@@ -9,7 +9,7 @@ namespace APOMaui
         public static List<WindowImageObject> OpenedImagesWindowsList = new();
         public static int? selectedWindow = null;
         public static readonly int InitWidth = 400;
-        public static readonly int MaxWidth = 800;
+       // public static readonly int MaxWidth = 800;
         private static readonly int windowHeightFix = 80;
 
         public static async void OpenPhotoWinIMG()
@@ -49,7 +49,7 @@ namespace APOMaui
             OpenedImagesWindowsList.Add(windowImageObject);
             selectedWindow = OpenedImagesWindowsList.Count - 1;
 #pragma warning disable 8602
-            Application.Current.OpenWindow(newWindow);
+            Application.Current.OpenWindow(OpenedImagesWindowsList[(int)selectedWindow].window);
 #pragma warning restore 8602
         }
 
@@ -72,15 +72,13 @@ namespace APOMaui
             {
                 OpenedImagesWindowsList[i].winImg.index--;
             }
-            OpenedImagesWindowsList.RemoveAt(index);
-        }
-        public static void OnCloseEventChart(int index)
-        {
-#pragma warning disable 8602
-            OpenedImagesWindowsList[index].chart.BindingContext = null;
+            OpenedImagesWindowsList[index].winImg = null;
+            OpenedImagesWindowsList[index].window.ClearLogicalChildren();
             OpenedImagesWindowsList[index].chart = null;
-            System.Diagnostics.Debug.WriteLine("Chart Disposed");
-#pragma warning restore 8602
+            Application.Current.CloseWindow(OpenedImagesWindowsList[index].window);
+            OpenedImagesWindowsList[index].Dispose();
+            OpenedImagesWindowsList.RemoveAt(index);
+            GC.Collect();
         }
         public static void ChangeSelectedtWinIMG(int index)
         {
@@ -191,7 +189,7 @@ namespace APOMaui
             res.Bytes = rawData;
             Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
         }
-        public static void HistStretchInRange(int index, int Lmin, int Lmax) //TODO: Optimize
+        public static void HistStretchInRange(int index, int Lmin, int Lmax) //TODO: Optimize//fix
         {
             Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage;
             byte[] rawData = img.Bytes;
@@ -216,6 +214,54 @@ namespace APOMaui
             res.Bytes = rawData;
             Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
 
+        }
+        public static void Posterize(int index, byte levels)
+        {
+            Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage;
+            byte[] rawData = img.Bytes;
+            int step = 255 / levels;
+            byte[] borders = new byte[levels];
+            byte[] levelsOfBrigtness = new byte[levels];
+            byte[] LUT = new byte[256];
+
+            for (int i = 1; i < levels; i++)
+            {
+                borders[i - 1] = (byte)(step * i);
+            }
+            borders[levels-1] = 255;
+            for(int i = 0; i < levels; i++)
+            {
+                if (i == 0)
+                {
+                    levelsOfBrigtness[i] = 0;
+                }
+                if (i == levels - 1)
+                {
+                    levelsOfBrigtness[i] = 255;
+                }
+                else
+                {
+                    levelsOfBrigtness[i] = (byte)((255 / (levels - 1)) * i);
+                }
+            }
+
+            int currpos = 0;
+            for (int i = 0; i < levels; i++)
+            {
+                for (int j = currpos; j <= borders[i]; j++, currpos++)
+                {
+                    LUT[j] = levelsOfBrigtness[i];
+                }
+            }
+            
+            for(int i = 0; i < rawData.Length; i++)
+            {
+                rawData[i] = LUT[rawData[i]];
+            }
+
+            Image<Gray, Byte> res = new(img.Width, img.Height);
+            res.Bytes = rawData;
+            Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
         }
     }
 }

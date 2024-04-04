@@ -12,5 +12,6 @@
         <Button x:Name="ButtonStretch" Text="Stretch Histogram" Clicked="OnButtonStretchClick" StyleClass="MainPageButton"/>
         <Button x:Name="ButtonNegative" Text="Negative" Clicked="OnButtonNegativeClick" StyleClass="MainPageButton"/>
         <Button x:Name="ButtonQ3Q4" Text="Stetch Q3-Q4" Clicked="OnButtonQ3Q4Click" StyleClass="MainPageButton"/>
+        <Button x:Name="ButtonPosterize" Text="Posterize" Clicked="OnButtonPosterizeClick" StyleClass="MainPageButton"/>
     </VerticalStackLayout>
 </ContentPage>

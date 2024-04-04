@@ -142,4 +142,30 @@ public partial class Operations : ContentPage
             Main.HistStretchInRange(index, min, max);
         }
     }
+    public async void OnButtonPosterizeClick(object sender, EventArgs e)
+    {
+        if (Main.selectedWindow == null)
+        {
+            await DisplayAlert("Alert", "None image is selected!", "Ok");
+            return;
+        }
+        int index = (int)Main.selectedWindow;
+        if (Main.OpenedImagesWindowsList[index].winImg.Type != ImgType.Gray)
+        {
+            await DisplayAlert("Alert", "Selected image is not GrayScale", "Ok");
+            return;
+        }
+        byte levels;
+        if (!byte.TryParse(await DisplayPromptAsync("Grayscale levels", "Type number of gray levels"), out levels))
+        {
+            await DisplayAlert("Alert", "Value not Valid", "Ok");
+            return;
+        }
+        if(levels < 2)
+        {
+            await DisplayAlert("Alert", "Value not Valid", "Ok");
+            return;
+        }
+        Main.Posterize(index, levels);
+    }
 }

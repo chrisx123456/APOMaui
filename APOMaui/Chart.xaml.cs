@@ -44,7 +44,20 @@ public partial class Chart : ContentPage
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
-        Main.OnCloseEventChart(indexOfImg);
+        this.Series = null;
+        this.BindingContext = null;
+        myChart.BindingContext = null;
+        myChart.Legend = null;
+        myChart.ClearLogicalChildren();
+        myChart.Series = null;
+        TableHistogram.Children.Clear();
+        Main.OpenedImagesWindowsList[indexOfImg].chart = null;
+        System.Diagnostics.Debug.WriteLine($"Chart of {indexOfImg} Disposed");
+        window.ClearLogicalChildren();
+        Application.Current.CloseWindow(window);
+        this.window = null;
+        GC.Collect();
+        GC.ReRegisterForFinalize(this);
     }
     public void AddElementsToTableChart(int[] tab)
     {
