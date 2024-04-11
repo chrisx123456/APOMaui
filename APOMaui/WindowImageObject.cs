@@ -2,7 +2,6 @@
 {
     internal class WindowImageObject : IDisposable
     {
-        private bool disposed = false;
         public WinIMG winImg;
         public Window window;
         public Chart? chart;

@@ -20,5 +20,9 @@
             Title="Wykresy"
             ContentTemplate="{DataTemplate local:Charts}"
             Route="Charts" />
+        <ShellContent
+            Title="Kernele"
+            ContentTemplate="{DataTemplate local:Kernels}"
+            Route="Kernels" />
     </TabBar>
 </Shell>

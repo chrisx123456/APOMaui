@@ -435,10 +435,22 @@
         <Setter Property="Shadow">
             <Shadow Radius="4" Offset="5,5" Opacity="0.6"/>
         </Setter>
-
     </Style>
-    
-    
+    <Style TargetType="Entry" Class="EntryKernel">
+        <Setter Property="Margin"
+                Value="4"/>
+        <Setter Property="FontSize"
+                Value="12"/>
+        <Setter Property="HeightRequest"
+                Value="35"/>
+        <Setter Property="MinimumHeightRequest"
+                Value="35"/>
+        <Setter Property="WidthRequest"
+                Value="35"/>
+        <Setter Property="MinimumWidthRequest"
+                Value="35"/>
+    </Style>
+
 
 
 </ResourceDictionary>

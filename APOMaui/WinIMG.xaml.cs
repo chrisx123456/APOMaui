@@ -56,25 +56,35 @@ public partial class WinIMG : ContentPage
         }
         set
         {
-            BindingContext = null;
-            if (colorImage != null) colorImage.Dispose();
-            grayImage = value;
-            this.ImageSource = EmguImgToImageSource(grayImage);
-            BindingContext = this;
-            Type = ImgType.Gray;
+            OnSet(value);
+            System.Diagnostics.Debug.WriteLine("sett Done");
+        }
+    }   // Setter&Getter to refresh content after RGB->Grayscale, Dispose other img, Set new ImageSource
+    public void OnSet(Image<Gray, Byte> value)
+    {
+        BindingContext = null;
+        if (colorImage != null) colorImage.Dispose();
+        if (grayImage != null) grayImage.Dispose();
+        grayImage = value;
+        this.ImageSource = EmguImgToImageSource(grayImage);
+        BindingContext = this;
+        Type = ImgType.Gray;
+        _ = Task.Run(() =>
+        {
             if (Main.OpenedImagesWindowsList[index].chart != null)
             {
+
                 byte[] bytes = grayImage.Bytes;
-                int[] hist = new int[256];
-                foreach (byte b in bytes) hist[b]++;
+                int[] hist = Main.CalcHistValues(bytes);
+
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
                 Main.OpenedImagesWindowsList[index].chart.UpdateChart(hist);
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
+                System.Diagnostics.Debug.WriteLine("Task chart updating done");
             }
-            
-        }
-    }   // Setter&Getter to refresh content after RGB->Grayscale, Dispose other img, Set new ImageSource
-
+        });
+        
+    }
     public WinIMG(Image<Bgr, Byte> img, int index, int realWidth, int realHeight)
     {
         InitializeComponent();

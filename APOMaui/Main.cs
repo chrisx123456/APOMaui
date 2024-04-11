@@ -1,6 +1,8 @@
 ﻿using Emgu.CV;
+using Emgu.CV.Cuda;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
+using System.Linq;
 using System.Runtime.InteropServices;
 namespace APOMaui
 {
@@ -85,12 +87,38 @@ namespace APOMaui
             selectedWindow = index;
             System.Diagnostics.Debug.WriteLine($"Selected {index}");
         }
+        public static int[] CalcHistValues(byte[] rawData)
+        {
+            int threads = Environment.ProcessorCount;
+            int[] final = new int[256];
+            int subsetSize = rawData.Length / threads;
+            Task<int[]>[]? tasks = new Task<int[]>[threads];
+            for(int i = 0; i< threads; i++)
+            {
+                int startIndex = i * subsetSize;
+                int endIndex = (i+1)*subsetSize;
+                if (i == threads - 1) endIndex = rawData.Length; //If rawData is not divisible by threads no. 
+                tasks[i] = new Task<int[]>(() =>
+                {
+                    int[] subHist = new int[256];
+                    for(int j = startIndex; j < endIndex; j++) { subHist[rawData[j]]++; };
+                    return subHist;
+                });
+            }
+            foreach (Task<int[]> task in tasks) task.Start();
+            Task.WaitAll(tasks);
+            foreach (Task < int[]> task in tasks)
+            {
+                final = final.Zip(task.Result, (a, b) => a + b).ToArray();
+            }
+            tasks = null;
+            return final;
+        }
         public static void CreateHistogramChart(int index)
         {
             Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage; //Cant be null, checked in Charts.xaml.cs
             byte[] rawData = img.Bytes;
-            int[] GrayScaleHist = new int[256];
-            foreach (byte b in rawData) GrayScaleHist[b]++;
+            int[] GrayScaleHist = CalcHistValues(rawData);
             var page = new Chart(GrayScaleHist, index);
             OpenedImagesWindowsList[index].chart = page;
             int width = 830, height = 350;
@@ -188,6 +216,7 @@ namespace APOMaui
             Image<Gray, Byte> res = new(img.Width, img.Height);
             res.Bytes = rawData;
             Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
+
         }
         public static void HistStretchInRange(int index, int Lmin, int Lmax) //TODO: Optimize//fix
         {

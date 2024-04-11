@@ -2,33 +2,57 @@ using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore;
 using LiveChartsCore.SkiaSharpView.Painting;
 using SkiaSharp;
-using System.Collections.ObjectModel;
+
 namespace APOMaui;
 
-public partial class Chart : ContentPage
+public partial class Chart : ContentPage, IDisposable
 {
     public Window? window;
     public int indexOfImg;
-    public ISeries[] Series { get; set; }
+    public ISeries[]? Series { get; set; }
     public Chart(int[] values, int indexOfImg)
 	{
 		InitializeComponent();
         myChart.AutoUpdateEnabled = true;
-        this.Series = CreateChart_HistGrayscale(values);
+        this.Series = CreateISeries(values);
         this.indexOfImg = indexOfImg;
         AddElementsToTableChart(values);
         BindingContext = this;
 	}
-    public void UpdateChart(int[] values)
+    public void Dispose()
     {
+        this.myChart.Legend = null;
+        foreach (var series in myChart.Series) series.Values = null;
+        this.Series = null;
+        this.TableHistogram.ClearLogicalChildren();
+        this.TableHistogram.Children.Clear();
+        this.TableHistogram.Clear();
+        GC.Collect(2, GCCollectionMode.Forced);
+    }
+    public async void UpdateChart(int[] values)
+    {
+        //Img sets first but photo tends to lag sometimes
         BindingContext = null;
-        this.Series = CreateChart_HistGrayscale(values);
-        TableHistogram.Children.Clear();
-        AddElementsToTableChart(values);
+        await this.Dispatcher.DispatchAsync(() =>  //Invokes UI thread
+        {  
+            this.Dispose();
+            AddElementsToTableChart(values);
+        });
+        this.Series = CreateISeries(values);
         System.Diagnostics.Debug.WriteLine($"Chart of {Main.OpenedImagesWindowsList[indexOfImg].window.Title} Updated");
         BindingContext = this;
+
+        //this.Dispatcher.Dispatch(() => {  //Img sets while hist is done
+        //    BindingContext = null;
+        //    this.Dispose();
+        //    this.Series = CreateISeries(values);
+        //    AddElementsToTableChart(values);
+        //    System.Diagnostics.Debug.WriteLine($"Chart of {Main.OpenedImagesWindowsList[indexOfImg].window.Title} Updated");
+        //    BindingContext = this;
+        //});
+
     }
-    private static ISeries[] CreateChart_HistGrayscale(int[] values)
+    private static ISeries[] CreateISeries(int[] values)
     {
         ISeries[] series = new ISeries[] {
             new ColumnSeries<int>
