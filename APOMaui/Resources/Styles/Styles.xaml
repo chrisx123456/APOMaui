@@ -436,7 +436,7 @@
             <Shadow Radius="4" Offset="5,5" Opacity="0.6"/>
         </Setter>
     </Style>
-    <Style TargetType="Entry" Class="EntryKernel">
+    <Style TargetType="Entry" Class="EntryKernel" x:Key="EntryKernel">
         <Setter Property="Margin"
                 Value="4"/>
         <Setter Property="FontSize"

@@ -4,28 +4,23 @@
              x:Class="APOMaui.Kernels"
              Title="Kernels">
     <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Start">
-        
+        <HorizontalStackLayout HorizontalOptions="Center" VerticalOptions="Start">
+            <Label Text="Custom Kernel: " VerticalOptions="Center"/>
+            <CheckBox IsChecked="False" x:Name="IsCustomKernel" VerticalOptions="Center" CheckedChanged="IsCustomKernelCheckedChanged"/>
+        </HorizontalStackLayout>
         <VerticalStackLayout VerticalOptions="Start" HorizontalOptions="Center" Margin="0,0,0,50">
-            <Label Text="Edge Options" FontSize="12" HorizontalOptions="Center" VerticalOptions="Center"/>
+            <Label x:Name ="EdgePickerLabel" Text="Edge Options" FontSize="12" HorizontalOptions="Center" VerticalOptions="Center"/>
             <Picker x:Name="EdgePicker" MinimumHeightRequest="30" HeightRequest="30" FontSize="13" SelectedIndexChanged="OnEdgePickerSelectedIndexChanged"/>
-            <Label Text="Pick Filter" FontSize="12" HorizontalOptions="Center" VerticalOptions="Center"/>
+            <Label x:Name ="FilterPickerLabel" Text="Pick Filter" FontSize="12" HorizontalOptions="Center" VerticalOptions="Center"/>
             <Picker x:Name="FilterPicker" MinimumHeightRequest="30" HeightRequest="30" FontSize="13" SelectedIndexChanged="OnFilterPickerSelectedIndexChanged"/>
+            <Label x:Name ="SizePickerLabel" Text="Pick Size" FontSize="12" HorizontalOptions="Center" VerticalOptions="Center" IsEnabled="False" IsVisible="False"/>
+            <Picker x:Name="SizePicker" MinimumHeightRequest="30" HeightRequest="30" FontSize="13" SelectedIndexChanged="OnSizePickerSelectedIndexChanged" IsEnabled="False" IsVisible="False"/>
             
 
         </VerticalStackLayout>
         
         <HorizontalStackLayout HorizontalOptions="Center" >
-            <Grid HorizontalOptions="Center" VerticalOptions="Center" ColumnDefinitions="*,*,*" RowDefinitions="*,*,*" Padding="4">
-                <Entry Grid.Column="0" Grid.Row="0" StyleClass="EntryKernel"/>
-                <Entry Grid.Column="1" Grid.Row="0" StyleClass="EntryKernel"/>
-                <Entry Grid.Column="2" Grid.Row="0" StyleClass="EntryKernel"/>
-                <Entry Grid.Column="0" Grid.Row="1" StyleClass="EntryKernel"/>
-                <Entry Grid.Column="1" Grid.Row="1" StyleClass="EntryKernel"/>
-                <Entry Grid.Column="2" Grid.Row="1" StyleClass="EntryKernel"/>
-                <Entry Grid.Column="0" Grid.Row="2" StyleClass="EntryKernel"/>
-                <Entry Grid.Column="1" Grid.Row="2" StyleClass="EntryKernel"/>
-                <Entry Grid.Column="2" Grid.Row="2" StyleClass="EntryKernel"/>
-            </Grid>
+            <Grid x:Name="MatrixGrid" HorizontalOptions="Center" VerticalOptions="Center" Padding="4"/>
         </HorizontalStackLayout>
         
         <Button x:Name="ButtonKernel" Text="Wykonaj" Clicked="OnKernelButtonClicked" StyleClass="MainPageButton"/>
