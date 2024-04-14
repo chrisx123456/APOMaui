@@ -2,14 +2,34 @@
 namespace APOMaui;
 
 public partial class Kernels : ContentPage
-{
-    
-    private static List<Entry> _entries = new List<Entry>();
+{ 
     private static readonly List<String> _edgesOptions = new List<String> { "Isolated", "Reflect", "Replicate" };
+    private static readonly List<String> _kernelSizes = new() { "3", "4", "5" };
     private static readonly List<String> _filtersOptions = new List<String> {"Blur", "GaussianBlur", "SobelX","SobelY", "LaplacianEdge", "Canny","LaplacianSharpen1",
         "LaplacianSharpen2", "LaplacianSharpen3", "PrewittE", "PrewittSE", "PrewittS", "PrewittSW", "PrewittW", "PrewittNW", "PrewittN", "PrewittNE"};
-    private static readonly Dictionary<String, float[,]> _filtersDictionary = new() // No Blur/GausianBlur/Canny
-	{
+    private static readonly Dictionary<String, float[,]> _filtersDictionary = new() 
+	{ 
+        {"Canny",
+            new float[,]
+            {
+                {2},
+                {2},
+                {2}
+            }},
+        {"GaussianBlur",
+            new float[,]
+            {
+                {1},
+                {1},
+                {1}
+            }},
+        {"Blur",
+            new float[,]
+            {
+                {0},
+                {0},
+                {0}
+            }},
         {"SobelX",
             new float[,]
             {
@@ -114,16 +134,19 @@ public partial class Kernels : ContentPage
                 {0f,-1f,-1f}
             }},
 
-    };
+    };//Blur:0, GBlur:1, Canny:2<->In-Built functions so untypical matrix to identify later on
     private static readonly Dictionary<String, Emgu.CV.CvEnum.BorderType> _edgesDictionary = new()
     {
         {"Isolated", Emgu.CV.CvEnum.BorderType.Isolated },
         {"Reflect", Emgu.CV.CvEnum.BorderType.Reflect },
         {"Replicate", Emgu.CV.CvEnum.BorderType.Replicate },
     };
-    private static readonly List<String> _kernelSizes = new() { "3", "4", "5" };
+
+    private static List<Entry> _entries = new List<Entry>();
     private static Emgu.CV.CvEnum.BorderType? _selectedEdge = null;
     private static float[,]? _selectedFilter = null;
+    private static int _matrixSize;
+
     public Kernels()
 	{
 		InitializeComponent();
@@ -136,7 +159,9 @@ public partial class Kernels : ContentPage
         SizePicker.ItemsSource = _kernelSizes;
         _selectedEdge = null;
         _selectedFilter = null;
-        CreateMatrix(3);
+        _matrixSize = 3;
+        //SizePicker.SelectedIndex = 0;
+        CreateMatrix(_matrixSize, false);
 
     }
     private void OnFilterPickerSelectedIndexChanged(object sender, EventArgs e)
@@ -159,15 +184,14 @@ public partial class Kernels : ContentPage
     {
         if (IsCustomKernel.IsChecked == true)
         {
-            EdgePicker.IsEnabled = false;
-            EdgePicker.IsVisible = false;
-            EdgePickerLabel.IsEnabled = false;
-            EdgePickerLabel.IsVisible = false;
+            ClearEntriesValues_ResetCheckedValues();
+            foreach(Entry entry in _entries) entry.IsEnabled = true;
+          
             FilterPicker.IsEnabled = false;
             FilterPicker.IsVisible = false;
             FilterPickerLabel.IsVisible = false;
             FilterPickerLabel.IsEnabled = false;
-
+   
             SizePicker.IsEnabled = true;
             SizePicker.IsVisible = true;
             SizePickerLabel.IsEnabled = true;
@@ -175,10 +199,10 @@ public partial class Kernels : ContentPage
         }
         else
         {
-            EdgePicker.IsEnabled = true;
-            EdgePicker.IsVisible = true;
-            EdgePickerLabel.IsEnabled = true;
-            EdgePickerLabel.IsVisible = true;
+            ClearEntriesValues_ResetCheckedValues();
+            _matrixSize = 3; //def val
+            CreateMatrix(_matrixSize, false);
+
             FilterPicker.IsEnabled = true;
             FilterPicker.IsVisible = true;
             FilterPickerLabel.IsVisible = true;
@@ -188,29 +212,39 @@ public partial class Kernels : ContentPage
             SizePicker.IsVisible = false;
             SizePickerLabel.IsEnabled = false;
             SizePickerLabel.IsVisible = false;
+
         }
+    }
+    private void ClearEntriesValues_ResetCheckedValues()
+    {
+        foreach(Entry e in _entries) e.Text = null;
+        //Disabling events in order to change selected index without calling method
+        FilterPicker.SelectedIndexChanged -= OnFilterPickerSelectedIndexChanged;
+        SizePicker.SelectedIndexChanged -= OnSizePickerSelectedIndexChanged;
+        EdgePicker.SelectedIndexChanged -= OnEdgePickerSelectedIndexChanged;
+
+        FilterPicker.SelectedIndex = -1;
+        EdgePicker.SelectedIndex = -1;
+        SizePicker.SelectedIndex = -1;
+        //Re-enabling events
+        FilterPicker.SelectedIndexChanged += OnFilterPickerSelectedIndexChanged;
+        SizePicker.SelectedIndexChanged += OnSizePickerSelectedIndexChanged;
+        EdgePicker.SelectedIndexChanged += OnEdgePickerSelectedIndexChanged;
     }
     private void OnSizePickerSelectedIndexChanged(object sender, EventArgs e)
     {
-        
+        if(IsCustomKernel.IsChecked == true && int.TryParse(SizePicker.SelectedItem.ToString(), out int size)){
+            _matrixSize = size;
+        }
+        CreateMatrix(_matrixSize, true);
     }
-    private void CreateMatrix(int size)
+    private void CreateMatrix(int size, bool editable)
     {
-        // Usunac stary matrix jesli zmieniamy na np 4x4
-        Style s = new Style(typeof(Entry))
-        {
-            Setters =
-            {
-                new Setter{Property = Entry.MinimumHeightRequestProperty, Value = 35},
-                new Setter{Property = Entry.MinimumWidthRequestProperty, Value = 35 },
-                new Setter{Property = Entry.MaximumHeightRequestProperty, Value = 35},
-                new Setter{Property = Entry.MaximumWidthRequestProperty, Value = 35},
-                new Setter{Property = Entry.MarginProperty, Value = 4},
-                new Setter{Property = Entry.FontSizeProperty, Value=12},
-                new Setter{Property = Entry.BackgroundColorProperty, Value = Color.FromArgb("D3D3D3")},
-
-            }
-        };
+        MatrixGrid.RowDefinitions.Clear();
+        MatrixGrid.ColumnDefinitions.Clear();
+        MatrixGrid.ClearLogicalChildren();
+        MatrixGrid.Clear();
+        _entries.Clear();
 
         for (int i = 0; i < size; i++)
         {
@@ -222,6 +256,7 @@ public partial class Kernels : ContentPage
             for(int col = 0; col < size; col++)
             {
                 Entry e = new Entry();
+                e.IsEnabled = editable;
                 e.SetDynamicResource(Entry.StyleProperty, "EntryKernel");
                 MatrixGrid.Add(e, col, row);
                 _entries.Add(e);
@@ -233,7 +268,7 @@ public partial class Kernels : ContentPage
     {
         int rows = MatrixGrid.RowDefinitions.Count;
         int cols = MatrixGrid.ColumnDefinitions.Count;
-        if (rows == cols)
+        if (rows == cols && kernel.GetLength(0) == kernel.GetLength(1) && kernel.GetLength(0) == _matrixSize)
         {
             int size = cols;
             int krow = 0;
@@ -250,13 +285,38 @@ public partial class Kernels : ContentPage
             }
         }
     }
-    public static void OnKernelButtonClicked(object sender, EventArgs e)
+    public async void OnKernelButtonClicked(object sender, EventArgs e)
 	{
-
-	}
-
-    private void isCustomKernel_CheckedChanged(object sender, CheckedChangedEventArgs e)
-    {
+        if (Main.selectedWindow == null)
+        {
+            await DisplayAlert("Alert", "None image is selected!", "Ok");
+            return;
+        }
+        int index = (int)Main.selectedWindow;
+        if (Main.OpenedImagesWindowsList[index].winImg.Type != ImgType.Gray)
+        {
+            await DisplayAlert("Alert", "Selected image is not GrayScale", "Ok");
+            return;
+        }
+        if (_selectedEdge == null)
+        {
+            await DisplayAlert("Alert", "Border type not selected", "Ok");
+            return;
+        }
+        if (IsCustomKernel.IsChecked == false)
+        {
+            if (_selectedFilter == null)
+            {
+                await DisplayAlert("Alert", "Kernel/Filter not selected", "Ok");
+                return;
+            }
+            Main.ApplyKernel(index, _selectedFilter, (Emgu.CV.CvEnum.BorderType)_selectedEdge);
+        }
+        else
+        {
+            //Todo
+        }
 
     }
+
 }

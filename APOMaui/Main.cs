@@ -192,6 +192,7 @@ namespace APOMaui
             Image<Gray, Byte> res = new(img.Width, img.Height);
             res.Bytes = rawData;
             Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
+            img.Dispose();
         }
         public static void HistStretch(int index)
         {
@@ -207,6 +208,7 @@ namespace APOMaui
             Image<Gray, Byte> res = new(img.Width, img.Height);
             res.Bytes = rawData;
             Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
+            img.Dispose();
         }
         public static void ImageNegative(int index)
         {
@@ -216,6 +218,7 @@ namespace APOMaui
             Image<Gray, Byte> res = new(img.Width, img.Height);
             res.Bytes = rawData;
             Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
+            img.Dispose();
 
         }
         public static void HistStretchInRange(int index, int Lmin, int Lmax) //TODO: Optimize//fix
@@ -242,6 +245,7 @@ namespace APOMaui
             Image<Gray, Byte> res = new(img.Width, img.Height);
             res.Bytes = rawData;
             Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
+            img.Dispose();
 
         }
         public static void Posterize(int index, byte levels)
@@ -291,6 +295,25 @@ namespace APOMaui
             Image<Gray, Byte> res = new(img.Width, img.Height);
             res.Bytes = rawData;
             Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
+            img.Dispose();
+        }
+        public static void ApplyKernel(int index, float[,] kernel, Emgu.CV.CvEnum.BorderType border)
+        {
+            Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage;
+            Image<Gray, Byte> res = new(img.Width, img.Height);
+            Matrix<float> inputArray = new(kernel);
+            if (kernel.GetLength(1) == 1)
+            {
+                if (kernel[0, 0] == 0) CvInvoke.Blur(img, res, new System.Drawing.Size(5, 5), new System.Drawing.Point(-1, -1), border);
+                else if (kernel[0, 0] == 1) CvInvoke.GaussianBlur(img, res, new System.Drawing.Size(5, 5), 0, 0, border);
+                else {/* Todo Canny */ }
+            }
+            else
+            {
+                CvInvoke.Filter2D(img, res, inputArray, new System.Drawing.Point(-1, -1), 0, border);
+            }
+            Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
+            img.Dispose();
         }
     }
 }
