@@ -57,7 +57,7 @@ public partial class WinIMG : ContentPage
         set
         {
             OnSet(value);
-            System.Diagnostics.Debug.WriteLine("sett Done");
+            System.Diagnostics.Debug.WriteLine("Setter Done");
         }
     }   // Setter&Getter to refresh content after RGB->Grayscale, Dispose other img, Set new ImageSource
     public void OnSet(Image<Gray, Byte> value)
@@ -119,7 +119,7 @@ public partial class WinIMG : ContentPage
         BindingContext = this;
         this.winImgBox.GestureRecognizers.Add(new TapGestureRecognizer
         {
-            Command = new Command(() => Main.ChangeSelectedtWinIMG(index))
+            Command = new Command(() => Main.ChangeSelectedtWinIMG(this.index))
         });
     }
     public static ImageSource EmguImgToImageSource(Image<Bgr, Byte> img)
