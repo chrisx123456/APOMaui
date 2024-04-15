@@ -1,34 +1,44 @@
 
+using Emgu.CV.CvEnum;
+using Emgu.CV.Ocl;
+
 namespace APOMaui;
 
 public partial class Kernels : ContentPage
 { 
-    private static readonly List<String> _edgesOptions = new List<String> { "Isolated", "Reflect", "Replicate" };
-    private static readonly List<String> _kernelSizes = new() { "3", "4", "5" };
-    private static readonly List<String> _filtersOptions = new List<String> {"Blur", "GaussianBlur", "SobelX","SobelY", "LaplacianEdge", "Canny","LaplacianSharpen1",
+    private static readonly List<String> _borderOptions = new List<String> { "Isolated", "Reflect", "Replicate" };
+    private static readonly List<String> _kernelSizes = new() { "3", "5", "7" };
+    private static readonly List<String> _filtersOptions = new List<String> {"Median", "Blur", "GaussianBlur", "SobelX","SobelY", "LaplacianEdge", "Canny","LaplacianSharpen1",
         "LaplacianSharpen2", "LaplacianSharpen3", "PrewittE", "PrewittSE", "PrewittS", "PrewittSW", "PrewittW", "PrewittNW", "PrewittN", "PrewittNE"};
     private static readonly Dictionary<String, float[,]> _filtersDictionary = new() 
-	{ 
+	{
+        {"Median",
+            new float[,]
+            {
+                {},
+                {},
+                {}
+            }},
         {"Canny",
             new float[,]
             {
-                {2},
-                {2},
-                {2}
+                {},
+                {},
+                {}
             }},
         {"GaussianBlur",
             new float[,]
             {
-                {1},
-                {1},
-                {1}
+                {},
+                {},
+                {}
             }},
         {"Blur",
             new float[,]
             {
-                {0},
-                {0},
-                {0}
+                {},
+                {},
+                {}
             }},
         {"SobelX",
             new float[,]
@@ -135,7 +145,7 @@ public partial class Kernels : ContentPage
             }},
 
     };//Blur:0, GBlur:1, Canny:2<->In-Built functions so untypical matrix to identify later on
-    private static readonly Dictionary<String, Emgu.CV.CvEnum.BorderType> _edgesDictionary = new()
+    private static readonly Dictionary<String, Emgu.CV.CvEnum.BorderType> _bordersDictionary = new()
     {
         {"Isolated", Emgu.CV.CvEnum.BorderType.Isolated },
         {"Reflect", Emgu.CV.CvEnum.BorderType.Reflect },
@@ -143,7 +153,7 @@ public partial class Kernels : ContentPage
     };
 
     private static List<Entry> _entries = new List<Entry>();
-    private static Emgu.CV.CvEnum.BorderType? _selectedEdge = null;
+    private static Emgu.CV.CvEnum.BorderType? _selectedBorder = null;
     private static float[,]? _selectedFilter = null;
     private static int _matrixSize;
 
@@ -154,10 +164,10 @@ public partial class Kernels : ContentPage
         SizePicker.IsVisible = false;
         SizePickerLabel.IsEnabled = false;
         SizePickerLabel.IsVisible = false;
-		EdgePicker.ItemsSource = _edgesOptions;
+		EdgePicker.ItemsSource = _borderOptions;
 		FilterPicker.ItemsSource = _filtersOptions;
         SizePicker.ItemsSource = _kernelSizes;
-        _selectedEdge = null;
+        _selectedBorder = null;
         _selectedFilter = null;
         _matrixSize = 3;
         //SizePicker.SelectedIndex = 0;
@@ -175,8 +185,8 @@ public partial class Kernels : ContentPage
     {
         if (EdgePicker.SelectedItem != null && EdgePicker.SelectedIndex != -1)
         {
-            _selectedEdge = _edgesDictionary[EdgePicker.SelectedItem.ToString()];
-            System.Diagnostics.Debug.WriteLine(_selectedEdge);
+            _selectedBorder = _bordersDictionary[EdgePicker.SelectedItem.ToString()];
+            System.Diagnostics.Debug.WriteLine(_selectedBorder);
         }
 
     }
@@ -268,7 +278,7 @@ public partial class Kernels : ContentPage
     {
         int rows = MatrixGrid.RowDefinitions.Count;
         int cols = MatrixGrid.ColumnDefinitions.Count;
-        if (rows == cols && kernel.GetLength(0) == kernel.GetLength(1) && kernel.GetLength(0) == _matrixSize)
+        if (rows == cols && kernel.GetLength(0) == kernel.GetLength(1) && kernel.GetLength(0) == _matrixSize && rows == _matrixSize)
         {
             int size = cols;
             int krow = 0;
@@ -283,7 +293,37 @@ public partial class Kernels : ContentPage
                 _entries[i].Text = kernel[krow, kcol].ToString();
                 kcol++;
             }
+        } else
+        {
+            foreach (Entry e in _entries) e.Text = null;
         }
+    }
+    private float[,] ReadKernel()
+    {
+        float[,] kernel = new float[_matrixSize, _matrixSize];
+        int rows = MatrixGrid.RowDefinitions.Count;
+        int cols = MatrixGrid.ColumnDefinitions.Count;
+
+        if (rows == cols && rows == _matrixSize && (_matrixSize*_matrixSize) == _entries.Count)
+        {
+            int size = cols;
+            int krow = 0;
+            int kcol = 0;
+            for (int i = 0; i < _entries.Count; i++)
+            {
+                if (kcol == size)
+                {
+                    krow++;
+                    kcol = 0;
+                }
+                //_entries[i].Text = kernel[krow, kcol].ToString();
+                if (!float.TryParse(_entries[i].Text, out kernel[krow, kcol])) return null;
+                kcol++;
+            }
+        }
+        else return null;
+
+        return kernel;
     }
     public async void OnKernelButtonClicked(object sender, EventArgs e)
 	{
@@ -298,25 +338,71 @@ public partial class Kernels : ContentPage
             await DisplayAlert("Alert", "Selected image is not GrayScale", "Ok");
             return;
         }
-        if (_selectedEdge == null)
+        if (_selectedBorder == null)
         {
             await DisplayAlert("Alert", "Border type not selected", "Ok");
             return;
         }
-        if (IsCustomKernel.IsChecked == false)
+        switch (IsCustomKernel.IsChecked)
         {
-            if (_selectedFilter == null)
-            {
-                await DisplayAlert("Alert", "Kernel/Filter not selected", "Ok");
-                return;
-            }
-            Main.ApplyKernel(index, _selectedFilter, (Emgu.CV.CvEnum.BorderType)_selectedEdge);
+            case true:
+                    float[,] customKernel = new float[_matrixSize, _matrixSize];
+                    customKernel = ReadKernel();
+                    if (customKernel == null)
+                    {
+                        await DisplayAlert("Alert", "Entered kernel not valid", "Ok");
+                        return;
+                    }
+                    Main.ApplyKernel(index, customKernel, (BorderType)_selectedBorder);
+                break;
+            case false:
+                if (_selectedFilter == null)
+                {
+                    await DisplayAlert("Alert", "Kernel/Filter not selected", "Ok");
+                    return;
+                }
+                string key = _filtersDictionary.FirstOrDefault(x => x.Value == _selectedFilter).Key;
+                switch (key)
+                {
+                    case "SobelX":
+                            Main.EdgeDetectionFilters(index, BuiltInFilters.SobelX, (BorderType)_selectedBorder, -1, -1);
+                        break;
+                    case "SobelY":
+                            Main.EdgeDetectionFilters(index, BuiltInFilters.SobelY, (BorderType)_selectedBorder, -1, -1);
+                        break;
+                    case "LaplacianEdge":
+                            Main.EdgeDetectionFilters(index, BuiltInFilters.LaplacianEdge, (BorderType)_selectedBorder, -1, -1);
+                        break;
+                    case "Canny":
+                            int ths1, ths2;
+                            if (!int.TryParse(await DisplayPromptAsync("Threshold 1", "Type Threshold 1 value"), out ths1))
+                            {
+                                await DisplayAlert("Alert", "Threshold 1 value not valid", "Ok");
+                                return;
+                            }
+                            if (!int.TryParse(await DisplayPromptAsync("Threshold 2", "Type Threshold 2 value"), out ths2))
+                            {
+                                await DisplayAlert("Alert", "Threshold 2 value not valid", "Ok");
+                                return;
+                            }
+                            Main.EdgeDetectionFilters(index, BuiltInFilters.Canny, (BorderType)_selectedBorder, ths1, ths2);
+                        break;
+                    case "Median":
+                            string[] options = {"3","5","7"};
+                            string picked = await DisplayActionSheet("Pick size", "Cancel", null, options);
+                            if (!int.TryParse(picked, out int ksize))
+                            {
+                                await DisplayAlert("Alert", "Error, kernel size not valid", "Ok");
+                                return;
+                            }
+                            Main.MedianFilter(index, ksize, (BorderType)_selectedBorder, (int)(ksize/2));
+                        break;
+                    default:
+                            Main.ApplyKernel(index, _selectedFilter, (BorderType)_selectedBorder);
+                        break;
+                }
+                break;
         }
-        else
-        {
-            //Todo
-        }
-
     }
 
 }

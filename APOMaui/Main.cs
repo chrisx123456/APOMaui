@@ -2,6 +2,7 @@
 using Emgu.CV.Cuda;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
+using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
 namespace APOMaui
@@ -297,21 +298,49 @@ namespace APOMaui
             Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
             img.Dispose();
         }
+        public static void MedianFilter(int index, int ksize, Emgu.CV.CvEnum.BorderType border, int pixelOffset)
+        {
+            Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage;
+            Image<Gray, Byte> temp = new( img.Width+2*pixelOffset, img.Height+2*pixelOffset);
+            //Image<Gray, Byte> res = new(img.Width, img.Height);
+            Mat res = new(new System.Drawing.Size(img.Width, img.Height), DepthType.Cv8U, 1);
+            CvInvoke.CopyMakeBorder(img, temp, pixelOffset, pixelOffset, pixelOffset, pixelOffset, border, default);
+            CvInvoke.MedianBlur(temp, res, ksize);
+            Main.OpenedImagesWindowsList[index].winImg.GrayImage = new Image<Gray, Byte>(res);
+            //Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
+            img.Dispose();
+            temp.Dispose();
+        }
+        public static void EdgeDetectionFilters(int index, BuiltInFilters filterType, Emgu.CV.CvEnum.BorderType border, int ths1, int ths2)
+        {
+            //Sobel X, Sobel Y, LaplacianEdge, Canny
+            Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage;
+            Mat res = new(new System.Drawing.Size(img.Width, img.Height), DepthType.Cv64F, 1);
+            switch(filterType)
+            {
+                case BuiltInFilters.SobelX:
+                    CvInvoke.Sobel(img, res, DepthType.Cv64F, 1, 0, 3, 1, 0, border);
+                        break;
+                case BuiltInFilters.SobelY:
+                    CvInvoke.Sobel(img, res, DepthType.Cv64F, 0, 1, 3, 1, 0, border);
+                    break;
+                case BuiltInFilters.LaplacianEdge:
+                    CvInvoke.Laplacian(img, res, DepthType.Cv64F, 1, 1, 0, border);
+                        break;
+                case BuiltInFilters.Canny:
+                    CvInvoke.Canny(img, res, ths1, ths2, 3, false);
+                    break;
+            }
+            Main.OpenedImagesWindowsList[index].winImg.GrayImage = new Image<Gray, Byte>(res);
+            img.Dispose();
+
+        }
         public static void ApplyKernel(int index, float[,] kernel, Emgu.CV.CvEnum.BorderType border)
         {
             Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage;
             Image<Gray, Byte> res = new(img.Width, img.Height);
             Matrix<float> inputArray = new(kernel);
-            if (kernel.GetLength(1) == 1)
-            {
-                if (kernel[0, 0] == 0) CvInvoke.Blur(img, res, new System.Drawing.Size(5, 5), new System.Drawing.Point(-1, -1), border);
-                else if (kernel[0, 0] == 1) CvInvoke.GaussianBlur(img, res, new System.Drawing.Size(5, 5), 0, 0, border);
-                else {/* Todo Canny */ }
-            }
-            else
-            {
-                CvInvoke.Filter2D(img, res, inputArray, new System.Drawing.Point(-1, -1), 0, border);
-            }
+            CvInvoke.Filter2D(img, res, inputArray, new System.Drawing.Point(-1, -1), 0, border);
             Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
             img.Dispose();
         }

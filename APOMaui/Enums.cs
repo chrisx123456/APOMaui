@@ -11,4 +11,11 @@ namespace APOMaui
         Gray,
         Lab,
     }
+    public enum BuiltInFilters
+    {
+        SobelX,
+        SobelY,
+        LaplacianEdge,
+        Canny,
+    }
 }
