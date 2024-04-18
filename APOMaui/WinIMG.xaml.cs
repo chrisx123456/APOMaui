@@ -2,25 +2,19 @@
 using Emgu.CV;
 using Emgu.CV.Structure;
 using System.Drawing;
-
+using System.Diagnostics;
 namespace APOMaui;
 
 public partial class WinIMG : ContentPage
 {
-
-    private readonly double realWidth;
-    private readonly double realHeight;
-
     private Image<Bgr, Byte>? colorImage;
     private Image<Gray, Byte>? grayImage;
+    public ImageSource ImageSource { get; set; }
 
 
     string title;
     public int index;
-    public ImageSource ImageSource { get; set; }
-    public double DesiredWidth { get; set; }
-    public double ImgScale { get; set; }
-
+    double imgScale;
     public ImgType? Type;
 
     public Image<Bgr, Byte> ColorImage
@@ -38,6 +32,7 @@ public partial class WinIMG : ContentPage
         {
             BindingContext = null;
             if(grayImage != null) grayImage.Dispose();
+            if(colorImage != null) colorImage.Dispose();
             colorImage = value;
             this.ImageSource = EmguImgToImageSource(colorImage);
             BindingContext = this;
@@ -57,11 +52,49 @@ public partial class WinIMG : ContentPage
         }
         set
         {
-            OnSet(value);
+            OnSetGrayImage(value);
             System.Diagnostics.Debug.WriteLine("Setter Done");
         }
     }   // Setter&Getter to refresh content after RGB->Grayscale, Dispose other img, Set new ImageSource
-    public void OnSet(Image<Gray, Byte> value)
+    public WinIMG(Image<Bgr, Byte> img, int index, string title)
+    {
+        InitializeComponent();
+        this.title = title;
+        this.Type = ImgType.RGB;
+        this.colorImage = img;
+        this.index = index;
+        this.ImageSource = EmguImgToImageSource(colorImage);
+        this.imgScale = (double)img.Height / (double)img.Width;
+        BindingContext = this;
+    }
+    public WinIMG(Image<Gray, Byte> img, int index, string title)
+    {
+        InitializeComponent();
+        this.title = title;
+        this.Type = ImgType.Gray;
+        this.grayImage = img;
+        this.index = index;
+        this.ImageSource = EmguImgToImageSource(grayImage);
+        this.imgScale = (double)img.Height / (double)img.Width;
+        BindingContext = this;
+    }
+    public static ImageSource EmguImgToImageSource(Image<Bgr, Byte> img)
+    {
+        Bitmap bitmap = Emgu.CV.BitmapExtension.ToBitmap(img);
+        MemoryStream stream = new();
+        bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Bmp);
+        stream.Position = 0;
+        return ImageSource.FromStream(() => stream);
+    }
+    public static ImageSource EmguImgToImageSource(Image<Gray, Byte> img)
+    {
+        Bitmap bitmap = Emgu.CV.BitmapExtension.ToBitmap(img);
+        MemoryStream stream = new();
+        bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Bmp);
+        stream.Position = 0;
+        return ImageSource.FromStream(() => stream);
+    }
+    public void OnSetGrayImage(Image<Gray, Byte> value)
     {
         BindingContext = null;
         if (colorImage != null) colorImage.Dispose();
@@ -84,67 +117,7 @@ public partial class WinIMG : ContentPage
                 System.Diagnostics.Debug.WriteLine("Task chart updating done");
             }
         });
-        
-    }
-    public WinIMG(Image<Bgr, Byte> img, int index, int realWidth, int realHeight, string title)
-    {
-        InitializeComponent();
-        this.title = title;
-        this.Type = ImgType.RGB;
-        this.colorImage = img;
-        this.realHeight = realHeight;
-        this.realWidth = realWidth;
-        this.index = index;
-        this.DesiredWidth = Main.InitWidth;
-        this.ImageSource = EmguImgToImageSource(colorImage);
-        this.ImgScale = CalcScale();
-        this.scaleLabel.Text = new string(ImgScale.ToString() + "%");
-        BindingContext = this;
-        this.winImgBox.GestureRecognizers.Add(new TapGestureRecognizer
-        {
-            Command = new Command(() => Main.ChangeSelectedtWinIMG(this.index))
-        });
-        this.title = title;
-    }
-    public WinIMG(Image<Gray, Byte> img, int index, int realWidth, int realHeight, string title)
-    {
-        InitializeComponent();
-        this.title = title;
-        this.Type = ImgType.Gray;
-        this.grayImage = img;
-        this.realHeight = realHeight;
-        this.realWidth = realWidth;
-        this.index = index;
-        this.DesiredWidth = Main.InitWidth;
-        this.ImageSource = EmguImgToImageSource(grayImage);
-        this.ImgScale = CalcScale();
-        this.scaleLabel.Text = new string(ImgScale.ToString() + "%");
 
-        BindingContext = this;
-        this.winImgBox.GestureRecognizers.Add(new TapGestureRecognizer
-        {
-            Command = new Command(() => Main.ChangeSelectedtWinIMG(this.index))
-        });
-    }
-    public static ImageSource EmguImgToImageSource(Image<Bgr, Byte> img)
-    {
-        Bitmap bitmap = Emgu.CV.BitmapExtension.ToBitmap(img);
-        MemoryStream stream = new();
-        bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Bmp);
-        stream.Position = 0;
-        return ImageSource.FromStream(() => stream);
-    }
-    public static ImageSource EmguImgToImageSource(Image<Gray, Byte> img)
-    {
-        Bitmap bitmap = Emgu.CV.BitmapExtension.ToBitmap(img);
-        MemoryStream stream = new();
-        bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Bmp);
-        stream.Position = 0;
-        return ImageSource.FromStream(() => stream);
-    }
-    private double CalcScale()
-    {
-        return Math.Round((((double)this.DesiredWidth / (double)this.realWidth) * 100), 2);
     }
     protected override void OnDisappearing()
     {
@@ -153,17 +126,16 @@ public partial class WinIMG : ContentPage
     }
     public void ZoomIn(object sender, EventArgs e)
     {
-        this.DesiredWidth += this.DesiredWidth * 0.1D;
-        this.ImgScale = CalcScale();
-        this.scaleLabel.Text = new string(ImgScale.ToString() + "%");
-        Main.ResizeWindow(index, DesiredWidth, realWidth, realHeight);
+        Main.OpenedImagesWindowsList[index].window.Height += (int)((20 * imgScale) + 0.5); // Approx. Height
+        Main.OpenedImagesWindowsList[index].window.Width += 20;
+        winImgBox.WidthRequest = winImgBox.Width + 20;
+
     }
     public void ZoomOut(object sender, EventArgs e)
     {
-        this.DesiredWidth -= this.DesiredWidth * 0.1D;
-        this.ImgScale = CalcScale();
-        this.scaleLabel.Text = new string(ImgScale.ToString() + "%");
-        Main.ResizeWindow(index, DesiredWidth, realWidth, realHeight);
+        Main.OpenedImagesWindowsList[index].window.Height -= (int)((20 * imgScale) + 0.5); // Approx. Height
+        Main.OpenedImagesWindowsList[index].window.Width -= 20;
+        winImgBox.WidthRequest = winImgBox.Width - 20;
     }
 
 

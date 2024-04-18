@@ -11,9 +11,8 @@ namespace APOMaui
     {
         public static List<WindowImageObject> OpenedImagesWindowsList = new();
         public static int? selectedWindow = null;
-        public static readonly int InitWidth = 400;
-       // public static readonly int MaxWidth = 800;
-        private static readonly int windowHeightFix = 80;
+        public const int windowHeightFix = 100;
+        public const int windowWidthFix = 22;
 
         public static async void OpenPhotoWinIMG()
         {
@@ -39,14 +38,23 @@ namespace APOMaui
         }
         public static void OpenNewWindowWinIMG(dynamic img, string title) //Argument is dynamic cuz' dont want to make overload for GrayScale/Color.
         {
-            var page = new WinIMG(img, OpenedImagesWindowsList.Count, img.Width, img.Height, title);
-            var newWindow = new Window
+            WinIMG page = new WinIMG(img, OpenedImagesWindowsList.Count, title);
+            Window newWindow = new Window
             {
                 Page = page,
-                Width = InitWidth,
-                Height = ((double)InitWidth / (double)img.Width) * (double)img.Height + windowHeightFix,
-                Title = title
+                Title = title,
+                Width = img.Width + windowWidthFix,
+                Height = img.Height + windowHeightFix,
+                MinimumWidth = 0,
+                MinimumHeight = 0,
             };
+            page.Content.GestureRecognizers.Add(new TapGestureRecognizer
+            {
+                Command = new Command(() =>
+                {
+                    Main.ChangeSelectedtWinIMG(page.index);
+                })
+            });
 
             WindowImageObject windowImageObject = new(page, newWindow);
             OpenedImagesWindowsList.Add(windowImageObject);
@@ -55,13 +63,6 @@ namespace APOMaui
             Application.Current.OpenWindow(OpenedImagesWindowsList[(int)selectedWindow].window);
 #pragma warning restore 8602
         }
-
-        public static void ResizeWindow(int index, double newwidth, double realwidth, double realheight)
-        {
-            OpenedImagesWindowsList[index].window.Width = newwidth;
-            OpenedImagesWindowsList[index].window.Height = (((newwidth / realwidth) * realheight) + windowHeightFix);
-        }
-
         public static void OnCloseEventWinIMG(int index)
         {
             System.Diagnostics.Debug.WriteLine($"CloseEventWinIMG: {index}");

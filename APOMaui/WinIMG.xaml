@@ -21,7 +21,7 @@
         </StackLayout>
 
         <!-- Obraz -->
-        <Image x:Name="winImgBox" Grid.Row="1" Source="{Binding ImageSource}" WidthRequest="{Binding Width}" HorizontalOptions="Center" VerticalOptions="End" />
+        <Image x:Name="winImgBox" Grid.Row="1" Source="{Binding ImageSource}" HorizontalOptions="Center" VerticalOptions="End" Margin="0"/>
     </Grid>
 
 
