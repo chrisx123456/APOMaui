@@ -39,7 +39,7 @@ namespace APOMaui
         }
         public static void OpenNewWindowWinIMG(dynamic img, string title) //Argument is dynamic cuz' dont want to make overload for GrayScale/Color.
         {
-            var page = new WinIMG(img, OpenedImagesWindowsList.Count, img.Width, img.Height);
+            var page = new WinIMG(img, OpenedImagesWindowsList.Count, img.Width, img.Height, title);
             var newWindow = new Window
             {
                 Page = page,
@@ -61,6 +61,7 @@ namespace APOMaui
             OpenedImagesWindowsList[index].window.Width = newwidth;
             OpenedImagesWindowsList[index].window.Height = (((newwidth / realwidth) * realheight) + windowHeightFix);
         }
+
         public static void OnCloseEventWinIMG(int index)
         {
             System.Diagnostics.Debug.WriteLine($"CloseEventWinIMG: {index}");
@@ -302,12 +303,16 @@ namespace APOMaui
         {
             Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage;
             Image<Gray, Byte> temp = new( img.Width+2*pixelOffset, img.Height+2*pixelOffset);
+
             //Image<Gray, Byte> res = new(img.Width, img.Height);
             Mat res = new(new System.Drawing.Size(img.Width, img.Height), DepthType.Cv8U, 1);
+
             CvInvoke.CopyMakeBorder(img, temp, pixelOffset, pixelOffset, pixelOffset, pixelOffset, border, default);
             CvInvoke.MedianBlur(temp, res, ksize);
+
             Main.OpenedImagesWindowsList[index].winImg.GrayImage = new Image<Gray, Byte>(res);
             //Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
+
             img.Dispose();
             temp.Dispose();
         }
@@ -323,17 +328,33 @@ namespace APOMaui
                         break;
                 case BuiltInFilters.SobelY:
                     CvInvoke.Sobel(img, res, DepthType.Cv64F, 0, 1, 3, 1, 0, border);
-                    break;
+                        break;
                 case BuiltInFilters.LaplacianEdge:
                     CvInvoke.Laplacian(img, res, DepthType.Cv64F, 1, 1, 0, border);
                         break;
                 case BuiltInFilters.Canny:
                     CvInvoke.Canny(img, res, ths1, ths2, 3, false);
-                    break;
+                        break;
             }
             Main.OpenedImagesWindowsList[index].winImg.GrayImage = new Image<Gray, Byte>(res);
             img.Dispose();
 
+        }
+        public static void BlurFilrers(int index, BuiltInFilters filterType, Emgu.CV.CvEnum.BorderType border)
+        {
+            Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage;
+            Image<Gray, Byte> res = new(img.Width, img.Height);
+            switch (filterType)
+            {
+                case BuiltInFilters.Blur:
+                    CvInvoke.Blur(img, res, new System.Drawing.Size(3, 3), new System.Drawing.Point(-1, -1), border);
+                        break;
+                case BuiltInFilters.GaussianBlur:
+                    CvInvoke.MedianBlur(img, res, 3);
+                        break;
+            }
+            Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
+            img.Dispose();
         }
         public static void ApplyKernel(int index, float[,] kernel, Emgu.CV.CvEnum.BorderType border)
         {

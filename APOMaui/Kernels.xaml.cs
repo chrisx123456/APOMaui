@@ -1,4 +1,4 @@
-
+﻿
 using Emgu.CV.CvEnum;
 using Emgu.CV.Ocl;
 
@@ -155,6 +155,7 @@ public partial class Kernels : ContentPage
     private static List<Entry> _entries = new List<Entry>();
     private static Emgu.CV.CvEnum.BorderType? _selectedBorder = null;
     private static float[,]? _selectedFilter = null;
+    private static string? _selectedBuiltInFilter = null;
     private static int _matrixSize;
 
     public Kernels()
@@ -176,10 +177,19 @@ public partial class Kernels : ContentPage
     }
     private void OnFilterPickerSelectedIndexChanged(object sender, EventArgs e)
     {
-        _selectedFilter = _filtersDictionary[FilterPicker.SelectedItem.ToString()];
-        FillKernel(_selectedFilter);
+        if (_filtersDictionary[FilterPicker.SelectedItem.ToString()].GetLength(1) != 0)
+        {
+            _selectedFilter = _filtersDictionary[FilterPicker.SelectedItem.ToString()];
+            _selectedBuiltInFilter = null;
+            FillKernel(_selectedFilter);
+        }
+        else
+        {
+            _selectedFilter = null;
+            _selectedBuiltInFilter = FilterPicker.SelectedItem.ToString();
+        }
         System.Diagnostics.Debug.WriteLine(_selectedFilter);
-
+        System.Diagnostics.Debug.WriteLine(_selectedBuiltInFilter);
     }
     private void OnEdgePickerSelectedIndexChanged(object sender, EventArgs e)
     {
@@ -356,13 +366,12 @@ public partial class Kernels : ContentPage
                     Main.ApplyKernel(index, customKernel, (BorderType)_selectedBorder);
                 break;
             case false:
-                if (_selectedFilter == null)
+                if (_selectedFilter == null && _selectedBuiltInFilter == null)
                 {
                     await DisplayAlert("Alert", "Kernel/Filter not selected", "Ok");
                     return;
                 }
-                string key = _filtersDictionary.FirstOrDefault(x => x.Value == _selectedFilter).Key;
-                switch (key)
+                switch (_selectedBuiltInFilter)
                 {
                     case "SobelX":
                             Main.EdgeDetectionFilters(index, BuiltInFilters.SobelX, (BorderType)_selectedBorder, -1, -1);
@@ -396,6 +405,12 @@ public partial class Kernels : ContentPage
                                 return;
                             }
                             Main.MedianFilter(index, ksize, (BorderType)_selectedBorder, (int)(ksize/2));
+                        break;
+                    case "GaussianBlur":
+                            Main.BlurFilrers(index, BuiltInFilters.GaussianBlur, (BorderType)_selectedBorder);
+                        break;
+                    case "Blur":
+                            Main.BlurFilrers(index, BuiltInFilters.Blur, (BorderType)_selectedBorder);
                         break;
                     default:
                             Main.ApplyKernel(index, _selectedFilter, (BorderType)_selectedBorder);

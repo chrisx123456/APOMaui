@@ -17,5 +17,7 @@ namespace APOMaui
         SobelY,
         LaplacianEdge,
         Canny,
+        Blur,
+        GaussianBlur
     }
 }

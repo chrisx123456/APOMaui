@@ -7,6 +7,7 @@ namespace APOMaui;
 
 public partial class WinIMG : ContentPage
 {
+
     private readonly double realWidth;
     private readonly double realHeight;
 
@@ -14,7 +15,7 @@ public partial class WinIMG : ContentPage
     private Image<Gray, Byte>? grayImage;
 
 
-
+    string title;
     public int index;
     public ImageSource ImageSource { get; set; }
     public double DesiredWidth { get; set; }
@@ -85,9 +86,10 @@ public partial class WinIMG : ContentPage
         });
         
     }
-    public WinIMG(Image<Bgr, Byte> img, int index, int realWidth, int realHeight)
+    public WinIMG(Image<Bgr, Byte> img, int index, int realWidth, int realHeight, string title)
     {
         InitializeComponent();
+        this.title = title;
         this.Type = ImgType.RGB;
         this.colorImage = img;
         this.realHeight = realHeight;
@@ -102,10 +104,12 @@ public partial class WinIMG : ContentPage
         {
             Command = new Command(() => Main.ChangeSelectedtWinIMG(this.index))
         });
+        this.title = title;
     }
-    public WinIMG(Image<Gray, Byte> img, int index, int realWidth, int realHeight)
+    public WinIMG(Image<Gray, Byte> img, int index, int realWidth, int realHeight, string title)
     {
         InitializeComponent();
+        this.title = title;
         this.Type = ImgType.Gray;
         this.grayImage = img;
         this.realHeight = realHeight;
