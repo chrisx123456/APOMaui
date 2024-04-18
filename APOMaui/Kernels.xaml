@@ -8,21 +8,15 @@
             <Label Text="Custom Kernel: " VerticalOptions="Center"/>
             <CheckBox IsChecked="False" x:Name="IsCustomKernel" VerticalOptions="Center" CheckedChanged="IsCustomKernelCheckedChanged"/>
         </HorizontalStackLayout>
-        <VerticalStackLayout VerticalOptions="Start" HorizontalOptions="Center" Margin="0,0,0,50">
+        <VerticalStackLayout VerticalOptions="Start" HorizontalOptions="Center" Margin="0,10,0,0">
             <Label x:Name ="EdgePickerLabel" Text="Edge Options" FontSize="12" HorizontalOptions="Center" VerticalOptions="Center"/>
             <Picker x:Name="EdgePicker" MinimumHeightRequest="30" HeightRequest="30" FontSize="13" SelectedIndexChanged="OnEdgePickerSelectedIndexChanged"/>
             <Label x:Name ="FilterPickerLabel" Text="Pick Filter" FontSize="12" HorizontalOptions="Center" VerticalOptions="Center"/>
             <Picker x:Name="FilterPicker" MinimumHeightRequest="30" HeightRequest="30" FontSize="13" SelectedIndexChanged="OnFilterPickerSelectedIndexChanged"/>
             <Label x:Name ="SizePickerLabel" Text="Pick Size" FontSize="12" HorizontalOptions="Center" VerticalOptions="Center" IsEnabled="False" IsVisible="False"/>
             <Picker x:Name="SizePicker" MinimumHeightRequest="30" HeightRequest="30" FontSize="13" SelectedIndexChanged="OnSizePickerSelectedIndexChanged" IsEnabled="False" IsVisible="False"/>
-            
-
         </VerticalStackLayout>
-        
-        <HorizontalStackLayout HorizontalOptions="Center" >
-            <Grid x:Name="MatrixGrid" HorizontalOptions="Center" VerticalOptions="Center" Padding="4"/>
-        </HorizontalStackLayout>
-        
-        <Button x:Name="ButtonKernel" Text="Wykonaj" Clicked="OnKernelButtonClicked" StyleClass="MainPageButton"/>
+        <Grid x:Name="MatrixGrid" HorizontalOptions="Center" VerticalOptions="Center" Padding="4"/>
+        <Button x:Name="ButtonKernel" Text="Execute" Clicked="OnKernelButtonClicked" StyleClass="MainPageButton"/>
     </VerticalStackLayout>
 </ContentPage>

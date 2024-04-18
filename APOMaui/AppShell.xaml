@@ -24,5 +24,9 @@
             Title="Kernele"
             ContentTemplate="{DataTemplate local:Kernels}"
             Route="Kernels" />
+        <ShellContent
+            Title="2 Argument ops"
+            ContentTemplate="{DataTemplate local:TwoArgument}"
+            Route="TwoArgument" />
     </TabBar>
 </Shell>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="APOMaui.TwoArgument"
+             Title="TwoArgument">
+    <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Start" Margin="0,10,0,0" WidthRequest="200">
+        <Label x:Name ="Img1Label" Text="Image 1" FontSize="12" HorizontalOptions="Center" VerticalOptions="Center"/>
+        <Picker x:Name="Img1Picker" MinimumHeightRequest="30" HeightRequest="30" FontSize="13" SelectedIndexChanged="OnImg1PickerSelectedIndexChanged"/>
+        <Label x:Name ="Img2Label" Text="Image 2" FontSize="12" HorizontalOptions="Center" VerticalOptions="Center"/>
+        <Picker x:Name="Img2Picker" MinimumHeightRequest="30" HeightRequest="30" FontSize="13" SelectedIndexChanged="OnImg2PickerSelectedIndexChanged"/>
+        <Label x:Name ="OperationLabel" Text="Operation" FontSize="12" HorizontalOptions="Center" VerticalOptions="Center"/>
+        <Picker x:Name="OperationPicker" MinimumHeightRequest="30" HeightRequest="30" FontSize="13" SelectedIndexChanged="OnOperationPickerSelectedIndexChanged"/>
+        <Button x:Name="ButtonTwoArgument" Text="Execute" Clicked="OnTwoArgumentButtonClicked" StyleClass="MainPageButton"/>
+    </VerticalStackLayout>
+</ContentPage>

@@ -93,6 +93,9 @@
 	  <MauiXaml Update="Operations.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="TwoArgument.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="WinIMG.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

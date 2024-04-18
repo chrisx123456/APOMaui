@@ -65,7 +65,7 @@ public partial class Kernels : ContentPage
             new float[,]
             {
                 { 0f,-1f,0f},
-                {-1f, 5,1f},
+                {-1f, 5f,1f},
                 { 0f,-1f,0f}
             }},
         {"LaplacianSharpen2",
@@ -187,9 +187,11 @@ public partial class Kernels : ContentPage
         {
             _selectedFilter = null;
             _selectedBuiltInFilter = FilterPicker.SelectedItem.ToString();
+            foreach (Entry entry in _entries) entry.Text = null;
         }
         System.Diagnostics.Debug.WriteLine(_selectedFilter);
         System.Diagnostics.Debug.WriteLine(_selectedBuiltInFilter);
+
     }
     private void OnEdgePickerSelectedIndexChanged(object sender, EventArgs e)
     {
