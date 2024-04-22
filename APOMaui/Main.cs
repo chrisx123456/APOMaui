@@ -1,19 +1,17 @@
 ﻿using Emgu.CV;
-using Emgu.CV.Cuda;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
-using System.Drawing;
-using System.Linq;
-using System.Runtime.InteropServices;
+using System.Diagnostics;
 namespace APOMaui
 {
     internal static class Main
     {
+        public static event Action? OnWinIMGClosingEvent;
+
         public static List<WindowImageObject> OpenedImagesWindowsList = new();
         public static int? selectedWindow = null;
         public const int windowHeightFix = 100;
         public const int windowWidthFix = 22;
-
         public static async void OpenPhotoWinIMG()
         {
             if (DeviceInfo.Platform == DevicePlatform.WinUI)
@@ -27,6 +25,15 @@ namespace APOMaui
                 string FileFullPath = result.FullPath.ToString();
                 var img = ImageLoader.LoadImage(FileFullPath); // Important!! Type Image<Bgr, Byte> or Image<Gray, Byte> depends on file type detected in FileLoader
                 string fileName = FileFullPath.Substring(FileFullPath.LastIndexOf('\\') + 1);
+                int duplicates = 0;
+                foreach(WindowImageObject wio in OpenedImagesWindowsList) //Sketchy
+                {
+                    string s = wio.winImg.GetTitle;
+                    int dotIndex = s.LastIndexOf('.');
+                    string output = s.Substring(0, dotIndex);
+                    if (output == fileName) duplicates++;
+                }
+                fileName += $".{duplicates}";
                 OpenNewWindowWinIMG(img, fileName);
 
 
@@ -84,6 +91,7 @@ namespace APOMaui
             OpenedImagesWindowsList[index].Dispose();
             OpenedImagesWindowsList.RemoveAt(index);
             GC.Collect();
+            OnWinIMGClosingEvent?.Invoke();
         }
         public static void ChangeSelectedtWinIMG(int index)
         {
@@ -365,6 +373,38 @@ namespace APOMaui
             CvInvoke.Filter2D(img, res, inputArray, new System.Drawing.Point(-1, -1), 0, border);
             Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
             img.Dispose();
+        }
+        public static void TwoArgsOperations(int index1, int index2, TwoArgsOps arg, int w1, int w2)
+        {
+            Image<Gray, Byte> img1 = Main.OpenedImagesWindowsList[index1].winImg.GrayImage;
+            Image<Gray, Byte> img2 = Main.OpenedImagesWindowsList[index2].winImg.GrayImage;
+            Image<Gray, Byte> res = new(img1.Width, img1.Height);
+            switch (arg)
+            {
+                case TwoArgsOps.ADD:
+                    CvInvoke.Add(img1, img2, res, null, DepthType.Cv8U);
+                    break;
+                case TwoArgsOps.SUBTRACT:
+                    CvInvoke.Subtract(img1, img2, res, null, DepthType.Cv8U);
+                    break;
+                case TwoArgsOps.BLEND:
+                    CvInvoke.AddWeighted(img1, w1, img2, w2, gamma: 0, res, DepthType.Cv8U);
+                    break;
+                case TwoArgsOps.AND:
+                    CvInvoke.BitwiseAnd(img1, img2, res, null);
+                    break;
+                case TwoArgsOps.OR:
+                    CvInvoke.BitwiseOr(img1, img2, res, null);
+                    break;
+                case TwoArgsOps.XOR:
+                    CvInvoke.BitwiseXor(img1, img2, res, null);
+                    break;
+                case TwoArgsOps.NOT:
+                    //Przeciez jest juz negacja to po co to robic
+                    break;
+            }
+            string title = Main.OpenedImagesWindowsList[index1].winImg.GetTitle + " " + arg.ToString() + " " + Main.OpenedImagesWindowsList[index2].winImg.GetTitle;
+            OpenNewWindowWinIMG(res, title);
         }
     }
 }

@@ -13,6 +13,10 @@ public partial class WinIMG : ContentPage
 
 
     string title;
+    public string GetTitle
+    {
+        get => title;
+    }
     public int index;
     double imgScale;
     public ImgType? Type;

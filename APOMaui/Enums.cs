@@ -20,4 +20,14 @@ namespace APOMaui
         Blur,
         GaussianBlur
     }
+    public enum TwoArgsOps
+    {
+        ADD,
+        SUBTRACT,
+        BLEND,
+        AND,
+        OR,
+        NOT,
+        XOR
+    }
 }

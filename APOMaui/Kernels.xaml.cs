@@ -1,6 +1,7 @@
 ﻿
 using Emgu.CV.CvEnum;
 using Emgu.CV.Ocl;
+using System.Diagnostics;
 
 namespace APOMaui;
 
@@ -177,11 +178,18 @@ public partial class Kernels : ContentPage
     }
     private void OnFilterPickerSelectedIndexChanged(object sender, EventArgs e)
     {
-        if (_filtersDictionary[FilterPicker.SelectedItem.ToString()].GetLength(1) != 0)
+
+
+        if (_filtersDictionary[FilterPicker.SelectedItem.ToString()].GetLength(0) == 3 && _filtersDictionary[FilterPicker.SelectedItem.ToString()].GetLength(1) == 3)
         {
             _selectedFilter = _filtersDictionary[FilterPicker.SelectedItem.ToString()];
             _selectedBuiltInFilter = null;
             FillKernel(_selectedFilter);
+            if (FilterPicker.SelectedItem.ToString() == "SobelX" || FilterPicker.SelectedItem.ToString() == "SobelY")
+            {
+                _selectedBuiltInFilter = FilterPicker.SelectedItem.ToString();
+                _selectedFilter = null;
+            }
         }
         else
         {
