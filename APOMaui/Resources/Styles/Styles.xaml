@@ -436,6 +436,25 @@
             <Shadow Radius="4" Offset="5,5" Opacity="0.6"/>
         </Setter>
     </Style>
+    <Style TargetType="Button" Class="PassButtons">
+        <Setter Property="Margin"
+                Value="8"/>
+        <Setter Property="Padding"
+                Value="8"/>
+        <Setter Property="CornerRadius"
+                Value="8"/>
+        <Setter Property="MinimumHeightRequest"
+                Value="32"/>
+        <Setter Property="HeightRequest"
+                Value="32"/>
+        <Setter Property="BackgroundColor"
+                Value="MediumPurple"/>
+        <Setter Property="TextColor"
+                Value="Black"/>
+        <Setter Property="Shadow">
+            <Shadow Radius="2" Offset="3,3" Opacity="0.4"/>
+        </Setter>
+    </Style>
     <Style TargetType="Entry" Class="EntryKernel" x:Key="EntryKernel">
         <Setter Property="Margin"
                 Value="4"/>

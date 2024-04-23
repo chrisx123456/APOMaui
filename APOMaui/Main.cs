@@ -1,5 +1,7 @@
 ﻿using Emgu.CV;
+using Emgu.CV.Cuda;
 using Emgu.CV.CvEnum;
+using Emgu.CV.Ocl;
 using Emgu.CV.Structure;
 using System.Diagnostics;
 namespace APOMaui
@@ -342,10 +344,14 @@ namespace APOMaui
                     CvInvoke.Laplacian(img, res, DepthType.Cv64F, 1, 1, 0, border);
                         break;
                 case BuiltInFilters.Canny:
-                    CvInvoke.Canny(img, res, ths1, ths2, 3, false);
+                    Mat cannyWBorder = new Mat();
+                    CvInvoke.CopyMakeBorder(img, cannyWBorder, 1, 1, 1, 1, border, default);
+                    CvInvoke.Canny(cannyWBorder, res, ths1, ths2, 3, false);
                         break;
             }
-            Main.OpenedImagesWindowsList[index].winImg.GrayImage = new Image<Gray, Byte>(res);
+            Mat final = new();
+            CvInvoke.ConvertScaleAbs(res, final, 1, 0);
+            Main.OpenedImagesWindowsList[index].winImg.GrayImage = new Image<Gray, Byte>(final);
             img.Dispose();
 
         }
@@ -359,7 +365,7 @@ namespace APOMaui
                     CvInvoke.Blur(img, res, new System.Drawing.Size(3, 3), new System.Drawing.Point(-1, -1), border);
                         break;
                 case BuiltInFilters.GaussianBlur:
-                    CvInvoke.MedianBlur(img, res, 3);
+                    CvInvoke.GaussianBlur(img, res, new System.Drawing.Size(3, 3), 0, 0, border);
                         break;
             }
             Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
@@ -374,7 +380,7 @@ namespace APOMaui
             Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
             img.Dispose();
         }
-        public static void TwoArgsOperations(int index1, int index2, TwoArgsOps arg, int w1, int w2)
+        public static void TwoArgsOperations(int index1, int index2, TwoArgsOps arg, double w1, double w2)
         {
             Image<Gray, Byte> img1 = Main.OpenedImagesWindowsList[index1].winImg.GrayImage;
             Image<Gray, Byte> img2 = Main.OpenedImagesWindowsList[index2].winImg.GrayImage;
@@ -406,5 +412,99 @@ namespace APOMaui
             string title = Main.OpenedImagesWindowsList[index1].winImg.GetTitle + " " + arg.ToString() + " " + Main.OpenedImagesWindowsList[index2].winImg.GetTitle;
             OpenNewWindowWinIMG(res, title);
         }
+        public static void TwoStage233(int index, BorderType border, BuiltInFilters stage1, float[,] stage2)
+        {
+            Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage;
+            Image<Gray, Byte> stage1res = new(img.Width, img.Height);
+            switch (stage1)
+            {
+                case BuiltInFilters.Blur:
+                    CvInvoke.Blur(img, stage1res, new System.Drawing.Size(3, 3), default, border);
+                    break;
+                case BuiltInFilters.GaussianBlur:
+                    CvInvoke.GaussianBlur(img, stage1res, new System.Drawing.Size(3, 3), 0, 0, border);
+                    break;
+                case BuiltInFilters.Median:
+                    Debug.WriteLine("Two stage median not implemented yet");
+                    break;
+                default:
+                    Debug.WriteLine("Wrong builtinfilter at TwoStage233 main.cs");
+                    break;
+            }
+            Image<Gray, Byte> final = new(img.Width, img.Height);
+            Matrix<float> stage2kernel = new(stage2);
+            CvInvoke.Filter2D(stage1res, final, stage2kernel, default, 0, border);
+            Main.OpenedImagesWindowsList[index].winImg.GrayImage = final;
+        }
+        public static void TwoStage55(int index, BorderType border, BuiltInFilters stage1, float[,] stage2)
+        {
+            float[,] blur = new float[,] {
+            { 1f/9f, 1f/9f, 1f/9f },
+            { 1f/9f, 1f/9f, 1f/9f },
+            { 1f/9f, 1f/9f, 1f/9f }
+            };
+            float[,] gblur = new float[,] {
+            { 1f/16f, 1f/8f, 1f/16f },
+            { 1f/8f, 1f/4f, 1f/8f },
+            { 1f/16f, 1f/8f, 1f/16f }
+            };
+            float[,] kernel55 = new float[5,5];
+            switch (stage1)
+            {
+                case BuiltInFilters.Blur:
+                    kernel55 = Convolution(blur, stage2);
+                    break;
+                case BuiltInFilters.GaussianBlur:
+                    kernel55 = Convolution(gblur, stage2);
+                    break;
+                case BuiltInFilters.Median:
+                    Debug.WriteLine("Two stage median not implemented yet");
+                    break;
+                default:
+                    Debug.WriteLine("Wrong builtinfilter at TwoStage233 main.cs");
+                    break;
+            }
+            Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage;
+            Image<Gray, Byte> res = new(img.Width, img.Height);
+            CvInvoke.Filter2D(img, res, new Matrix<float>(kernel55), new System.Drawing.Point(-1, -1), 0, border);
+            Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
+            PrintMatrix(kernel55);
+
+        }
+        private static float[,] Convolution(float[,] matrix1, float[,] matrix2)
+        {
+            float[,] resultMatrix = new float[5, 5];
+
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    for (int m = 0; m < 3; m++)
+                    {
+                        for (int n = 0; n < 3; n++)
+                        {
+                            resultMatrix[i + m, j + n] += matrix1[i, j] * matrix2[m, n];
+                        }
+                    }
+                }
+            }
+
+            return resultMatrix;
+        }
+        private static void PrintMatrix(float[,] matrix)
+        {
+            int rows = matrix.GetLength(0);
+            int columns = matrix.GetLength(1);
+
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < columns; j++)
+                {
+                    Debug.Write(matrix[i, j] + "\t");
+                }
+                Debug.WriteLine("");
+            }
+        }
     }
 }
+

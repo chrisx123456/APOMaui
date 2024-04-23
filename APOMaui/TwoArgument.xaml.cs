@@ -99,7 +99,25 @@ public partial class TwoArgument : ContentPage
 			return;
 		}
 		//TODO; Blend weight
-        Main.TwoArgsOperations((int)_selectedImage1, (int)_selectedImage1, (TwoArgsOps)_selectedOperation, -1, -1);
+		if(_selectedOperation == TwoArgsOps.BLEND)
+		{
+            if (!double.TryParse(await DisplayPromptAsync("Weight 1", "Type Weigt 1 value"), out double w1) && w1 < 0 && w1 > 1)
+			{
+                await DisplayAlert("Alert", "Weight 1 value not valid", "Ok");
+                return;
+            }
+            if (!double.TryParse(await DisplayPromptAsync("Weight 2", "Type Weigt 2 value"), out double w2) && w2<0 && w2>1)
+            {
+                await DisplayAlert("Alert", "Weight 2 value not valid", "Ok");
+                return;
+            }
+            Main.TwoArgsOperations((int)_selectedImage1, (int)_selectedImage1, (TwoArgsOps)_selectedOperation, w1, w2);
+        }
+        else
+		{
+			Main.TwoArgsOperations((int)_selectedImage1, (int)_selectedImage1, (TwoArgsOps)_selectedOperation, -1, -1);
+		}
+		
     }
 
 }

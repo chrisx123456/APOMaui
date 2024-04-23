@@ -18,7 +18,8 @@ namespace APOMaui
         LaplacianEdge,
         Canny,
         Blur,
-        GaussianBlur
+        GaussianBlur,
+        Median
     }
     public enum TwoArgsOps
     {

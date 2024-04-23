@@ -1,18 +1,32 @@
 ﻿
 using Emgu.CV.CvEnum;
-using Emgu.CV.Ocl;
-using System.Diagnostics;
 
 namespace APOMaui;
 
 public partial class Kernels : ContentPage
-{ 
-    private static readonly List<String> _borderOptions = new List<String> { "Isolated", "Reflect", "Replicate" };
-    private static readonly List<String> _kernelSizes = new() { "3", "5", "7" };
-    private static readonly List<String> _filtersOptions = new List<String> {"Median", "Blur", "GaussianBlur", "SobelX","SobelY", "LaplacianEdge", "Canny","LaplacianSharpen1",
+{
+    private static readonly List<string> _stage1Options = new List<string> { "Median", "Blur", "GaussianBlur" };
+    private static readonly List<string> _stage2Options = new List<string> { "LaplacianSharpen1", "LaplacianSharpen2", "LaplacianSharpen3" };
+    private static readonly List<string> _borderOptions = new List<string> { "Isolated", "Reflect", "Replicate" };
+    private static readonly List<string> _kernelSizes = new() { "3", "5", "7" };
+    private static readonly List<string> _filtersOptions = new List<string> {"Median", "Blur", "GaussianBlur", "SobelX","SobelY", "LaplacianEdge", "Canny","LaplacianSharpen1",
         "LaplacianSharpen2", "LaplacianSharpen3", "PrewittE", "PrewittSE", "PrewittS", "PrewittSW", "PrewittW", "PrewittNW", "PrewittN", "PrewittNE"};
-    private static readonly Dictionary<String, float[,]> _filtersDictionary = new() 
+    private static readonly Dictionary<string, float[,]> _filtersDictionary = new() 
 	{
+        {"Hi-Pass",
+            new float[,]
+            {
+                {},
+                {},
+                {}
+            }},
+        {"Lo-Pass",
+            new float[,]
+            {
+                {},
+                {},
+                {}
+            }},
         {"Median",
             new float[,]
             {
@@ -146,7 +160,7 @@ public partial class Kernels : ContentPage
             }},
 
     };//Blur:0, GBlur:1, Canny:2<->In-Built functions so untypical matrix to identify later on
-    private static readonly Dictionary<String, Emgu.CV.CvEnum.BorderType> _bordersDictionary = new()
+    private static readonly Dictionary<string, Emgu.CV.CvEnum.BorderType> _bordersDictionary = new()
     {
         {"Isolated", Emgu.CV.CvEnum.BorderType.Isolated },
         {"Reflect", Emgu.CV.CvEnum.BorderType.Reflect },
@@ -157,6 +171,8 @@ public partial class Kernels : ContentPage
     private static Emgu.CV.CvEnum.BorderType? _selectedBorder = null;
     private static float[,]? _selectedFilter = null;
     private static string? _selectedBuiltInFilter = null;
+    private static string? _stage1SelectedFilter = null;
+    private static string? _stage2SelectedFilter = null;
     private static int _matrixSize;
 
     public Kernels()
@@ -169,6 +185,8 @@ public partial class Kernels : ContentPage
 		EdgePicker.ItemsSource = _borderOptions;
 		FilterPicker.ItemsSource = _filtersOptions;
         SizePicker.ItemsSource = _kernelSizes;
+        Stage1Picker.ItemsSource = _stage1Options;
+        Stage2Picker.ItemsSource= _stage2Options;
         _selectedBorder = null;
         _selectedFilter = null;
         _matrixSize = 3;
@@ -176,11 +194,53 @@ public partial class Kernels : ContentPage
         CreateMatrix(_matrixSize, false);
 
     }
+    private void IsTwoStageCheckedChanged(object sender, EventArgs e)
+    {
+        if(IsTwoStage.IsChecked == true)
+        {
+            foreach (Entry entry in _entries) entry.Text = null;
+            IsCustomKernel.IsChecked = false;
+            FilterPicker.IsEnabled = false;
+            FilterPicker.IsVisible = false;
+            FilterPickerLabel.IsEnabled = false;
+            FilterPickerLabel.IsVisible = false;
+            //MatrixGrid.IsVisible = false;
+            //MatrixGrid.IsEnabled = false;
+
+            Stage1Picker.IsEnabled = true;
+            Stage1Picker.IsVisible = true;
+            Stage2Picker.IsEnabled = true;
+            Stage2Picker.IsVisible = true;
+            Stage1PickerLabel.IsEnabled = true;
+            Stage1PickerLabel.IsVisible = true;
+            Stage2PickerLabel.IsEnabled = true;
+            Stage2PickerLabel.IsVisible = true;
+        } 
+        else
+        {
+            foreach (Entry entry in _entries) entry.Text = null;
+            FilterPicker.IsEnabled = true;
+            FilterPicker.IsVisible = true;
+            FilterPickerLabel.IsEnabled = true;
+            FilterPickerLabel.IsVisible = true;
+            MatrixGrid.IsVisible = true;
+            MatrixGrid.IsEnabled = true;
+
+            Stage1Picker.IsEnabled = false;
+            Stage1Picker.IsVisible = false;
+            Stage2Picker.IsEnabled = false;
+            Stage2Picker.IsVisible = false;
+            Stage1PickerLabel.IsEnabled = false;
+            Stage1PickerLabel.IsVisible = false;
+            Stage2PickerLabel.IsEnabled = false;
+            Stage2PickerLabel.IsVisible = false;
+        }
+    }
     private void OnFilterPickerSelectedIndexChanged(object sender, EventArgs e)
     {
-
-
-        if (_filtersDictionary[FilterPicker.SelectedItem.ToString()].GetLength(0) == 3 && _filtersDictionary[FilterPicker.SelectedItem.ToString()].GetLength(1) == 3)
+        if (FilterPicker.SelectedIndex != -1 && FilterPicker.SelectedItem != null && 
+            _filtersDictionary[FilterPicker.SelectedItem.ToString()].GetLength(0) == 3 && 
+            _filtersDictionary[FilterPicker.SelectedItem.ToString()].GetLength(1) == 3)
         {
             _selectedFilter = _filtersDictionary[FilterPicker.SelectedItem.ToString()];
             _selectedBuiltInFilter = null;
@@ -214,6 +274,7 @@ public partial class Kernels : ContentPage
     {
         if (IsCustomKernel.IsChecked == true)
         {
+            IsTwoStage.IsChecked = false;
             ClearEntriesValues_ResetCheckedValues();
             foreach(Entry entry in _entries) entry.IsEnabled = true;
           
@@ -243,6 +304,21 @@ public partial class Kernels : ContentPage
             SizePickerLabel.IsEnabled = false;
             SizePickerLabel.IsVisible = false;
 
+        }
+    }
+    private void OnStage1PickerSelectedIndexChanged(object sender, EventArgs e)
+    {
+        if(Stage1Picker.SelectedItem != null && Stage1Picker.SelectedIndex != -1) 
+        {
+            _stage1SelectedFilter = Stage1Picker.SelectedItem.ToString();
+        }
+    }
+    private void OnStage2PickerSelectedIndexChanged(object sender, EventArgs e)
+    {
+        if (Stage2Picker.SelectedItem != null && Stage2Picker.SelectedIndex != -1)
+        {
+            _stage2SelectedFilter = Stage2Picker.SelectedItem.ToString();
+            FillKernel(_filtersDictionary[_stage2SelectedFilter]);
         }
     }
     private void ClearEntriesValues_ResetCheckedValues()
@@ -346,7 +422,7 @@ public partial class Kernels : ContentPage
         return kernel;
     }
     public async void OnKernelButtonClicked(object sender, EventArgs e)
-	{
+    {
         if (Main.selectedWindow == null)
         {
             await DisplayAlert("Alert", "None image is selected!", "Ok");
@@ -363,71 +439,120 @@ public partial class Kernels : ContentPage
             await DisplayAlert("Alert", "Border type not selected", "Ok");
             return;
         }
-        switch (IsCustomKernel.IsChecked)
+
+        BorderType border = (BorderType)_selectedBorder;
+
+        if (IsCustomKernel.IsChecked == true && IsTwoStage.IsChecked == true)
         {
-            case true:
-                    float[,] customKernel = new float[_matrixSize, _matrixSize];
-                    customKernel = ReadKernel();
-                    if (customKernel == null)
-                    {
-                        await DisplayAlert("Alert", "Entered kernel not valid", "Ok");
-                        return;
-                    }
-                    Main.ApplyKernel(index, customKernel, (BorderType)_selectedBorder);
+            await DisplayAlert("Error", "CustoKernel && TwoStage are True", "Ok");
+            return;
+        }
+        
+        if (IsCustomKernel.IsChecked == true)
+        {
+            ApplyCustomKernel(index, border);
+        }
+
+        if(IsTwoStage.IsChecked == true)
+        {
+            TwoStageFilter(index, border);
+        }
+
+        if (IsCustomKernel.IsChecked == false && IsTwoStage.IsChecked == false)
+        {
+            ApplyFilter(index, border);
+        }
+
+    }
+    private async void TwoStageFilter(int index, BorderType border)
+    {
+        if (_stage1SelectedFilter == null || _stage2SelectedFilter == null)
+        {
+            await DisplayAlert("Alert", "Stage 1/2 not selected", "Ok");
+            return;
+        }
+        BuiltInFilters stage1;
+        float[,] stage2kernel;
+        switch (_stage1SelectedFilter)
+        {
+            case "Blur":
+                stage1 = BuiltInFilters.Blur;
                 break;
-            case false:
-                if (_selectedFilter == null && _selectedBuiltInFilter == null)
+            case "GaussianBlur":
+                stage1 = BuiltInFilters.GaussianBlur;
+                break;
+            case "Median":
+                stage1 = BuiltInFilters.Median;
+                break;
+            default:
+                return;
+        }
+        stage2kernel = _filtersDictionary[_stage2SelectedFilter];
+        Main.TwoStage233(index, border, stage1, stage2kernel);
+
+    }
+    private async void ApplyCustomKernel(int index, BorderType border)
+    {
+        float[,] customKernel = new float[_matrixSize, _matrixSize];
+        customKernel = ReadKernel();
+        if (customKernel == null)
+        {
+            await DisplayAlert("Alert", "Entered kernel not valid", "Ok");
+            return;
+        }
+        Main.ApplyKernel(index, customKernel, border);
+    }
+    private async void ApplyFilter(int index, BorderType border)
+    {
+        if (_selectedFilter == null && _selectedBuiltInFilter == null)
+        {
+            await DisplayAlert("Alert", "Kernel/Filter not selected", "Ok");
+            return;
+        }
+        switch (_selectedBuiltInFilter)
+        {
+            case "SobelX":
+                Main.EdgeDetectionFilters(index, BuiltInFilters.SobelX, border, -1, -1);
+                break;
+            case "SobelY":
+                Main.EdgeDetectionFilters(index, BuiltInFilters.SobelY, border, -1, -1);
+                break;
+            case "LaplacianEdge":
+                Main.EdgeDetectionFilters(index, BuiltInFilters.LaplacianEdge, border, -1, -1);
+                break;
+            case "Canny":
+                int ths1, ths2;
+                if (!int.TryParse(await DisplayPromptAsync("Threshold 1", "Type Threshold 1 value"), out ths1))
                 {
-                    await DisplayAlert("Alert", "Kernel/Filter not selected", "Ok");
+                    await DisplayAlert("Alert", "Threshold 1 value not valid", "Ok");
                     return;
                 }
-                switch (_selectedBuiltInFilter)
+                if (!int.TryParse(await DisplayPromptAsync("Threshold 2", "Type Threshold 2 value"), out ths2))
                 {
-                    case "SobelX":
-                            Main.EdgeDetectionFilters(index, BuiltInFilters.SobelX, (BorderType)_selectedBorder, -1, -1);
-                        break;
-                    case "SobelY":
-                            Main.EdgeDetectionFilters(index, BuiltInFilters.SobelY, (BorderType)_selectedBorder, -1, -1);
-                        break;
-                    case "LaplacianEdge":
-                            Main.EdgeDetectionFilters(index, BuiltInFilters.LaplacianEdge, (BorderType)_selectedBorder, -1, -1);
-                        break;
-                    case "Canny":
-                            int ths1, ths2;
-                            if (!int.TryParse(await DisplayPromptAsync("Threshold 1", "Type Threshold 1 value"), out ths1))
-                            {
-                                await DisplayAlert("Alert", "Threshold 1 value not valid", "Ok");
-                                return;
-                            }
-                            if (!int.TryParse(await DisplayPromptAsync("Threshold 2", "Type Threshold 2 value"), out ths2))
-                            {
-                                await DisplayAlert("Alert", "Threshold 2 value not valid", "Ok");
-                                return;
-                            }
-                            Main.EdgeDetectionFilters(index, BuiltInFilters.Canny, (BorderType)_selectedBorder, ths1, ths2);
-                        break;
-                    case "Median":
-                            string[] options = {"3","5","7"};
-                            string picked = await DisplayActionSheet("Pick size", "Cancel", null, options);
-                            if (!int.TryParse(picked, out int ksize))
-                            {
-                                await DisplayAlert("Alert", "Error, kernel size not valid", "Ok");
-                                return;
-                            }
-                            Main.MedianFilter(index, ksize, (BorderType)_selectedBorder, (int)(ksize/2));
-                        break;
-                    case "GaussianBlur":
-                            Main.BlurFilrers(index, BuiltInFilters.GaussianBlur, (BorderType)_selectedBorder);
-                        break;
-                    case "Blur":
-                            Main.BlurFilrers(index, BuiltInFilters.Blur, (BorderType)_selectedBorder);
-                        break;
-                    default:
-                            Main.ApplyKernel(index, _selectedFilter, (BorderType)_selectedBorder);
-                        break;
+                    await DisplayAlert("Alert", "Threshold 2 value not valid", "Ok");
+                    return;
                 }
+                Main.EdgeDetectionFilters(index, BuiltInFilters.Canny, border, ths1, ths2);
+                break;
+            case "Median":
+                string[] options = { "3", "5", "7" };
+                string picked = await DisplayActionSheet("Pick size", "Cancel", null, options);
+                if (!int.TryParse(picked, out int ksize))
+                {
+                    await DisplayAlert("Alert", "Error, kernel size not valid", "Ok");
+                    return;
+                }
+                Main.MedianFilter(index, ksize, border, (int)(ksize / 2));
+                break;
+            case "GaussianBlur":
+                Main.BlurFilrers(index, BuiltInFilters.GaussianBlur, border);
+                break;
+            case "Blur":
+                Main.BlurFilrers(index, BuiltInFilters.Blur, border);
+                break;
+            default:
+                Main.ApplyKernel(index, _selectedFilter, border);
                 break;
         }
     }
-
 }
