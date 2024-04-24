@@ -1,11 +1,13 @@
 ﻿
+using Emgu.CV;
 using Emgu.CV.CvEnum;
+using System.Diagnostics;
 
 namespace APOMaui;
 
 public partial class Kernels : ContentPage
 {
-    private static readonly List<string> _stage1Options = new List<string> { "Median", "Blur", "GaussianBlur" };
+    private static readonly List<string> _stage1Options = new List<string> {"Blur", "GaussianBlur" };
     private static readonly List<string> _stage2Options = new List<string> { "LaplacianSharpen1", "LaplacianSharpen2", "LaplacianSharpen3" };
     private static readonly List<string> _borderOptions = new List<string> { "Isolated", "Reflect", "Replicate" };
     private static readonly List<string> _kernelSizes = new() { "3", "5", "7" };
@@ -13,20 +15,6 @@ public partial class Kernels : ContentPage
         "LaplacianSharpen2", "LaplacianSharpen3", "PrewittE", "PrewittSE", "PrewittS", "PrewittSW", "PrewittW", "PrewittNW", "PrewittN", "PrewittNE"};
     private static readonly Dictionary<string, float[,]> _filtersDictionary = new() 
 	{
-        {"Hi-Pass",
-            new float[,]
-            {
-                {},
-                {},
-                {}
-            }},
-        {"Lo-Pass",
-            new float[,]
-            {
-                {},
-                {},
-                {}
-            }},
         {"Median",
             new float[,]
             {
@@ -44,16 +32,16 @@ public partial class Kernels : ContentPage
         {"GaussianBlur",
             new float[,]
             {
-                {},
-                {},
-                {}
+            { 1f, 2f, 1f },
+            { 2f, 4f, 2f },
+            { 1f, 2f, 1f }
             }},
         {"Blur",
             new float[,]
             {
-                {},
-                {},
-                {}
+            { 1f, 1f, 1f },
+            { 1f, 1f, 1f },
+            { 1f, 1f, 1f }
             }},
         {"SobelX",
             new float[,]
@@ -80,7 +68,7 @@ public partial class Kernels : ContentPage
             new float[,]
             {
                 { 0f,-1f,0f},
-                {-1f, 5f,1f},
+                {-1f, 5f,-1f},
                 { 0f,-1f,0f}
             }},
         {"LaplacianSharpen2",
@@ -245,7 +233,8 @@ public partial class Kernels : ContentPage
             _selectedFilter = _filtersDictionary[FilterPicker.SelectedItem.ToString()];
             _selectedBuiltInFilter = null;
             FillKernel(_selectedFilter);
-            if (FilterPicker.SelectedItem.ToString() == "SobelX" || FilterPicker.SelectedItem.ToString() == "SobelY")
+            if (FilterPicker.SelectedItem.ToString() == "SobelX" || FilterPicker.SelectedItem.ToString() == "SobelY" ||
+                FilterPicker.SelectedItem.ToString() == "Blur" || FilterPicker.SelectedItem.ToString() == "GaussianBlur")
             {
                 _selectedBuiltInFilter = FilterPicker.SelectedItem.ToString();
                 _selectedFilter = null;
@@ -274,6 +263,7 @@ public partial class Kernels : ContentPage
     {
         if (IsCustomKernel.IsChecked == true)
         {
+            SizePicker.SelectedIndex = 0;
             IsTwoStage.IsChecked = false;
             ClearEntriesValues_ResetCheckedValues();
             foreach(Entry entry in _entries) entry.IsEnabled = true;
@@ -386,7 +376,7 @@ public partial class Kernels : ContentPage
                     krow++;
                     kcol = 0;
                 }
-                _entries[i].Text = kernel[krow, kcol].ToString();
+                _entries[i].Text = kernel[krow, kcol].ToString("#");
                 kcol++;
             }
         } else
@@ -418,6 +408,11 @@ public partial class Kernels : ContentPage
             }
         }
         else return null;
+
+        float sum = kernel.Cast<float>().Sum();
+        for (int i = 0; i < rows; i++)
+            for (int j = 0; j < cols; j++)
+                kernel[i, j] = kernel[i, j] / sum;
 
         return kernel;
     }
@@ -481,14 +476,23 @@ public partial class Kernels : ContentPage
             case "GaussianBlur":
                 stage1 = BuiltInFilters.GaussianBlur;
                 break;
-            case "Median":
-                stage1 = BuiltInFilters.Median;
-                break;
             default:
                 return;
         }
         stage2kernel = _filtersDictionary[_stage2SelectedFilter];
-        Main.TwoStage233(index, border, stage1, stage2kernel);
+        //Main.TwoStage233(index, border, stage1, new Matrix<float>(stage2kernel));
+        string result = await DisplayActionSheet("Option", "Cancel", null, "2*3x3 Kernel", "5x5 Kernel");
+        switch(result)
+        {
+            case "Cancel":
+                return;
+            case "2*3x3 Kernel":
+                Main.TwoStage233(index, border, stage1, new Matrix<float>(stage2kernel));
+                break;
+            case "5x5 Kernel":
+                Main.TwoStage55(index, border, stage1, new Matrix<float>(stage2kernel));
+                break;
+        }
 
     }
     private async void ApplyCustomKernel(int index, BorderType border)
@@ -522,12 +526,12 @@ public partial class Kernels : ContentPage
                 break;
             case "Canny":
                 int ths1, ths2;
-                if (!int.TryParse(await DisplayPromptAsync("Threshold 1", "Type Threshold 1 value"), out ths1))
+                if (!int.TryParse(await DisplayPromptAsync("Threshold 1", "Type Threshold 1 value"), out ths1) && ths1>=0 && ths1<=255)
                 {
                     await DisplayAlert("Alert", "Threshold 1 value not valid", "Ok");
                     return;
                 }
-                if (!int.TryParse(await DisplayPromptAsync("Threshold 2", "Type Threshold 2 value"), out ths2))
+                if (!int.TryParse(await DisplayPromptAsync("Threshold 2", "Type Threshold 2 value"), out ths2) && ths2 >= 0 && ths2 <= 255)
                 {
                     await DisplayAlert("Alert", "Threshold 2 value not valid", "Ok");
                     return;

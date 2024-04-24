@@ -17,7 +17,6 @@ public partial class TwoArgument : ContentPage
 		_imageList = GetImagesList();
 		AddPickersItems();
 		Main.OnWinIMGClosingEvent += this.UpdatePickersItems;
-        //Dodac event zeby to sie aktualizowalo
         //Zmienic w kernelach zeby wsm tak samo sie do pickera dodawalo jak tutaj
 
     }
@@ -67,25 +66,32 @@ public partial class TwoArgument : ContentPage
 		{
 			case "ADD":
 				_selectedOperation = TwoArgsOps.ADD;
-				break;
+                Img2Picker.IsEnabled = true;
+                break;
 			case "SUBSTRACT":
 				_selectedOperation = TwoArgsOps.SUBTRACT;
-				break;
+                Img2Picker.IsEnabled = true;
+                break;
 			case "BLEND":
 				_selectedOperation = TwoArgsOps.BLEND;
-				break;
+                Img2Picker.IsEnabled = true;
+                break;
 			case "AND":
 				_selectedOperation = TwoArgsOps.AND;
-				break;
+                Img2Picker.IsEnabled = true;
+                break;
 			case "OR":
 				_selectedOperation = TwoArgsOps.OR;
-				break;
+                Img2Picker.IsEnabled = true;
+                break;
 			case "NOT":
 				_selectedOperation = TwoArgsOps.NOT;
-				break;
+                Img2Picker.IsEnabled = false;
+                break;
 			case "XOR":
 				_selectedOperation = TwoArgsOps.XOR;
-				break;
+                Img2Picker.IsEnabled = true;
+                break;
 			default:
 				_selectedOperation = null;
 				break;
@@ -93,7 +99,7 @@ public partial class TwoArgument : ContentPage
     }
     private async void OnTwoArgumentButtonClicked(object sender, EventArgs e)
     {
-		if(_selectedImage1 == null || _selectedImage2 == null || _selectedOperation == null)
+		if(_selectedImage1 == null || (_selectedImage2 == null && Img2Picker.IsEnabled==true) || _selectedOperation == null)
 		{
 			await DisplayAlert("Alert", "Image 1/2 or operation not selected", "Ok");
 			return;
@@ -101,21 +107,25 @@ public partial class TwoArgument : ContentPage
 		//TODO; Blend weight
 		if(_selectedOperation == TwoArgsOps.BLEND)
 		{
-            if (!double.TryParse(await DisplayPromptAsync("Weight 1", "Type Weigt 1 value"), out double w1) && w1 < 0 && w1 > 1)
+            if (!double.TryParse(await DisplayPromptAsync("Weight 1", "Type Weigt 1 value"), out double w1) && w1 >= 0 && w1 <= 1)
 			{
                 await DisplayAlert("Alert", "Weight 1 value not valid", "Ok");
                 return;
             }
-            if (!double.TryParse(await DisplayPromptAsync("Weight 2", "Type Weigt 2 value"), out double w2) && w2<0 && w2>1)
+            if (!double.TryParse(await DisplayPromptAsync("Weight 2", "Type Weigt 2 value"), out double w2) && w2 >= 0 && w2 <= 1)
             {
                 await DisplayAlert("Alert", "Weight 2 value not valid", "Ok");
                 return;
             }
-            Main.TwoArgsOperations((int)_selectedImage1, (int)_selectedImage1, (TwoArgsOps)_selectedOperation, w1, w2);
+            Main.TwoArgsOperations((int)_selectedImage1, (int)_selectedImage2, (TwoArgsOps)_selectedOperation, w1, w2);
+        }
+		else if(_selectedOperation == TwoArgsOps.NOT)
+		{
+            Main.TwoArgsOperations((int)_selectedImage1, (int)_selectedImage1, (TwoArgsOps)_selectedOperation, -1, -1);
         }
         else
 		{
-			Main.TwoArgsOperations((int)_selectedImage1, (int)_selectedImage1, (TwoArgsOps)_selectedOperation, -1, -1);
+			Main.TwoArgsOperations((int)_selectedImage1, (int)_selectedImage2, (TwoArgsOps)_selectedOperation, -1, -1);
 		}
 		
     }
