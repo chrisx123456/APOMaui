@@ -439,7 +439,7 @@ public partial class Kernels : ContentPage
 
         if (IsCustomKernel.IsChecked == true && IsTwoStage.IsChecked == true)
         {
-            await DisplayAlert("Error", "CustoKernel && TwoStage are True", "Ok");
+            await DisplayAlert("Error", "CustomKernel && TwoStage are True", "Ok");
             return;
         }
         

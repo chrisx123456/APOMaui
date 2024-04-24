@@ -87,6 +87,8 @@ public partial class TwoArgument : ContentPage
 			case "NOT":
 				_selectedOperation = TwoArgsOps.NOT;
                 Img2Picker.IsEnabled = false;
+				_selectedImage2 = null;
+				Img2Picker.SelectedIndex = -1;
                 break;
 			case "XOR":
 				_selectedOperation = TwoArgsOps.XOR;
@@ -104,8 +106,13 @@ public partial class TwoArgument : ContentPage
 			await DisplayAlert("Alert", "Image 1/2 or operation not selected", "Ok");
 			return;
 		}
-		//TODO; Blend weight
-		if(_selectedOperation == TwoArgsOps.BLEND)
+        if (Main.OpenedImagesWindowsList[(int)_selectedImage1].winImg.Type != ImgType.Gray 
+			|| (_selectedImage2 != null && Main.OpenedImagesWindowsList[(int)_selectedImage2].winImg.Type != ImgType.Gray))
+        {
+            await DisplayAlert("Alert", "Selected image 1/2 is not GrayScale", "Ok");
+            return;
+        }
+        if (_selectedOperation == TwoArgsOps.BLEND)
 		{
             if (!double.TryParse(await DisplayPromptAsync("Weight 1", "Type Weigt 1 value"), out double w1) && w1 >= 0 && w1 <= 1)
 			{
