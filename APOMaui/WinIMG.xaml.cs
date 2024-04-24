@@ -7,6 +7,8 @@ namespace APOMaui;
 
 public partial class WinIMG : ContentPage
 {
+    //Add backup 4 color images!
+    private Image<Gray, Byte>? backupGray;
     private Image<Bgr, Byte>? colorImage;
     private Image<Gray, Byte>? grayImage;
     public ImageSource ImageSource { get; set; }
@@ -102,7 +104,11 @@ public partial class WinIMG : ContentPage
     {
         BindingContext = null;
         if (colorImage != null) colorImage.Dispose();
-        if (grayImage != null) grayImage.Dispose();
+        if (grayImage != null)
+        {
+            backupGray = grayImage.Clone();
+            grayImage.Dispose();
+        }
         grayImage = value;
         this.ImageSource = EmguImgToImageSource(grayImage);
         BindingContext = this;
@@ -140,6 +146,15 @@ public partial class WinIMG : ContentPage
         Main.OpenedImagesWindowsList[index].window.Height -= (int)((20 * imgScale) + 0.5); // Approx. Height
         Main.OpenedImagesWindowsList[index].window.Width -= 20;
         winImgBox.WidthRequest = winImgBox.Width - 20;
+    }
+    public void Undo(object sender, EventArgs e)
+    {
+        if(backupGray != null)
+        {
+            this.GrayImage = backupGray;
+            backupGray.Dispose();
+            backupGray = null;
+        }
     }
 
 
