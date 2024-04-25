@@ -65,6 +65,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="Resources\Images\line.png" />
 	  <None Remove="Resources\Images\zoomin.png" />
 	  <None Remove="Resources\Images\zoomout.png" />
 	</ItemGroup>
@@ -74,6 +75,7 @@
 		<PackageReference Include="Emgu.CV.Bitmap" Version="4.8.1.5350" />
 		<PackageReference Include="Emgu.CV.runtime.maui.mini" Version="4.8.1.5350" />
 		<PackageReference Include="LiveChartsCore.SkiaSharpView.Maui" Version="2.0.0-rc2" />
+		<PackageReference Include="Microcharts.Maui" Version="1.0.0" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
@@ -107,12 +109,6 @@
 	  <MauiXaml Update="WinIMG.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	</ItemGroup>
-
-	<ItemGroup Condition="'$(TargetFramework)' == 'net8.0-android'">
-	  <PackageReference Include="Emgu.CV.runtime.maui.mini.android">
-	    <Version>4.8.1.5350</Version>
-	  </PackageReference>
 	</ItemGroup>
 
 </Project>

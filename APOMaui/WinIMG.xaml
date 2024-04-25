@@ -13,10 +13,11 @@
         </Grid.RowDefinitions>
 
         <!-- Kontener na przyciski -->
-        <StackLayout Grid.Row="0" Orientation="Horizontal" VerticalOptions="Center" HorizontalOptions="Start">
-            <ImageButton Margin="6" Padding="4" Source="undo.png" WidthRequest="1" Clicked="Undo" VerticalOptions="Center" HorizontalOptions="Center"/>
-            <ImageButton Margin="6" Padding="4" Source="zoomin.png" WidthRequest="1" Clicked="ZoomIn" VerticalOptions="Center" HorizontalOptions="Center"/>
-            <ImageButton Margin="6" Padding="4" Source="zoomout.png" WidthRequest="1" Clicked="ZoomOut" VerticalOptions="Center" HorizontalOptions="Center"/>
+        <StackLayout Grid.Row="0" Orientation="Horizontal" VerticalOptions="Start" HorizontalOptions="Start">
+            <ImageButton Margin="3" Padding="2" Source="undo.png" MinimumWidthRequest="20" WidthRequest="36" Clicked="Undo" VerticalOptions="Center" HorizontalOptions="Center"/>
+            <ImageButton Margin="3" Padding="2" Source="zoomin.png" MinimumWidthRequest="20" WidthRequest="36" Clicked="ZoomIn" VerticalOptions="Center" HorizontalOptions="Center"/>
+            <ImageButton Margin="3" Padding="2" Source="zoomout.png" MinimumWidthRequest="20" WidthRequest="36" Clicked="ZoomOut" VerticalOptions="Center" HorizontalOptions="Center"/>
+            <ImageButton Margin="3" Padding="2" Source="line.png" MinimumWidthRequest="20" WidthRequest="36" Clicked="ProfileLine" VerticalOptions="Center" HorizontalOptions="Center"/>
             <Label x:Name="scaleLabel" Margin="6" Padding="4" Text="" FontSize="20" FontAttributes="Bold" VerticalOptions="Center" HorizontalOptions="Center"/>
             <!-- Dodaj kolejne przyciski według potrzeb -->
         </StackLayout>

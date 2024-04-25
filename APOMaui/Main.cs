@@ -2,6 +2,7 @@
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using System.Diagnostics;
+using System.Numerics;
 namespace APOMaui
 {
     internal static class Main
@@ -465,6 +466,23 @@ namespace APOMaui
             Image<Gray, Byte> res = new(img.Width, img.Height);
             CvInvoke.Filter2D(img, res, finalkernel5x5, new System.Drawing.Point(-1, -1), 0, border);
             Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
+
+        }
+        public static void ProfileLine(int index, System.Drawing.Point pt1, System.Drawing.Point pt2)
+        {
+            //Debug.WriteLine($"{pt1.X}, {pt1.Y}, {pt2.X}, {pt2.Y}");
+            Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage.Clone();
+            CvInvoke.Line(img, pt1, pt2, new MCvScalar(), 1, LineType.EightConnected, 0);
+            Main.OpenedImagesWindowsList[index].winImg.GrayImage = img;
+            LineIterator it = new(img.Mat, pt1, pt2, 8, false);
+            byte[,,] data = img.Data;
+            byte[] res = new byte[it.Count];
+            for(int i = 0; i < it.Count; i++)
+            {
+                res[i] = data[it.Pos.X, it.Pos.Y, 0];
+                it.MoveNext();
+            }
+            
 
         }
     }

@@ -1,4 +1,4 @@
-
+﻿
 using Emgu.CV;
 using Emgu.CV.Structure;
 using System.Drawing;
@@ -25,20 +25,20 @@ public partial class WinIMG : ContentPage
 
     public Image<Bgr, Byte> ColorImage
     {
-        get 
-        { 
-            if(colorImage!=null) return colorImage;
+        get
+        {
+            if (colorImage != null) return colorImage;
             else
             {
                 System.Diagnostics.Debug.WriteLine("WINImg.xaml.cs: Tried to get color image while image is GrayScale");
-                return new Image<Bgr, Byte>(0,0);
+                return new Image<Bgr, Byte>(0, 0);
             }
         }
-        set 
+        set
         {
             BindingContext = null;
-            if(grayImage != null) grayImage.Dispose();
-            if(colorImage != null) colorImage.Dispose();
+            if (grayImage != null) grayImage.Dispose();
+            if (colorImage != null) colorImage.Dispose();
             colorImage = value;
             this.ImageSource = EmguImgToImageSource(colorImage);
             BindingContext = this;
@@ -47,9 +47,9 @@ public partial class WinIMG : ContentPage
     }   // Setter&Getter to refresh content after RGB->Grayscale, Dispose other img, Set new ImageSource
     public Image<Gray, Byte> GrayImage
     {
-        get 
+        get
         {
-            if(grayImage!=null) return grayImage;
+            if (grayImage != null) return grayImage;
             else
             {
                 System.Diagnostics.Debug.WriteLine("WINImg.xaml.cs: Tried to get grayscale image while image is Color");
@@ -134,28 +134,76 @@ public partial class WinIMG : ContentPage
         base.OnDisappearing();
         Main.OnCloseEventWinIMG(index);
     }
-    public void ZoomIn(object sender, EventArgs e)
+    private void ZoomIn(object sender, EventArgs e)
     {
         Main.OpenedImagesWindowsList[index].window.Height += (int)((20 * imgScale) + 0.5); // Approx. Height
         Main.OpenedImagesWindowsList[index].window.Width += 20;
         winImgBox.WidthRequest = winImgBox.Width + 20;
 
     }
-    public void ZoomOut(object sender, EventArgs e)
+    private void ZoomOut(object sender, EventArgs e)
     {
         Main.OpenedImagesWindowsList[index].window.Height -= (int)((20 * imgScale) + 0.5); // Approx. Height
         Main.OpenedImagesWindowsList[index].window.Width -= 20;
         winImgBox.WidthRequest = winImgBox.Width - 20;
     }
-    public void Undo(object sender, EventArgs e)
+    private void Undo(object sender, EventArgs e)
     {
-        if(backupGray != null)
+        if (backupGray != null)
         {
             this.GrayImage = backupGray;
             backupGray.Dispose();
             backupGray = null;
         }
     }
+    private void ProfileLine(object sender, EventArgs e)
+    {
+        int c = 0;
+        TapGestureRecognizer tgr = new TapGestureRecognizer();
+        winImgBox.GestureRecognizers.Add(tgr);
+        System.Drawing.Point p1 = new System.Drawing.Point();
+        System.Drawing.Point p2 = new System.Drawing.Point();
+        tgr.Tapped += (s, e) =>
+        {
+
+            Main.ChangeSelectedtWinIMG(this.index);
+            var img = s as Microsoft.Maui.Controls.Image;
+            var tappedEvent = e as TappedEventArgs;
+            Microsoft.Maui.Graphics.Point? tapPos = e.GetPosition(img);
+            if (img != null && tapPos != null && grayImage != null)
+            {
+                // Rozmiar obrazka
+                var imageSize = new System.Drawing.Size((int)img.Width, (int)img.Height);
+
+                // Rozmiar obrazu źródłowego
+                var sourceSize = new System.Drawing.Size(grayImage.Width, grayImage.Height);
+
+                // Współrzędne piksela w obrazie źródłowym
+                var pixelX = (int)(tapPos?.X * (sourceSize.Width / (double)imageSize.Width));
+                var pixelY = (int)(tapPos?.Y * (sourceSize.Height / (double)imageSize.Height));
+
+                // Wyświetlenie współrzędnych piksela
+                //Debug.WriteLine($"Pozycja kliknięcia: X={tapPos?.X}, Y={tapPos?.Y}");
+                //Debug.WriteLine($"Współrzędne piksela: X={pixelX}, Y={pixelY}");
+                c++;
+                if (c == 1)
+                {
+                    p1.X = pixelX;
+                    p1.Y = pixelY;
+                }
+                if (c == 2)
+                {
+                    p2.X = pixelX;
+                    p2.Y = pixelY;
+                    Main.ProfileLine(index, p1, p2);
+                    this.winImgBox.GestureRecognizers.Clear();
+                }
+            }
+
+        };
+        
+    }
+    
 
 
 }
