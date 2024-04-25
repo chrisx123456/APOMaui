@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="APOMaui.Morph"
+             Title="Morph">
+    <VerticalStackLayout Margin="0,10,0,0" VerticalOptions="Start" HorizontalOptions="Center">
+        <Label x:Name ="MorphPickerLabel" Text="Morph. Operation" FontSize="12" HorizontalOptions="Center" VerticalOptions="Center"/>
+        <Picker x:Name="MorphPicker" MinimumHeightRequest="30" HeightRequest="30" FontSize="13" SelectedIndexChanged="OnMorphPickerSelectedIndexChanged"/>
+        <Label x:Name ="StructPickerLabel" Text="Structuring element" FontSize="12" HorizontalOptions="Center" VerticalOptions="Center"/>
+        <Picker x:Name="StructPicker" MinimumHeightRequest="30" HeightRequest="30" FontSize="13" SelectedIndexChanged="OnStructPickerSelectedIndexChanged"/>
+        <Label x:Name ="EdgePickerLabel" Text="Edge Options" FontSize="12" HorizontalOptions="Center" VerticalOptions="Center"/>
+        <Picker x:Name="EdgePicker" MinimumHeightRequest="30" HeightRequest="30" FontSize="13" SelectedIndexChanged="OnEdgePickerSelectedIndexChanged"/>
+        <Button x:Name="ButtonMorph" Text="Execute" Clicked="OnMorphButtonClicked" StyleClass="MainPageButton"/>
+    </VerticalStackLayout>
+</ContentPage>

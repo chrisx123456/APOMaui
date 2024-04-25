@@ -2,7 +2,6 @@
 using Emgu.CV;
 using Emgu.CV.Structure;
 using System.Drawing;
-using System.Diagnostics;
 namespace APOMaui;
 
 public partial class WinIMG : ContentPage

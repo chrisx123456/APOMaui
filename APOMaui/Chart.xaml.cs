@@ -61,6 +61,8 @@ public partial class Chart : ContentPage, IDisposable
                 Fill = new SolidColorPaint(SKColors.Gray),
                 MaxBarWidth=10,
                 Padding=0,
+                EasingFunction = null,
+                IsHoverable = false,
             }
         };
         return series;

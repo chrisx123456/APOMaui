@@ -485,6 +485,15 @@ namespace APOMaui
             
 
         }
+        public static void MathMorph(int index, MorphOp mop, ElementShape es, BorderType border, MCvScalar constant)
+        {
+            Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage;
+            Image<Gray, Byte> res = new(img.Width, img.Height);
+            Mat structElement = CvInvoke.GetStructuringElement(es, new System.Drawing.Size(3, 3), new System.Drawing.Point(-1, -1));
+            CvInvoke.MorphologyEx(img, res, mop, structElement, new System.Drawing.Point(-1, -1), 1, border, constant);
+
+            Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
+        }
     }
 }
 

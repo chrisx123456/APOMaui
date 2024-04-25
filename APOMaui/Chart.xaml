@@ -6,7 +6,7 @@
     xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.Maui;assembly=LiveChartsCore.SkiaSharpView.Maui">
     <StackLayout Orientation="Horizontal">
         <Grid WidthRequest="700">
-            <lvc:CartesianChart
+            <lvc:CartesianChart 
                   Series="{Binding Series}"
                   x:Name="myChart">
             </lvc:CartesianChart>

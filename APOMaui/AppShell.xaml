@@ -25,8 +25,12 @@
             ContentTemplate="{DataTemplate local:Kernels}"
             Route="Kernels" />
         <ShellContent
-            Title="2 Argument ops"
+            Title="2args ops"
             ContentTemplate="{DataTemplate local:TwoArgument}"
             Route="TwoArgument" />
+        <ShellContent
+           Title="Morph"
+           ContentTemplate="{DataTemplate local:Morph}"
+           Route="Morph" />
     </TabBar>
 </Shell>
