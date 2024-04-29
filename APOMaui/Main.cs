@@ -494,6 +494,32 @@ namespace APOMaui
 
             Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
         }
+        public static void Skeletonize(int index, ElementShape es, BorderType border, MCvScalar constant)
+        {
+            Image<Gray, byte> imgcopy = Main.OpenedImagesWindowsList[index].winImg.GrayImage.Clone();
+            Image<Gray, byte> skel = new(imgcopy.Size);
+            skel.SetValue(0);
+
+            var ese = CvInvoke.GetStructuringElement(es, new System.Drawing.Size(3, 3), new System.Drawing.Point(-1, -1));
+            while (true)
+            {
+                Image<Gray, byte> imopen = new(imgcopy.Size);
+                CvInvoke.MorphologyEx(imgcopy, imopen, MorphOp.Open, ese, new System.Drawing.Point(-1, -1), 1, border, constant);
+
+                Image<Gray, byte> temp = new(imgcopy.Size);
+                CvInvoke.Subtract(imgcopy, imopen, temp);
+
+                Image<Gray, byte> eroded = new(imgcopy.Size);
+                CvInvoke.Erode(imgcopy, eroded, ese, new System.Drawing.Point(-1, -1), 1, border, constant);
+
+                CvInvoke.BitwiseOr(skel, temp, skel);
+
+                imgcopy.Dispose();
+                imgcopy = eroded.Clone();
+                if (CvInvoke.CountNonZero(imgcopy)==0) break;
+            }
+            Main.OpenedImagesWindowsList[index].winImg.GrayImage = skel;
+        }
     }
 }
 

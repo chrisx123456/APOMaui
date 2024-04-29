@@ -8,6 +8,7 @@ public partial class Morph : ContentPage
 	private Emgu.CV.CvEnum.ElementShape? _structElement;
 	private Emgu.CV.CvEnum.MorphOp? _morphOp;
 	private Emgu.CV.CvEnum.BorderType? _borderType;
+	private bool isSkeletonize = false;
     public Morph()
 	{
 		InitializeComponent();
@@ -31,6 +32,7 @@ public partial class Morph : ContentPage
 				EdgePicker.Items.Add(b.ToString());
 			}
 		}
+		MorphPicker.Items.Add("Skeletonize");
     }
 	private void OnEdgePickerSelectedIndexChanged(object sender, EventArgs e)
 	{
@@ -65,7 +67,8 @@ public partial class Morph : ContentPage
 	}
     private void OnMorphPickerSelectedIndexChanged(object sender, EventArgs e)
 	{
-		switch (MorphPicker.SelectedItem.ToString())
+        isSkeletonize = false;
+        switch (MorphPicker.SelectedItem.ToString())
 		{
 			case "Erode":
 				_morphOp = Emgu.CV.CvEnum.MorphOp.Erode;
@@ -91,6 +94,10 @@ public partial class Morph : ContentPage
 			case "HitMiss":
 				_morphOp = Emgu.CV.CvEnum.MorphOp.HitMiss;
 				break;
+			case "Skeletonize":
+				_morphOp = null;
+                isSkeletonize = true;
+                break;
 			default:
 				_morphOp = null;
 				break;
@@ -127,7 +134,7 @@ public partial class Morph : ContentPage
             await DisplayAlert("Alert", "Selected image is not GrayScale", "Ok");
             return;
         }
-		if (_borderType == null || _structElement == null || _morphOp == null)
+		if (_borderType == null || _structElement == null || (_morphOp == null && isSkeletonize==false))
         {
             await DisplayAlert("Alert", "Border / Struct. element / Morhp.op not selected", "Ok");
             return;
@@ -141,7 +148,13 @@ public partial class Morph : ContentPage
                 return;
             }
         }
-        Main.MathMorph(index, (MorphOp)_morphOp, (ElementShape)_structElement, (BorderType)_borderType, new Emgu.CV.Structure.MCvScalar(constB, constB, constB, constB));
+		if (isSkeletonize)
+		{
+			Main.Skeletonize(index, (ElementShape)_structElement, (BorderType)_borderType, new Emgu.CV.Structure.MCvScalar(constB, constB, constB, constB));
+		}
+        else Main.MathMorph(index, (MorphOp)_morphOp, (ElementShape)_structElement, (BorderType)_borderType, new Emgu.CV.Structure.MCvScalar(constB, constB, constB, constB));
+
+
     }
 
 }

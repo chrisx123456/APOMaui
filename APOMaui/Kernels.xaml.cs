@@ -67,9 +67,9 @@ public partial class Kernels : ContentPage
         {"LaplacianSharpen1",
             new float[,]
             {
-                { 0f,-1f,0f},
+                {0f,-1f,0f},
                 {-1f, 5f,-1f},
-                { 0f,-1f,0f}
+                {0f,-1f,0f}
             }},
         {"LaplacianSharpen2",
             new float[,]
@@ -376,7 +376,7 @@ public partial class Kernels : ContentPage
                     krow++;
                     kcol = 0;
                 }
-                _entries[i].Text = kernel[krow, kcol].ToString("#");
+                _entries[i].Text = kernel[krow, kcol].ToString();
                 kcol++;
             }
         } else
@@ -413,7 +413,6 @@ public partial class Kernels : ContentPage
         for (int i = 0; i < rows; i++)
             for (int j = 0; j < cols; j++)
                 kernel[i, j] = kernel[i, j] / sum;
-
         return kernel;
     }
     public async void OnKernelButtonClicked(object sender, EventArgs e)
