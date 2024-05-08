@@ -144,7 +144,6 @@ namespace APOMaui
                 MinimumHeight = height,
                 MaximumHeight = height,
                 Title = OpenedImagesWindowsList[index].window.Title + " Histogram"
-                
             };
             page.window = newWindow;
 #pragma warning disable 8602
@@ -476,13 +475,26 @@ namespace APOMaui
             Main.OpenedImagesWindowsList[index].winImg.GrayImage = img;
             LineIterator it = new(img.Mat, pt1, pt2, 8, false);
             byte[,,] data = img.Data;
-            byte[] res = new byte[it.Count];
+            int[] res = new int[it.Count];
             for(int i = 0; i < it.Count; i++)
             {
                 res[i] = data[it.Pos.X, it.Pos.Y, 0];
                 it.MoveNext();
             }
-            
+            ProfileLineChart plc = new ProfileLineChart(res);
+            int width = 700, height = 350;
+            Window plcw = new Window
+            {
+                Page = plc,
+                Width = width,
+                Height = height,
+                MinimumWidth = width,
+                MaximumWidth = width,
+                MinimumHeight = height,
+                MaximumHeight = height,
+                Title = OpenedImagesWindowsList[index].window.Title + " Profile Line"
+            };
+            Application.Current.OpenWindow(plcw);
 
         }
         public static void MathMorph(int index, MorphOp mop, ElementShape es, BorderType border, MCvScalar constant)
@@ -490,8 +502,9 @@ namespace APOMaui
             Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage;
             Image<Gray, Byte> res = new(img.Width, img.Height);
             Mat structElement = CvInvoke.GetStructuringElement(es, new System.Drawing.Size(3, 3), new System.Drawing.Point(-1, -1));
-            CvInvoke.MorphologyEx(img, res, mop, structElement, new System.Drawing.Point(-1, -1), 1, border, constant);
 
+            CvInvoke.MorphologyEx(img, res, mop, structElement, new System.Drawing.Point(-1, -1), 1, border, constant);
+            
             Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
         }
         public static void Skeletonize(int index, ElementShape es, BorderType border, MCvScalar constant)
@@ -519,7 +532,9 @@ namespace APOMaui
                 if (CvInvoke.CountNonZero(imgcopy)==0) break;
             }
             Main.OpenedImagesWindowsList[index].winImg.GrayImage = skel;
+           
         }
+        
     }
 }
 

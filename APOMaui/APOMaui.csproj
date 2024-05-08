@@ -105,6 +105,9 @@
 	  <MauiXaml Update="Operations.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="ProfileLineChart.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="TwoArgument.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

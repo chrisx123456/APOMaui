@@ -27,6 +27,20 @@ public partial class Chart : ContentPage, IDisposable
         this.TableHistogram.ClearLogicalChildren();
         this.TableHistogram.Children.Clear();
         this.TableHistogram.Clear();
+        this.Series = null;
+        this.BindingContext = null;
+        myChart.BindingContext = null;
+        myChart.Legend = null;
+        myChart.ClearLogicalChildren();
+        myChart.Series = null;
+        TableHistogram.Children.Clear();
+        Main.OpenedImagesWindowsList[indexOfImg].chart = null;
+        System.Diagnostics.Debug.WriteLine($"Chart of {indexOfImg} Disposed");
+        window.ClearLogicalChildren();
+        Application.Current.CloseWindow(window);
+        this.window = null;
+        GC.Collect();
+        GC.ReRegisterForFinalize(this);
         GC.Collect(2, GCCollectionMode.Forced);
     }
     public async void UpdateChart(int[] values)
@@ -70,20 +84,7 @@ public partial class Chart : ContentPage, IDisposable
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
-        this.Series = null;
-        this.BindingContext = null;
-        myChart.BindingContext = null;
-        myChart.Legend = null;
-        myChart.ClearLogicalChildren();
-        myChart.Series = null;
-        TableHistogram.Children.Clear();
-        Main.OpenedImagesWindowsList[indexOfImg].chart = null;
-        System.Diagnostics.Debug.WriteLine($"Chart of {indexOfImg} Disposed");
-        window.ClearLogicalChildren();
-        Application.Current.CloseWindow(window);
-        this.window = null;
-        GC.Collect();
-        GC.ReRegisterForFinalize(this);
+        this.Dispose();
     }
     public void AddElementsToTableChart(int[] tab)
     {

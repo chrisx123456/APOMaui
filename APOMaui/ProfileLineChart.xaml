@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="APOMaui.ProfileLineChart"
+             Title="ProfileLineChart"
+             xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.Maui;assembly=LiveChartsCore.SkiaSharpView.Maui">
+    <StackLayout Orientation="Horizontal">
+        <Grid WidthRequest="700">
+            <lvc:CartesianChart 
+                  Series="{Binding Series}"
+                  x:Name="myChart">
+            </lvc:CartesianChart>
+        </Grid>
+    </StackLayout>
+</ContentPage>
