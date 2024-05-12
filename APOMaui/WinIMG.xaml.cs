@@ -1,6 +1,7 @@
 ﻿
 using Emgu.CV;
 using Emgu.CV.Structure;
+using System.Diagnostics;
 using System.Drawing;
 namespace APOMaui;
 
@@ -148,7 +149,7 @@ public partial class WinIMG : ContentPage
     }
     private void Undo(object sender, EventArgs e)
     {
-        if (backupGray != null)
+        if (backupGray != null && grayImage != null && colorImage == null)
         {
             this.GrayImage = backupGray;
             backupGray.Dispose();
@@ -157,6 +158,7 @@ public partial class WinIMG : ContentPage
     }
     private void ProfileLine(object sender, EventArgs e)
     {
+        if (grayImage == null) return;
         int c = 0;
         TapGestureRecognizer tgr = new TapGestureRecognizer();
         winImgBox.GestureRecognizers.Add(tgr);
@@ -179,11 +181,12 @@ public partial class WinIMG : ContentPage
 
                 // Współrzędne piksela w obrazie źródłowym
                 var pixelX = (int)(tapPos?.X * (sourceSize.Width / (double)imageSize.Width));
+
                 var pixelY = (int)(tapPos?.Y * (sourceSize.Height / (double)imageSize.Height));
 
-                // Wyświetlenie współrzędnych piksela
-                //Debug.WriteLine($"Pozycja kliknięcia: X={tapPos?.X}, Y={tapPos?.Y}");
-                //Debug.WriteLine($"Współrzędne piksela: X={pixelX}, Y={pixelY}");
+                //Wyświetlenie współrzędnych piksela
+                Debug.WriteLine($"Pozycja kliknięcia: X={tapPos?.X}, Y={tapPos?.Y}");
+                Debug.WriteLine($"Współrzędne piksela: X={pixelX}, Y={pixelY}");
                 c++;
                 if (c == 1)
                 {
@@ -202,7 +205,6 @@ public partial class WinIMG : ContentPage
         };
         
     }
-    
 
 
 }

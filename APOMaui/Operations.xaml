@@ -8,10 +8,10 @@
         <Button x:Name="ButtonHSV" Text="RGB To HSV Channels" Clicked="OnButtonHSVClick" StyleClass="MainPageButton"/>
         <Button x:Name="ButtonLab" Text="RGB To Lab Channels" Clicked="OnButtonLabClick" StyleClass="MainPageButton"/>
         <Button x:Name="ButtonSplit" Text="Split RGB" Clicked="OnButtonSplitClick" StyleClass="MainPageButton"/>
-        <Button x:Name="ButtonEqualization" Text="Equalize Histogram" Clicked="OnButtonEqualizationClick" StyleClass="MainPageButton"/>
-        <Button x:Name="ButtonStretch" Text="Stretch Histogram" Clicked="OnButtonStretchClick" StyleClass="MainPageButton"/>
         <Button x:Name="ButtonNegative" Text="Negative" Clicked="OnButtonNegativeClick" StyleClass="MainPageButton"/>
-        <Button x:Name="ButtonQ3Q4" Text="Stetch Q3-Q4" Clicked="OnButtonQ3Q4Click" StyleClass="MainPageButton"/>
         <Button x:Name="ButtonPosterize" Text="Posterize" Clicked="OnButtonPosterizeClick" StyleClass="MainPageButton"/>
+        <Button x:Name="ButtonHough" Text="Hough Lines" Clicked="OnButtonHoughClick" StyleClass="MainPageButton"/>
+        <Button x:Name="ButtonPyr" Text="Pyramid" Clicked="OnButtonPyrClick" StyleClass="MainPageButton"/>
+
     </VerticalStackLayout>
 </ContentPage>

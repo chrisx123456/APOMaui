@@ -67,36 +67,6 @@ public partial class Operations : ContentPage
         Main.ConvertRgbToLab(index);
 
     }
-    public async void OnButtonEqualizationClick(object sender, EventArgs e)
-    {
-        if (Main.selectedWindow == null)
-        {
-            await DisplayAlert("Alert", "None image is selected!", "Ok");
-            return;
-        }
-        int index = (int)Main.selectedWindow;
-        if (Main.OpenedImagesWindowsList[index].winImg.Type != ImgType.Gray)
-        {
-            await DisplayAlert("Alert", "Selected image is not GrayScale", "Ok");
-            return;
-        }
-        Main.HistEqualization(index);
-    }
-    public async void OnButtonStretchClick(object sender, EventArgs e)
-    {
-        if (Main.selectedWindow == null)
-        {
-            await DisplayAlert("Alert", "None image is selected!", "Ok");
-            return;
-        }
-        int index = (int)Main.selectedWindow;
-        if (Main.OpenedImagesWindowsList[index].winImg.Type != ImgType.Gray)
-        {
-            await DisplayAlert("Alert", "Selected image is not GrayScale", "Ok");
-            return;
-        }
-        Main.HistStretch(index);
-    }
     public async void OnButtonNegativeClick(object sender, EventArgs e)
     {
         if (Main.selectedWindow == null)
@@ -112,36 +82,7 @@ public partial class Operations : ContentPage
         }
         Main.ImageNegative(index);
     }
-    public async void OnButtonQ3Q4Click(object sender, EventArgs e)
-    {
-        {
-            if (Main.selectedWindow == null)
-            {
-                await DisplayAlert("Alert", "None image is selected!", "Ok");
-                return;
-            }
-            int index = (int)Main.selectedWindow;
-            if (Main.OpenedImagesWindowsList[index].winImg.Type != ImgType.Gray)
-            {
-                await DisplayAlert("Alert", "Selected image is not GrayScale", "Ok");
-                return;
-            }
-            byte min;
-            byte max;
-            if(!byte.TryParse(await DisplayPromptAsync("Q3", "Type Q3 value"), out min))
-            {
-                await DisplayAlert("Alert", "Q3 Value not Valid", "Ok");
-                return;
-            }
-            if (!byte.TryParse(await DisplayPromptAsync("Q4", "Type Q4 value"), out max))
-            {
-                await DisplayAlert("Alert", "Q4 Value not Valid", "Ok");
-                return;
-            }
 
-            Main.HistStretchInRange(index, min, max);
-        }
-    }
     public async void OnButtonPosterizeClick(object sender, EventArgs e)
     {
         if (Main.selectedWindow == null)
@@ -167,5 +108,44 @@ public partial class Operations : ContentPage
             return;
         }
         Main.Posterize(index, levels);
+    }
+
+    private async void OnButtonHoughClick(object sender, EventArgs e)
+    {
+        if (Main.selectedWindow == null)
+        {
+            await DisplayAlert("Alert", "None image is selected!", "Ok");
+            return;
+        }
+        int index = (int)Main.selectedWindow;
+        if (Main.OpenedImagesWindowsList[index].winImg.Type != ImgType.Gray)
+        {
+            await DisplayAlert("Alert", "Selected image is not GrayScale", "Ok");
+            return;
+        }
+        Main.HoughLines(index);
+    }
+    private async void OnButtonPyrClick(object sender, EventArgs e)
+    {
+        if (Main.selectedWindow == null)
+        {
+            await DisplayAlert("Alert", "None image is selected!", "Ok");
+            return;
+        }
+        int index = (int)Main.selectedWindow;
+        if (Main.OpenedImagesWindowsList[index].winImg.Type != ImgType.Gray)
+        {
+            await DisplayAlert("Alert", "Selected image is not GrayScale", "Ok");
+            return;
+        }
+        var result = await DisplayActionSheet("Choose", "Cancel", null, new string[] { "Up", "Down" });
+        if(result == "Up") 
+        {
+            Main.PyrUp(index);
+        }
+        else
+        {
+            Main.PyrDown(index);
+        }
     }
 }

@@ -2,12 +2,16 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="APOMaui.Charts"
-             Title="Wykresy">
+             Title="Hist">
     
     <ScrollView>
         <VerticalStackLayout>
 
             <Button x:Name="ButtonChart" Text="Histogram" Clicked="OnButtonChartClicked" StyleClass="MainPageButton"/>
+            <Button x:Name="ButtonEqualization" Text="Equalize Histogram" Clicked="OnButtonEqualizationClick" StyleClass="MainPageButton"/>
+            <Button x:Name="ButtonStretch" Text="Stretch Histogram" Clicked="OnButtonStretchClick" StyleClass="MainPageButton"/>
+            <Button x:Name="ButtonQ3Q4" Text="Stetch Q3-Q4" Clicked="OnButtonQ3Q4Click" StyleClass="MainPageButton"/>
+
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

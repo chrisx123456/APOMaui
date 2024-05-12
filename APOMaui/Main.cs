@@ -1,7 +1,9 @@
 ﻿using Emgu.CV;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
+using Emgu.CV.Util;
 using System.Diagnostics;
+using System.Drawing;
 using System.Numerics;
 namespace APOMaui
 {
@@ -471,14 +473,15 @@ namespace APOMaui
         {
             //Debug.WriteLine($"{pt1.X}, {pt1.Y}, {pt2.X}, {pt2.Y}");
             Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage.Clone();
-            CvInvoke.Line(img, pt1, pt2, new MCvScalar(), 1, LineType.EightConnected, 0);
+            //CvInvoke.Line(img, pt1, pt2, new MCvScalar(0,0,255), 1, LineType.EightConnected, 0);
             Main.OpenedImagesWindowsList[index].winImg.GrayImage = img;
             LineIterator it = new(img.Mat, pt1, pt2, 8, false);
             byte[,,] data = img.Data;
             int[] res = new int[it.Count];
             for(int i = 0; i < it.Count; i++)
             {
-                res[i] = data[it.Pos.X, it.Pos.Y, 0];
+                //chuj wie czy yx czy xy
+                res[i] = data[it.Pos.Y, it.Pos.X, 0];
                 it.MoveNext();
             }
             ProfileLineChart plc = new ProfileLineChart(res);
@@ -534,7 +537,65 @@ namespace APOMaui
             Main.OpenedImagesWindowsList[index].winImg.GrayImage = skel;
            
         }
-        
+        public static void HoughLines(int index)
+        {
+            Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage;
+            Mat canny = new();
+            Image<Bgr, Byte> res = new(img.Size);
+            CvInvoke.CvtColor(img, res, ColorConversion.Gray2Bgr, 0);
+            CvInvoke.CopyMakeBorder(img, canny, 1, 1, 1, 1, BorderType.Reflect101, default);
+            CvInvoke.Canny(canny, canny, 100, 200, 3, false);
+            CvInvoke.ConvertScaleAbs(canny, canny, 1, 0);
+
+
+            LineSegment2D[] lines;
+            using (var vector = new VectorOfPointF())
+            {
+                CvInvoke.HoughLines(canny, vector, 1.0, Math.PI / 180.0, 250);
+                var linesList = new List<LineSegment2D>();
+                for (var i = 0; i < vector.Size; i++)
+                {
+                    var rho = vector[i].X;
+                    var theta = vector[i].Y;
+                    var pt1 = new System.Drawing.Point();
+                    var pt2 = new System.Drawing.Point();
+                    var a = Math.Cos(theta);
+                    var b = Math.Sin(theta);
+                    var x0 = a * rho;
+                    var y0 = b * rho;
+                    pt1.X = (int)Math.Round(x0 + img.Width * (-b));
+                    pt1.Y = (int)Math.Round(y0 + img.Height * (a));
+                    pt2.X = (int)Math.Round(x0 - img.Width * (-b));
+                    pt2.Y = (int)Math.Round(y0 - img.Height * (a));
+
+                    res.Draw(new LineSegment2D(pt1, pt2), new Bgr(50,50,230), 3);
+                    linesList.Add(new LineSegment2D(pt1, pt2));
+                }
+
+                lines = linesList.ToArray();
+            }
+            Main.OpenedImagesWindowsList[index].winImg.ColorImage = res;
+
+
+
+
+
+        } //Idk jak to zrobic, chyba trzeva dodac cannego 
+        public static void PyrUp(int index)
+        {
+            Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage;
+            Mat res = new();
+            CvInvoke.PyrUp(img, res, BorderType.Reflect101);
+            Main.OpenedImagesWindowsList[index].winImg.GrayImage = res.ToImage<Gray, Byte>();
+        }
+        public static void PyrDown(int index)
+        {
+            Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage;
+            Mat res = new();
+            CvInvoke.PyrDown(img, res, BorderType.Reflect101);
+            Main.OpenedImagesWindowsList[index].winImg.GrayImage = res.ToImage<Gray, Byte>();
+        }
+
     }
 }
 
