@@ -1,8 +1,11 @@
 ﻿
 using Emgu.CV;
 using Emgu.CV.Structure;
+using Emgu.CV.Util;
+using SkiaSharp;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 namespace APOMaui;
 
 public partial class WinIMG : ContentPage
@@ -205,6 +208,66 @@ public partial class WinIMG : ContentPage
         };
         
     }
+    private void GrabCut(object sender, EventArgs e)
+    {
+        this.winImgBox.GestureRecognizers.Clear();
+        if (colorImage == null) return;
+        int c = 0;
+        Debug.WriteLine("GrabCut click");
+        TapGestureRecognizer tgr = new TapGestureRecognizer();
+        winImgBox.GestureRecognizers.Add(tgr);
+        System.Drawing.Point p1 = new System.Drawing.Point();
+        System.Drawing.Point p2 = new System.Drawing.Point();
+        tgr.Tapped += (s, e) =>
+        {
 
+            Main.ChangeSelectedtWinIMG(this.index);
+            var img = s as Microsoft.Maui.Controls.Image;
+            var tappedEvent = e as TappedEventArgs;
+            Microsoft.Maui.Graphics.Point? tapPos = e.GetPosition(img);
+            if (img != null && tapPos != null && colorImage != null)
+            {
+                
+                // Rozmiar obrazka
+                var imageSize = new System.Drawing.Size((int)img.Width, (int)img.Height);
 
+                // Rozmiar obrazu źródłowego
+                var sourceSize = new System.Drawing.Size(colorImage.Width, colorImage.Height);
+
+                // Współrzędne piksela w obrazie źródłowym
+                var pixelX = (int)(tapPos?.X * (sourceSize.Width / (double)imageSize.Width));
+
+                var pixelY = (int)(tapPos?.Y * (sourceSize.Height / (double)imageSize.Height));
+
+                //Wyświetlenie współrzędnych piksela
+                Debug.WriteLine($"Pozycja kliknięcia: X={tapPos?.X}, Y={tapPos?.Y}");
+                Debug.WriteLine($"Współrzędne piksela: X={pixelX}, Y={pixelY}");
+                c++;
+                if (c == 1)
+                {
+                    p1.X = pixelX;
+                    p1.Y = pixelY;
+                }
+                if (c == 2)
+                {
+                    p2.X = pixelX;
+                    p2.Y = pixelY;
+                    int width = Math.Abs(p2.X - p1.X);
+                    int height = Math.Abs(p2.Y - p1.Y);
+
+                    // Znajdujemy lewy górny róg prostokąta
+                    int x = Math.Min(p1.X, p2.X);
+                    int y = Math.Min(p1.Y, p2.Y);
+
+                    // Tworzymy Rectangle na podstawie obliczonych wartości
+                    Rectangle rectangle = new Rectangle(x, y, width, height);
+                    Debug.WriteLine("Calling GrabCut in main");
+
+                    Main.GrabCut(index, rectangle);
+                    this.winImgBox.GestureRecognizers.Clear();
+                }
+            }
+
+        };
+    }
 }

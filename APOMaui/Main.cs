@@ -643,7 +643,37 @@ namespace APOMaui
             CvInvoke.PyrDown(img, res, BorderType.Reflect101);
             Main.OpenedImagesWindowsList[index].winImg.GrayImage = res.ToImage<Gray, Byte>();
         }
+        public static void GrabCut(int index, Rectangle rect)
+        {
+            Image<Bgr, Byte> img = Main.OpenedImagesWindowsList[index].winImg.ColorImage;
+            Image<Gray, Byte> mask = new Image<Gray, Byte>(img.Size);
+            mask.SetZero();
+            Matrix<double> bg = new Matrix<double>(1, 65);
+            bg.SetZero();
+            Matrix<double> fg = new Matrix<double>(1, 65);
+            fg.SetZero();
 
+            CvInvoke.GrabCut(img, mask, rect, bg, fg, 3, GrabcutInitType.InitWithRect);
+
+            for (int x = 0; x < mask.Cols; x++)
+            {
+                for (int y = 0; y < mask.Rows; y++)
+                {
+                    if (mask[y, x].Intensity == new Gray(1).Intensity || mask[y, x].Intensity == new Gray(3).Intensity)
+                    {
+                        mask[y, x] = new Gray(1);
+                    }
+                    else
+                    {
+                        mask[y, x] = new Gray(0);
+                    }
+                }
+
+            }
+            img = img.Mul(mask.Convert<Bgr, Byte>());
+            Main.OpenedImagesWindowsList[index].winImg.ColorImage = img.Clone();
+            }
+  
     }
 }
 
