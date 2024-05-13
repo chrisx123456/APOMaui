@@ -1,3 +1,4 @@
+using Emgu.CV;
 using Emgu.CV.CvEnum;
 using System.Diagnostics;
 
@@ -8,7 +9,7 @@ public partial class Morph : ContentPage
 	private Emgu.CV.CvEnum.ElementShape? _structElement;
 	private Emgu.CV.CvEnum.MorphOp? _morphOp;
 	private Emgu.CV.CvEnum.BorderType? _borderType;
-	private bool isSkeletonize = false;
+	private MorphOpExtend? _morphOpExtend;
     public Morph()
 	{
 		InitializeComponent();
@@ -33,8 +34,10 @@ public partial class Morph : ContentPage
 			}
 		}
 		MorphPicker.Items.Add("Skeletonize");
+        MorphPicker.Items.Add("Watershed");
+
     }
-	private void OnEdgePickerSelectedIndexChanged(object sender, EventArgs e)
+    private void OnEdgePickerSelectedIndexChanged(object sender, EventArgs e)
 	{
 		switch (EdgePicker.SelectedItem.ToString()) 
 		{
@@ -67,7 +70,8 @@ public partial class Morph : ContentPage
 	}
     private void OnMorphPickerSelectedIndexChanged(object sender, EventArgs e)
 	{
-        isSkeletonize = false;
+		_morphOp = null;
+		_morphOpExtend = null;
         switch (MorphPicker.SelectedItem.ToString())
 		{
 			case "Erode":
@@ -96,9 +100,13 @@ public partial class Morph : ContentPage
 				break;
 			case "Skeletonize":
 				_morphOp = null;
-                isSkeletonize = true;
+                _morphOpExtend = MorphOpExtend.SKELETONIZE;
                 break;
-			default:
+			case "Watershed":
+                _morphOp = null;
+                _morphOpExtend = MorphOpExtend.WATERSHED;
+                break;
+            default:
 				_morphOp = null;
 				break;
 		}
@@ -134,7 +142,7 @@ public partial class Morph : ContentPage
             await DisplayAlert("Alert", "Selected image is not GrayScale", "Ok");
             return;
         }
-		if (_borderType == null || _structElement == null || (_morphOp == null && isSkeletonize==false))
+		if (_borderType == null || _structElement == null || (_morphOp == null && _morphOpExtend==null))
         {
             await DisplayAlert("Alert", "Border / Struct. element / Morhp.op not selected", "Ok");
             return;
@@ -148,11 +156,18 @@ public partial class Morph : ContentPage
                 return;
             }
         }
-		if (isSkeletonize)
+		if(_morphOp != null && _morphOpExtend == null)
 		{
-			Main.Skeletonize(index, (ElementShape)_structElement, (BorderType)_borderType, new Emgu.CV.Structure.MCvScalar(constB, constB, constB, constB));
+			Main.MathMorph(index, (MorphOp)_morphOp, (ElementShape)_structElement, (BorderType)_borderType, new Emgu.CV.Structure.MCvScalar(constB, constB, constB, constB));
+        }
+		if(_morphOp == null && _morphOpExtend == MorphOpExtend.SKELETONIZE)
+		{
+            Main.Skeletonize(index, (ElementShape)_structElement, (BorderType)_borderType, new Emgu.CV.Structure.MCvScalar(constB, constB, constB, constB));
+        }
+        if (_morphOp == null && _morphOpExtend == MorphOpExtend.WATERSHED)
+		{
+			Main.Watershed(index);
 		}
-        else Main.MathMorph(index, (MorphOp)_morphOp, (ElementShape)_structElement, (BorderType)_borderType, new Emgu.CV.Structure.MCvScalar(constB, constB, constB, constB));
 
 
     }

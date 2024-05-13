@@ -5,6 +5,7 @@ using Emgu.CV.Util;
 using System.Diagnostics;
 using System.Drawing;
 using System.Numerics;
+using Point = System.Drawing.Point;
 namespace APOMaui
 {
     internal static class Main
@@ -537,6 +538,53 @@ namespace APOMaui
             Main.OpenedImagesWindowsList[index].winImg.GrayImage = skel;
            
         }
+        public static void Watershed(int index)
+        {
+
+            Image<Gray, Byte> input = Main.OpenedImagesWindowsList[index].winImg.GrayImage;
+            Image<Bgr, Byte> img = new(input.Size);
+            CvInvoke.CvtColor(input, img, ColorConversion.Gray2Bgr, 0);
+            Image<Gray, byte> gray = img.Convert<Gray, Byte>();
+            Image<Gray, byte> thresh = gray.CopyBlank();
+            CvInvoke.Threshold(gray, thresh, 0, 255, Emgu.CV.CvEnum.ThresholdType.BinaryInv | Emgu.CV.CvEnum.ThresholdType.Otsu);
+
+            Matrix<byte> kernel = new Matrix<byte>(new Byte[3, 3] { { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 } }); //https://stackoverflow.com/a/33646626/4926757
+            Image<Gray, Byte> opening = thresh.MorphologyEx(Emgu.CV.CvEnum.MorphOp.Open, kernel, new Point(-1, -1), 2, Emgu.CV.CvEnum.BorderType.Default, new MCvScalar());
+            Image<Gray, Byte> sureBg = opening.Dilate(3);
+
+            Mat distanceTransform = new Mat();
+            CvInvoke.DistanceTransform(opening, distanceTransform, null, Emgu.CV.CvEnum.DistType.L2, 5);
+
+            double minVal = 0, maxVal = 0;
+            Point minLoc = new Point(), maxLoc = new Point();
+            CvInvoke.MinMaxLoc(distanceTransform, ref minVal, ref maxVal, ref minLoc, ref maxLoc);  //Find distanceTransform.max()
+
+            Mat sureFg0 = new Mat();
+            CvInvoke.Threshold(distanceTransform, sureFg0, 0.7 * maxVal, 255, Emgu.CV.CvEnum.ThresholdType.Binary);
+            Mat sureFg = new Mat();
+            sureFg0.ConvertTo(sureFg, Emgu.CV.CvEnum.DepthType.Cv8U); //Convert from float to Byte
+
+            Mat unknown = new Mat();
+            CvInvoke.Subtract(sureBg, sureFg, unknown);
+
+            Mat markers = new Mat();
+            CvInvoke.ConnectedComponents(sureFg, markers);
+            markers = markers + 1;
+
+            Mat zeros = markers - markers; 
+            zeros.CopyTo(markers, unknown); 
+
+            //Mat finalMarkers = new Mat(); //????
+            CvInvoke.Watershed(img, markers);
+
+            Mat mask = new Mat();
+            zeros.SetTo(new MCvScalar(-1)); 
+            CvInvoke.Compare(markers, zeros, mask, CmpType.Equal);
+            mask.ConvertTo(mask, Emgu.CV.CvEnum.DepthType.Cv8U); 
+
+            Main.OpenedImagesWindowsList[index].winImg.GrayImage = mask.ToImage<Gray, Byte>();
+
+        } //Chyba dziala, na pewno musze dodac komenatrze i zrozumiec co tu sie wgle dzieje
         public static void HoughLines(int index)
         {
             Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage;
@@ -580,7 +628,7 @@ namespace APOMaui
 
 
 
-        } //Idk jak to zrobic, chyba trzeva dodac cannego 
+        } 
         public static void PyrUp(int index)
         {
             Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage;

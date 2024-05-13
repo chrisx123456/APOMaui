@@ -9,7 +9,7 @@
 
     <TabBar Route="File">
         <ShellContent
-            Title="Plik"
+            Title="File"
             ContentTemplate="{DataTemplate local:MainPage}"
             Route="MainPage" />
         <ShellContent
@@ -17,15 +17,15 @@
             ContentTemplate="{DataTemplate local:Operations}"
             Route="Operations" />
         <ShellContent
-            Title="Wykresy"
+            Title="Hist"
             ContentTemplate="{DataTemplate local:Charts}"
             Route="Charts" />
         <ShellContent
-            Title="Kernele"
+            Title="Filters"
             ContentTemplate="{DataTemplate local:Kernels}"
             Route="Kernels" />
         <ShellContent
-            Title="2args ops"
+            Title="2-Arg ops."
             ContentTemplate="{DataTemplate local:TwoArgument}"
             Route="TwoArgument" />
         <ShellContent

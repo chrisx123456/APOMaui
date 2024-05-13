@@ -31,4 +31,9 @@ namespace APOMaui
         NOT,
         XOR
     }
+    public enum MorphOpExtend
+    {
+        SKELETONIZE,
+        WATERSHED,
+    }
 }
