@@ -148,4 +148,24 @@ public partial class Operations : ContentPage
             Main.PyrDown(index);
         }
     }
+    private async void OnButtonInpaintClick(object sender, EventArgs e)
+    {
+        if (Main.selectedWindow == null)
+        {
+            await DisplayAlert("Alert", "None image is selected!", "Ok");
+            return;
+        }
+        int index = (int)Main.selectedWindow;
+        Main.Inpainting(index);
+    }
+    private async void OnButtonAnalizeClick(object sender, EventArgs e)
+    {
+        if (Main.selectedWindow == null)
+        {
+            await DisplayAlert("Alert", "None image is selected!", "Ok");
+            return;
+        }
+        int index = (int)Main.selectedWindow;
+        Main.AnalizeImage(index);
+    }
 }

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="APOMaui.AnalysisResultPage"
+             Title="AnalysisResultPage">
+
+    <StackLayout>
+        <StackLayout Margin="10">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Label Grid.Row="0" Grid.Column="0" Text="No" FontAttributes="Bold" HorizontalTextAlignment="Center"/>
+                <Label Grid.Row="0" Grid.Column="1" Text="Moments" FontAttributes="Bold" HorizontalTextAlignment="Center"/>
+                <Label Grid.Row="0" Grid.Column="2" Text="Area" FontAttributes="Bold" HorizontalTextAlignment="Center"/>
+                <Label Grid.Row="0" Grid.Column="3" Text="Perimeter" FontAttributes="Bold" HorizontalTextAlignment="Center"/>
+                <Label Grid.Row="0" Grid.Column="4" Text="Aspect Ratio" FontAttributes="Bold" HorizontalTextAlignment="Center"/>
+                <Label Grid.Row="0" Grid.Column="5" Text="Extent" FontAttributes="Bold" HorizontalTextAlignment="Center"/>
+                <Label Grid.Row="0" Grid.Column="6" Text="Solidity" FontAttributes="Bold" HorizontalTextAlignment="Center"/>
+                <Label Grid.Row="0" Grid.Column="7" Text="Equivalent Diameter" FontAttributes="Bold" HorizontalTextAlignment="Center"/>
+            </Grid>
+            <BoxView HeightRequest="1" BackgroundColor="Black" HorizontalOptions="FillAndExpand"/>
+        </StackLayout>
+
+        <ListView x:Name="analysisResultsListView">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ViewCell>
+                        <Grid Padding="10">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Row="0" Grid.Column="0" Text="{Binding no}" HorizontalTextAlignment="Center"/>
+                            <Label Grid.Row="0" Grid.Column="1" Text="{Binding moments}" HorizontalTextAlignment="Center"/>
+                            <Label Grid.Row="0" Grid.Column="2" Text="{Binding area, StringFormat='{0:F3}'}" HorizontalTextAlignment="Center"/>
+                            <Label Grid.Row="0" Grid.Column="3" Text="{Binding perimeter, StringFormat='{0:F3}'}" HorizontalTextAlignment="Center"/>
+                            <Label Grid.Row="0" Grid.Column="4" Text="{Binding aspectRatio, StringFormat='{0:F3}'}" HorizontalTextAlignment="Center"/>
+                            <Label Grid.Row="0" Grid.Column="5" Text="{Binding extent, StringFormat='{0:F3}'}" HorizontalTextAlignment="Center"/>
+                            <Label Grid.Row="0" Grid.Column="6" Text="{Binding solidity, StringFormat='{0:F3}'}" HorizontalTextAlignment="Center"/>
+                            <Label Grid.Row="0" Grid.Column="7" Text="{Binding equivalentDiameter, StringFormat='{0:F3}'}" HorizontalTextAlignment="Center"/>
+                        </Grid>
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </StackLayout>
+</ContentPage>

@@ -5,7 +5,7 @@
         public MainPage()
         {
             InitializeComponent();
-            
+            Emgu.CV.Platform.Maui.MauiInvoke.Init();
         }
         private void OnSaveButtonClicked(object sender, EventArgs e)
         {

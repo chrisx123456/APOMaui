@@ -1,8 +1,7 @@
-﻿using CommunityToolkit.Maui;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using SkiaSharp.Views.Maui.Controls.Hosting;
 
-namespace APOMaui
+namespace Test
 {
     public static class MauiProgram
     {
@@ -10,16 +9,16 @@ namespace APOMaui
         {
             var builder = MauiApp.CreateBuilder();
             builder
-                .UseSkiaSharp(true)
+                .UseSkiaSharp()
                 .UseMauiApp<App>()
-                .UseMauiCommunityToolkit()
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
+
 #if DEBUG
-            builder.Logging.AddDebug();
+    		builder.Logging.AddDebug();
 #endif
 
             return builder.Build();

@@ -15,7 +15,7 @@ namespace APOMaui
         public static List<WindowImageObject> OpenedImagesWindowsList = new();
         public static int? selectedWindow = null;
         public const int windowHeightFix = 100;
-        public const int windowWidthFix = 22;
+        public const int windowWidthFix = 26;
         public static async void OpenPhotoWinIMG()
         {
             if (DeviceInfo.Platform == DevicePlatform.WinUI)
@@ -34,6 +34,7 @@ namespace APOMaui
                 {
                     string s = wio.winImg.GetTitle;
                     int dotIndex = s.LastIndexOf('.');
+                    if (dotIndex == -1) break;
                     string output = s.Substring(0, dotIndex);
                     if (output == fileName) duplicates++;
                 }
@@ -475,7 +476,6 @@ namespace APOMaui
             //Debug.WriteLine($"{pt1.X}, {pt1.Y}, {pt2.X}, {pt2.Y}");
             Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage.Clone();
             //CvInvoke.Line(img, pt1, pt2, new MCvScalar(0,0,255), 1, LineType.EightConnected, 0);
-            Main.OpenedImagesWindowsList[index].winImg.GrayImage = img;
             LineIterator it = new(img.Mat, pt1, pt2, 8, false);
             byte[,,] data = img.Data;
             int[] res = new int[it.Count];
@@ -673,7 +673,92 @@ namespace APOMaui
             img = img.Mul(mask.Convert<Bgr, Byte>());
             Main.OpenedImagesWindowsList[index].winImg.ColorImage = img.Clone();
             }
-  
+        public static async void Inpainting(int index)
+        {
+            if (!Main.OpenedImagesWindowsList[index].winImg.GetDrawBoxState())
+            {
+                Main.OpenedImagesWindowsList[index].winImg.ToggleDrawBox(true);
+            }
+            else
+            {
+                Debug.WriteLine("Getting Canvas Image");
+                Image<Gray, Byte> mask = await Main.OpenedImagesWindowsList[index].winImg.GetImageFromCanvas();
+                //CvInvoke.Imshow("dsd", mask);
+                if (Main.OpenedImagesWindowsList[index].winImg.ColorImage != null)
+                {
+                    Image<Bgr, Byte> img = Main.OpenedImagesWindowsList[index].winImg.ColorImage;
+                    Image<Bgr, Byte> res = new(img.Size);
+                    //CvInvoke.Inpaint(img, mask, res, 3.0, InpaintType.Telea);
+                    //Main.OpenedImagesWindowsList[index].winImg.ColorImage = res;
+                }
+                else if(Main.OpenedImagesWindowsList[index].winImg.GrayImage != null)
+                {
+                    Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage;
+                    Image<Gray, Byte> res = new(img.Size);
+                    //CvInvoke.Inpaint(img, mask, res, 3.0, InpaintType.Telea);
+                    //Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
+                }
+            }
+
+        }
+        public static void AnalizeImage(int index)
+        {
+            List<AnalysisResult> results = new List<AnalysisResult>();
+            Mat img = new();
+            string title = Main.OpenedImagesWindowsList[index].winImg.Title;
+            if (Main.OpenedImagesWindowsList[index].winImg.ColorImage != null)
+            {
+                CvInvoke.CvtColor(Main.OpenedImagesWindowsList[index].winImg.ColorImage, img, ColorConversion.Bgr2Gray, 0);
+            }
+            else
+            {
+                img = Main.OpenedImagesWindowsList[index].winImg.GrayImage.Mat;
+            }
+            Mat cntImg = new(img.Size, DepthType.Cv8U, 3);
+
+            CvInvoke.Threshold(img, img, 127, 255, ThresholdType.Binary);
+            VectorOfVectorOfPoint contours = new VectorOfVectorOfPoint();
+            CvInvoke.FindContours(img, contours, null, RetrType.List, ChainApproxMethod.ChainApproxNone);
+            for (int i = 0; i < contours.Size; i++)
+            {
+                Random r = new Random();
+                CvInvoke.DrawContours(cntImg, new VectorOfVectorOfPoint(contours[i]), -1, new MCvScalar(r.Next(255), r.Next(255), r.Next(255)), 1, LineType.EightConnected, null, -1, default);
+                double area = CvInvoke.ContourArea(contours[i]);
+                double perimeter = CvInvoke.ArcLength(contours[i], true);
+                Rectangle rect = CvInvoke.BoundingRectangle(contours[i]);
+                double aspectRatio = (double)rect.Width / (double)rect.Height;
+                double extent = (double)area / (double)(rect.Width + rect.Height);
+
+                var vf = new System.Drawing.PointF[contours[i].Size];
+                for (int ii = 0; ii < contours[i].Size; ii++) vf[ii] = contours[i][ii];
+                var hull = CvInvoke.ConvexHull(vf);
+                double hull_area = CvInvoke.ContourArea(new VectorOfPointF(hull), true);
+                double solidity = area / hull_area;
+                double equivalentDiameter = Math.Sqrt(4*area / Math.PI);
+
+                Debug.WriteLine("Obiekt {0}:", i);
+                Debug.WriteLine("Momenty: {0}", contours[i].Size);
+                Debug.WriteLine("Pole powierzchni: {0}", area);
+                Debug.WriteLine("Obwód: {0}", perimeter);
+                Debug.WriteLine("Współczynniki kształtu:");
+                Debug.WriteLine("  AspectRatio: {0}", aspectRatio);
+                Debug.WriteLine("  Extent: {0}", extent);
+                Debug.WriteLine("  Solidity: {0}", solidity);
+                Debug.WriteLine("  EquivalentDiameter: {0}", equivalentDiameter);
+                results.Add(new AnalysisResult(i, contours[i].Size, area, perimeter, aspectRatio, extent, solidity, equivalentDiameter));
+            }
+            AnalysisResultPage arp = new AnalysisResultPage(results);
+            Window w = new Window
+            {
+                Page = arp,
+                Height = 300,
+                Width = 700
+            };
+            //OpenNewWindowWinIMG(new Image<Bgr, Byte>(cntImg), $"{title} Contours");
+            Main.OpenedImagesWindowsList[index].winImg.ColorImage = new Image<Bgr, Byte>(cntImg);
+            Application.Current.OpenWindow(w);
+            //CvInvoke.Imshow("sd", cntImg);
+        }
     }
 }
 

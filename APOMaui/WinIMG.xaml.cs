@@ -1,11 +1,9 @@
 ﻿
 using Emgu.CV;
 using Emgu.CV.Structure;
-using Emgu.CV.Util;
 using SkiaSharp;
+using SkiaSharp.Views.Maui;
 using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Drawing2D;
 namespace APOMaui;
 
 public partial class WinIMG : ContentPage
@@ -16,7 +14,6 @@ public partial class WinIMG : ContentPage
     private Image<Gray, Byte>? grayImage;
     public ImageSource ImageSource { get; set; }
 
-
     string title;
     public string GetTitle
     {
@@ -26,6 +23,8 @@ public partial class WinIMG : ContentPage
     double imgScale;
     public ImgType? Type;
 
+    private SKPoint? previousPoint;
+
     public Image<Bgr, Byte> ColorImage
     {
         get
@@ -34,7 +33,7 @@ public partial class WinIMG : ContentPage
             else
             {
                 System.Diagnostics.Debug.WriteLine("WINImg.xaml.cs: Tried to get color image while image is GrayScale");
-                return new Image<Bgr, Byte>(0, 0);
+                return colorImage;
             }
         }
         set
@@ -42,6 +41,7 @@ public partial class WinIMG : ContentPage
             BindingContext = null;
             if (grayImage != null) grayImage.Dispose();
             if (colorImage != null) colorImage.Dispose();
+            grayImage = null;
             colorImage = value;
             this.ImageSource = EmguImgToImageSource(colorImage);
             BindingContext = this;
@@ -56,7 +56,7 @@ public partial class WinIMG : ContentPage
             else
             {
                 System.Diagnostics.Debug.WriteLine("WINImg.xaml.cs: Tried to get grayscale image while image is Color");
-                return new Image<Gray, Byte>(0, 0);
+                return grayImage;
             }
         }
         set
@@ -68,12 +68,15 @@ public partial class WinIMG : ContentPage
     public WinIMG(Image<Bgr, Byte> img, int index, string title)
     {
         InitializeComponent();
+        
         this.title = title;
         this.Type = ImgType.RGB;
         this.colorImage = img;
         this.index = index;
         this.ImageSource = EmguImgToImageSource(colorImage);
         this.imgScale = (double)img.Height / (double)img.Width;
+        ToggleDrawBox(false);
+        //setDrawBoxSize(img.Width, img.Height);
         BindingContext = this;
     }
     public WinIMG(Image<Gray, Byte> img, int index, string title)
@@ -85,11 +88,16 @@ public partial class WinIMG : ContentPage
         this.index = index;
         this.ImageSource = EmguImgToImageSource(grayImage);
         this.imgScale = (double)img.Height / (double)img.Width;
+        //setDrawBoxSize(img.Width, img.Height);
+        ToggleDrawBox(false);
         BindingContext = this;
+
     }
+
     public static ImageSource EmguImgToImageSource(Image<Bgr, Byte> img)
     {
-        Bitmap bitmap = Emgu.CV.BitmapExtension.ToBitmap(img);
+
+        System.Drawing.Bitmap bitmap = Emgu.CV.BitmapExtension.ToBitmap(img);
         MemoryStream stream = new();
         bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Bmp);
         stream.Position = 0;
@@ -97,11 +105,25 @@ public partial class WinIMG : ContentPage
     }
     public static ImageSource EmguImgToImageSource(Image<Gray, Byte> img)
     {
-        Bitmap bitmap = Emgu.CV.BitmapExtension.ToBitmap(img);
+        System.Drawing.Bitmap bitmap = Emgu.CV.BitmapExtension.ToBitmap(img);
         MemoryStream stream = new();
         bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Bmp);
         stream.Position = 0;
         return ImageSource.FromStream(() => stream);
+    }
+    public void ToggleDrawBox(bool value)
+    {
+        drawBox.IsVisible = value;
+        drawBox.IsEnabled = value;
+    }
+    public bool GetDrawBoxState()
+    {
+        return drawBox.IsVisible && drawBox.IsEnabled;
+    }
+    private void setDrawBoxSize(int w, int h)
+    {
+        this.drawBox.HeightRequest = h;
+        this.drawBox.WidthRequest = w;
     }
     public void OnSetGrayImage(Image<Gray, Byte> value)
     {
@@ -112,6 +134,7 @@ public partial class WinIMG : ContentPage
             backupGray = grayImage.Clone();
             grayImage.Dispose();
         }
+        colorImage = null;
         grayImage = value;
         this.ImageSource = EmguImgToImageSource(grayImage);
         BindingContext = this;
@@ -149,6 +172,7 @@ public partial class WinIMG : ContentPage
         Main.OpenedImagesWindowsList[index].window.Height -= (int)((20 * imgScale) + 0.5); // Approx. Height
         Main.OpenedImagesWindowsList[index].window.Width -= 20;
         winImgBox.WidthRequest = winImgBox.Width - 20;
+
     }
     private void Undo(object sender, EventArgs e)
     {
@@ -260,7 +284,7 @@ public partial class WinIMG : ContentPage
                     int y = Math.Min(p1.Y, p2.Y);
 
                     // Tworzymy Rectangle na podstawie obliczonych wartości
-                    Rectangle rectangle = new Rectangle(x, y, width, height);
+                    System.Drawing.Rectangle rectangle = new System.Drawing.Rectangle(x, y, width, height);
                     Debug.WriteLine("Calling GrabCut in main");
 
                     Main.GrabCut(index, rectangle);
@@ -269,5 +293,101 @@ public partial class WinIMG : ContentPage
             }
 
         };
+    }
+    void OnPaintSurface(object sender, SKPaintSurfaceEventArgs e)
+    {
+        SKSurface surface = e.Surface;
+        SKCanvas canvas = surface.Canvas;
+    }
+    public void OnPaint(object sender, SKTouchEventArgs e)
+    {
+        e.Handled = true;
+        switch (e.ActionType)
+        {
+            case SKTouchAction.Pressed:
+                Debug.WriteLine("Pressed");
+                previousPoint = null;
+                previousPoint = e.Location; // Ustaw bieżący punkt na początkowy
+                e.Handled = true;
+                break;
+            case SKTouchAction.Moved:
+                e.Handled = true;
+                if (previousPoint.HasValue)
+                {
+                    DrawLine(previousPoint.Value, e.Location); // Narysuj linię między poprzednim punktem a bieżącym punktem
+                    previousPoint = e.Location; // Ustaw bieżący punkt na poprzedni
+                    Debug.WriteLine("Moved");
+                    drawBox.InvalidateSurface();
+                }
+                break;
+            case SKTouchAction.Cancelled:
+                Debug.WriteLine("Cancelled");
+                return;
+            case SKTouchAction.Exited:
+                Debug.WriteLine("Exited");
+                break;
+            case SKTouchAction.Entered:
+                Debug.WriteLine("Entered");
+                break;
+            case SKTouchAction.Released:
+                Debug.WriteLine("Rel");
+                e.Handled = true;
+                drawBox.InvalidateSurface();
+                previousPoint = null; // Zresetuj poprzedni punkt po zwolnieniu dotyku
+                break;
+        }
+        e.Handled = true;
+    }
+    private void DrawLine(SKPoint startPoint, SKPoint endPoint)
+    {
+        // Narysuj linię między dwoma punktami na płótnie SKCanvasView
+        drawBox.PaintSurface += (s, args) =>
+        {
+            using (var paint = new SKPaint())
+            {
+                paint.Color = SKColors.White;
+                paint.Style = SKPaintStyle.Fill;
+                paint.StrokeWidth = 10;
+
+                args.Surface.Canvas.DrawLine(startPoint, endPoint, paint);
+            }
+        };
+
+    }
+    public async Task<Image<Gray, Byte>> GetImageFromCanvas()
+    {
+        var img = await drawBox.CaptureAsync();
+        Stream s = await img.OpenReadAsync();
+        s.Position = 0;
+        SKBitmap skb = SKBitmap.Decode(s);
+        Image<Gray, Byte> res = ConvertSKBitmapToGrayByteImage(skb);
+        //Main.OpenNewWindowWinIMG(res, "Test");
+        return res;
+
+    }
+    public Image<Gray, Byte> ConvertSKBitmapToGrayByteImage(SKBitmap skBitmap)
+    {
+        var image = new Image<Gray, byte>(skBitmap.Width, skBitmap.Height, new Gray(0));
+            for (int y = 0; y < skBitmap.Height; y++)
+            {
+                for (int x = 0; x < skBitmap.Width; x++)
+                {
+                    var color = skBitmap.GetPixel(x, y);
+
+                    byte grayValue = (byte)((color.Red + color.Green + color.Blue) / 3);
+
+                    image[y, x] = new Gray(grayValue);
+                }
+        }
+
+        if (colorImage != null)
+        {
+            return image.Resize(colorImage.Width, colorImage.Height, Emgu.CV.CvEnum.Inter.NearestExact);
+        }
+        else if (grayImage != null)
+        {
+            return image.Resize(grayImage.Width, grayImage.Height, Emgu.CV.CvEnum.Inter.NearestExact);
+        }
+        else return image;
     }
 }
