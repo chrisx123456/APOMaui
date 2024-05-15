@@ -1,4 +1,6 @@
-﻿using Emgu.CV;
+﻿using Emgu.CV.Util;
+
+using Emgu.CV;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using Emgu.CV.Util;
@@ -16,6 +18,17 @@ namespace APOMaui
         public static int? selectedWindow = null;
         public const int windowHeightFix = 100;
         public const int windowWidthFix = 26;
+        public static void SaveImage(int index)
+        {
+            if(OpenedImagesWindowsList[index].winImg.ColorImage != null)
+            {
+                OpenedImagesWindowsList[index].winImg.ColorImage.Save(("C:\\Users\\chris\\source\\repos\\APOMaui\\APOMaui\\rescolor.bmp"));
+            }
+            if (OpenedImagesWindowsList[index].winImg.GrayImage != null)
+            {
+                OpenedImagesWindowsList[index].winImg.ColorImage.Save("C:\\Users\\chris\\source\\repos\\APOMaui\\APOMaui\\resgray.bmp");
+            }
+        }
         public static async void OpenPhotoWinIMG()
         {
             if (DeviceInfo.Platform == DevicePlatform.WinUI)

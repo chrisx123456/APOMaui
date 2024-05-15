@@ -7,10 +7,6 @@
             InitializeComponent();
             Emgu.CV.Platform.Maui.MauiInvoke.Init();
         }
-        private void OnSaveButtonClicked(object sender, EventArgs e)
-        {
-
-        }
         private void OnFileButtonClicked(object sender, EventArgs e)
         {
             if (FileTab.IsVisible)
@@ -28,6 +24,16 @@
         {
             Main.OpenPhotoWinIMG();
             //Main.OpenPhotoInNewWindow();
+        }
+        private async void OnSaveButtonClicked(object sender, EventArgs e)
+        {
+            if (Main.selectedWindow == null)
+            {
+                await DisplayAlert("Alert", "None image is selected!", "Ok");
+                return;
+            }
+            int index = (int)Main.selectedWindow;
+            Main.SaveImage(index);
         }
 
 
