@@ -21,27 +21,35 @@ public partial class Chart : ContentPage, IDisposable
 	}
     public void Dispose()
     {
-        this.myChart.Legend = null;
-        foreach (var series in myChart.Series) series.Values = null;
-        this.Series = null;
-        this.TableHistogram.ClearLogicalChildren();
-        this.TableHistogram.Children.Clear();
+        BindingContext = null;  
         this.TableHistogram.Clear();
         this.Series = null;
-        this.BindingContext = null;
-        myChart.BindingContext = null;
-        myChart.Legend = null;
-        myChart.ClearLogicalChildren();
-        myChart.Series = null;
-        TableHistogram.Children.Clear();
-        Main.OpenedImagesWindowsList[indexOfImg].chart = null;
         System.Diagnostics.Debug.WriteLine($"Chart of {indexOfImg} Disposed");
-        window.ClearLogicalChildren();
-        Application.Current.CloseWindow(window);
-        this.window = null;
-        GC.Collect();
-        GC.ReRegisterForFinalize(this);
-        GC.Collect(2, GCCollectionMode.Forced);
+
+        //To ma isc do ondsp
+
+
+        //this.myChart.Legend = null;
+        //foreach (var series in myChart.Series) series.Values = null;
+        //this.Series = null;
+        //this.TableHistogram.ClearLogicalChildren();
+        //this.TableHistogram.Children.Clear();
+        //this.TableHistogram.Clear();
+        //this.Series = null;
+        //this.BindingContext = null;
+        //myChart.BindingContext = null;
+        //myChart.Legend = null;
+        //myChart.ClearLogicalChildren();
+        //myChart.Series = null;
+        //TableHistogram.Children.Clear();
+        //Main.OpenedImagesWindowsList[indexOfImg].chart = null;
+        //System.Diagnostics.Debug.WriteLine($"Chart of {indexOfImg} Disposed");
+        //window.ClearLogicalChildren();
+        //Application.Current.CloseWindow(window);
+        //this.window = null;
+        //GC.Collect();
+        //GC.ReRegisterForFinalize(this);
+        //GC.Collect(2, GCCollectionMode.Forced);
     }
     public async void UpdateChart(int[] values)
     {
@@ -85,6 +93,13 @@ public partial class Chart : ContentPage, IDisposable
     {
         base.OnDisappearing();
         this.Dispose();
+        this.myChart.ClearLogicalChildren();
+        this.TableHistogram = null;
+        this.myChart = null;
+        Main.OpenedImagesWindowsList[indexOfImg].chart = null;
+        this.window.ClearLogicalChildren();
+        Application.Current.CloseWindow(window);
+        this.window = null;
     }
     public void AddElementsToTableChart(int[] tab)
     {

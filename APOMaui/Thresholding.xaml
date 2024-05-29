@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="APOMaui.Thresholding"
+             Title="TwoArgument">
+    <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Start" Margin="0,10,0,0" WidthRequest="200">
+        <Label x:Name ="ThreshTypeLabel" Text="Thresholding type" FontSize="12" HorizontalOptions="Center" VerticalOptions="Center"/>
+        <Picker x:Name="ThreshTypePicker" MinimumHeightRequest="30" HeightRequest="30" FontSize="13" SelectedIndexChanged="OnThreshTypePickerIndexChanged"/>
+        <Label x:Name="displayLabel"
+               Text="(uninitialized)"
+               HorizontalOptions="Center"
+               VerticalOptions="Center" />
+        <Slider Maximum="255" ValueChanged="OnSliderValueChanged"/>
+        <Button x:Name="ButtonThreshAccept" Text="Accept" Clicked="OnButtonThreshAcceptClicked" StyleClass="MainPageButton"/>
+        <Button x:Name="ButtonThreshCancel" Text="Execute" Clicked="OnButtonThreshCancelClicked" StyleClass="MainPageButton"/>
+
+    </VerticalStackLayout>
+</ContentPage>

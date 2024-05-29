@@ -3,16 +3,15 @@
 using Emgu.CV;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
-using Emgu.CV.Util;
 using System.Diagnostics;
 using System.Drawing;
-using System.Numerics;
 using Point = System.Drawing.Point;
+using CommunityToolkit.Maui.Converters;
 namespace APOMaui
 {
     internal static class Main
     {
-        public static event Action? OnWinIMGClosingEvent;
+        public static event Action? OnWinIMGClosingOpeningEvent;
 
         public static List<WindowImageObject> OpenedImagesWindowsList = new();
         public static int? selectedWindow = null;
@@ -53,7 +52,7 @@ namespace APOMaui
                 }
                 fileName += $".{duplicates}";
                 OpenNewWindowWinIMG(img, fileName);
-
+                OnWinIMGClosingOpeningEvent?.Invoke();
 
             }
             else if(DeviceInfo.Platform == DevicePlatform.Android)
@@ -109,7 +108,7 @@ namespace APOMaui
             OpenedImagesWindowsList[index].Dispose();
             OpenedImagesWindowsList.RemoveAt(index);
             GC.Collect();
-            OnWinIMGClosingEvent?.Invoke();
+            OnWinIMGClosingOpeningEvent?.Invoke();
         }
         public static void ChangeSelectedtWinIMG(int index)
         {
@@ -249,25 +248,18 @@ namespace APOMaui
             img.Dispose();
 
         }
-        public static void HistStretchInRange(int index, int Lmin, int Lmax) //TODO: Optimize//fix
+        public static void HistStretchInRange(int index, byte p1, byte p2, byte q3, byte q4) //TODO: Optimize//fix
         {
             Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage;
             byte[] rawData = img.Bytes;
-            byte min = rawData.Min();
-            byte max = rawData.Max();
-            for(int i=0; i < rawData.Length; i++)
+
+            for (int i = 0; i < rawData.Length; i++)
             {
-                if (rawData[i] < min)
+                byte pixelValue = rawData[i];
+
+                if (pixelValue >= p1 && pixelValue <= p2)
                 {
-                    rawData[i] = (byte)Lmin;
-                } 
-                else if (rawData[i] <= max) 
-                {
-                    rawData[i] = (byte)((rawData[i] - min) * Lmax / (max - min));
-                }
-                else //rawdata[i] > max
-                {
-                    rawData[i] = (byte)Lmax;
+                    rawData[i] = (byte)((pixelValue - p1) * (q4 - q3) / (p2 - p1) + q3);
                 }
             }
             Image<Gray, Byte> res = new(img.Width, img.Height);
@@ -771,6 +763,37 @@ namespace APOMaui
             Main.OpenedImagesWindowsList[index].winImg.ColorImage = new Image<Bgr, Byte>(cntImg);
             Application.Current.OpenWindow(w);
             //CvInvoke.Imshow("sd", cntImg);
+        }
+        public static void Thresh(Image<Gray, Byte> img, int index, ThreshType type, int t1, ActionType action)
+        {
+            Image<Gray, Byte> res = new Image<Gray, Byte>(img.Size);
+            switch (type)
+            {
+                case ThreshType.MANUAL:
+                    CvInvoke.Threshold(img, res, t1, 255, ThresholdType.Binary);
+                    break;
+                case ThreshType.ADAPTIVE:
+                    CvInvoke.AdaptiveThreshold(img, res, 255, AdaptiveThresholdType.GaussianC, ThresholdType.Binary, 3, 1); //Ostatnie idk co to jest
+                    break;
+                case ThreshType.OTSU:
+                    CvInvoke.Threshold(img, res, t1, 255, ThresholdType.Otsu);
+                    break;
+                default:
+                    break;
+            }
+
+            switch(action)
+            {
+                case ActionType.PREVIEW:
+                    Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
+                    break;
+                case ActionType.ACCEPT:
+                    //To chyba ostatecznie nie jest potrzebne
+                    break;
+                case ActionType.CANCEL:
+                    Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
+                    break;
+            }
         }
     }
 }

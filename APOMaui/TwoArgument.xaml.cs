@@ -6,7 +6,7 @@ namespace APOMaui;
 public partial class TwoArgument : ContentPage
 {
     private readonly List<string> _operations = new List<string>() {"ADD","SUBSTRACT","BLEND","AND","OR","NOT","XOR"};
-    private readonly Dictionary<string, int> _imageList = new Dictionary<string, int>();
+    private Dictionary<string, int> _imageList = new Dictionary<string, int>();
 	private TwoArgsOps? _selectedOperation = null;
 	private int? _selectedImage1 = null;
 	private int? _selectedImage2 = null;
@@ -16,14 +16,19 @@ public partial class TwoArgument : ContentPage
         OperationPicker.ItemsSource = _operations;
 		_imageList = GetImagesList();
 		AddPickersItems();
-		Main.OnWinIMGClosingEvent += this.UpdatePickersItems;
+		Main.OnWinIMGClosingOpeningEvent += this.UpdatePickersItems;
         //Zmienic w kernelach zeby wsm tak samo sie do pickera dodawalo jak tutaj
 
     }
 	private void UpdatePickersItems()
 	{
-		ResetPickersItems();
+		BindingContext = null;
+		_imageList.Clear();
+        ResetPickersItems();
+
+        _imageList = GetImagesList();
 		AddPickersItems();
+		BindingContext = this;
 	}
 	private void ResetPickersItems()
 	{

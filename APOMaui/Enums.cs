@@ -36,4 +36,17 @@ namespace APOMaui
         SKELETONIZE,
         WATERSHED,
     }
+
+    public enum ThreshType
+    {
+        MANUAL,
+        ADAPTIVE,
+        OTSU
+    }
+    public enum ActionType
+    {
+        PREVIEW,
+        CANCEL,
+        ACCEPT,
+    }
 }

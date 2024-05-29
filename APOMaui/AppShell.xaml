@@ -32,5 +32,9 @@
            Title="Morph"
            ContentTemplate="{DataTemplate local:Morph}"
            Route="Morph" />
+        <ShellContent
+           Title="Thresh"
+           ContentTemplate="{DataTemplate local:Thresholding}"
+           Route="Thresholding" />
     </TabBar>
 </Shell>
