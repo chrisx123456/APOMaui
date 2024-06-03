@@ -89,14 +89,14 @@ public partial class Kernels : ContentPage
             new float[,]
             {
                 { 1f, 1f, 1f},
-                { 0f, 1f, 0f},
+                { 0f, 0f, 0f},
                 {-1f,-1f,-1f}
             }},
         {"PrewittNE",
             new float[,]
             {
                 { 0f, 1f,1f},
-                {-1f, 1f,1f},
+                {-1f, 0f,1f},
                 {-1f,-1f,0f}
             }},
 
@@ -104,7 +104,7 @@ public partial class Kernels : ContentPage
             new float[,]
             {
                 {-1f,0f,1f},
-                {-1f,1f,1f},
+                {-1f,0f,1f},
                 {-1f,0f,1f}
             }},
 
@@ -112,7 +112,7 @@ public partial class Kernels : ContentPage
             new float[,]
             {
                 {-1f,-1f,0f},
-                {-1f, 1f,1f},
+                {-1f, 0f,1f},
                 { 0f, 1f,1f}
             }},
 
@@ -120,7 +120,7 @@ public partial class Kernels : ContentPage
             new float[,]
             {
                 {-1f,-1f,-1f},
-                { 0f, 1f, 0f},
+                { 0f, 0f, 0f},
                 { 1f, 1f, 1f}
             }},
 
@@ -128,14 +128,14 @@ public partial class Kernels : ContentPage
             new float[,]
             {
                 {0f,-1f,-1f},
-                {1f, 1f,-1f},
+                {1f, 0f,-1f},
                 {1f, 1f, 0f}
             }},
         {"PrewittW",
             new float[,]
             {
                 {1f, 0f, -1f},
-                {1f, 1f, -1f},
+                {1f, 0f, -1f},
                 {1f, 0f, -1f}
             }},
 
@@ -143,7 +143,7 @@ public partial class Kernels : ContentPage
             new float[,]
             {
                 {1f, 1f, 0f},
-                {1f, 1f,-1f},
+                {1f, 0f,-1f},
                 {0f,-1f,-1f}
             }},
 

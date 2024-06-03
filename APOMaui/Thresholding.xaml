@@ -7,12 +7,12 @@
         <Label x:Name ="ThreshTypeLabel" Text="Thresholding type" FontSize="12" HorizontalOptions="Center" VerticalOptions="Center"/>
         <Picker x:Name="ThreshTypePicker" MinimumHeightRequest="30" HeightRequest="30" FontSize="13" SelectedIndexChanged="OnThreshTypePickerIndexChanged"/>
         <Label x:Name="displayLabel"
-               Text="(uninitialized)"
                HorizontalOptions="Center"
                VerticalOptions="Center" />
-        <Slider Maximum="255" ValueChanged="OnSliderValueChanged"/>
+        <Slider x:Name="Slider" Maximum="255" ValueChanged="OnSliderValueChanged"/>
+        <Button x:Name="ButtonThreshPreview" Text="Preview" Clicked="OnButtonThreshPreviewClicked" StyleClass="MainPageButton"/>
         <Button x:Name="ButtonThreshAccept" Text="Accept" Clicked="OnButtonThreshAcceptClicked" StyleClass="MainPageButton"/>
-        <Button x:Name="ButtonThreshCancel" Text="Execute" Clicked="OnButtonThreshCancelClicked" StyleClass="MainPageButton"/>
+        <Button x:Name="ButtonThreshCancel" Text="Cancel" Clicked="OnButtonThreshCancelClicked" StyleClass="MainPageButton"/>
 
     </VerticalStackLayout>
 </ContentPage>

@@ -6,12 +6,12 @@ using Emgu.CV.Structure;
 using System.Diagnostics;
 using System.Drawing;
 using Point = System.Drawing.Point;
-using CommunityToolkit.Maui.Converters;
 namespace APOMaui
 {
     internal static class Main
     {
         public static event Action? OnWinIMGClosingOpeningEvent;
+        public static event Action? OnWinIMGSelectionChanged;
 
         public static List<WindowImageObject> OpenedImagesWindowsList = new();
         public static int? selectedWindow = null;
@@ -82,7 +82,7 @@ namespace APOMaui
 
             WindowImageObject windowImageObject = new(page, newWindow);
             OpenedImagesWindowsList.Add(windowImageObject);
-            selectedWindow = OpenedImagesWindowsList.Count - 1;
+            ChangeSelectedtWinIMG(OpenedImagesWindowsList.Count - 1);
 #pragma warning disable 8602
             Application.Current.OpenWindow(OpenedImagesWindowsList[(int)selectedWindow].window);
 #pragma warning restore 8602
@@ -114,6 +114,7 @@ namespace APOMaui
         {
             selectedWindow = index;
             System.Diagnostics.Debug.WriteLine($"Selected {index}");
+            OnWinIMGSelectionChanged?.Invoke();
         }
         public static int[] CalcHistValues(byte[] rawData)
         {
@@ -172,6 +173,7 @@ namespace APOMaui
             CvInvoke.CvtColor(OpenedImagesWindowsList[index].winImg.ColorImage, grayImage, ColorConversion.Bgr2Gray);
             OpenedImagesWindowsList[index].winImg.GrayImage = grayImage;
             OpenedImagesWindowsList[index].winImg.Type = ImgType.Gray;
+            OnWinIMGSelectionChanged?.Invoke();
         }
         public static void ConvertRgbToHsv(int index) 
         {
@@ -776,7 +778,7 @@ namespace APOMaui
                     CvInvoke.AdaptiveThreshold(img, res, 255, AdaptiveThresholdType.GaussianC, ThresholdType.Binary, 3, 1); //Ostatnie idk co to jest
                     break;
                 case ThreshType.OTSU:
-                    CvInvoke.Threshold(img, res, t1, 255, ThresholdType.Otsu);
+                    CvInvoke.Threshold(img, res, 0, 255, ThresholdType.Otsu);
                     break;
                 default:
                     break;
