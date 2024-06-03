@@ -29,7 +29,9 @@ public partial class Thresholding : ContentPage
     private void UpdateImg()
 	{
 		System.Diagnostics.Debug.WriteLine("Thresh Updating img");
-		if(Main.selectedWindow != null)
+        ResetSlider();
+        //this.ThreshTypePicker.SelectedIndex = 0;
+        if (Main.selectedWindow != null)
 		{
 			if (Main.selectedWindow!= null && Main.OpenedImagesWindowsList[(int)Main.selectedWindow].winImg.Type == ImgType.Gray)
 			{
@@ -39,6 +41,7 @@ public partial class Thresholding : ContentPage
                 this.Slider.IsEnabled = true;
 				this.ButtonThreshAccept.IsEnabled = true;
 				this.ButtonThreshCancel.IsEnabled = true;
+				this.ButtonThreshPreview.IsEnabled = true;
             }
 			else DisableAll();
         } 
@@ -66,13 +69,13 @@ public partial class Thresholding : ContentPage
             switch (_selected)
             {
                 case ThreshType.MANUAL:
-                    Main.Thresh(this._img, (int)this._imgindex, ThreshType.MANUAL, _sliderValue, ActionType.PREVIEW);
+                    Main.Thresh(this._img, (int)this._imgindex, ThreshType.MANUAL, _sliderValue);
                     break;
                 case ThreshType.ADAPTIVE:
-                    Main.Thresh(this._img, (int)this._imgindex, ThreshType.ADAPTIVE, -1, ActionType.PREVIEW);
+                    Main.Thresh(this._img, (int)this._imgindex, ThreshType.ADAPTIVE, -1);
                     break;
                 case ThreshType.OTSU:
-                    Main.Thresh(this._img, (int)this._imgindex, ThreshType.OTSU, -1, ActionType.PREVIEW);
+                    Main.Thresh(this._img, (int)this._imgindex, ThreshType.OTSU, -1);
                     break;
             }
         }
@@ -109,7 +112,7 @@ public partial class Thresholding : ContentPage
     }
     private void OnButtonThreshAcceptClicked(object sender, EventArgs e)
     {
-		ResetSlider();
+		OnButtonThreshPreviewClicked(sender, e);
         UpdateImg();
     }
 	private void ResetSlider()
@@ -127,6 +130,7 @@ public partial class Thresholding : ContentPage
         this.ThreshTypePicker.IsEnabled = false;
         this.ButtonThreshAccept.IsEnabled = false;
         this.ButtonThreshCancel.IsEnabled = false;
+		this.ButtonThreshPreview.IsEnabled = false;
         this._imgindex = null;
         this._img = null;
     }

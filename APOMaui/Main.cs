@@ -6,6 +6,7 @@ using Emgu.CV.Structure;
 using System.Diagnostics;
 using System.Drawing;
 using Point = System.Drawing.Point;
+using CommunityToolkit.Maui.Storage;
 namespace APOMaui
 {
     internal static class Main
@@ -17,16 +18,55 @@ namespace APOMaui
         public static int? selectedWindow = null;
         public const int windowHeightFix = 100;
         public const int windowWidthFix = 26;
-        public static void SaveImage(int index)
+        public static async void SaveImage(int index, bool saveAs)
         {
-            if(OpenedImagesWindowsList[index].winImg.ColorImage != null)
+            switch (saveAs)
             {
-                OpenedImagesWindowsList[index].winImg.ColorImage.Save(("C:\\Users\\chris\\source\\repos\\APOMaui\\APOMaui\\rescolor.bmp"));
+                case false:
+                    if (OpenedImagesWindowsList[index].winImg.path == String.Empty) throw new InvalidOperationException(@"Image has no path. Save this image via ""Save as""");
+                    if (OpenedImagesWindowsList[index].winImg.ColorImage != null && OpenedImagesWindowsList[index].winImg.Type == ImgType.RGB)
+                    {
+                        OpenedImagesWindowsList[index].winImg.ColorImage.Save(OpenedImagesWindowsList[index].winImg.path);
+                    }
+                    if (OpenedImagesWindowsList[index].winImg.GrayImage != null && OpenedImagesWindowsList[index].winImg.Type == ImgType.Gray)
+                    {
+                        OpenedImagesWindowsList[index].winImg.GrayImage.Save(OpenedImagesWindowsList[index].winImg.path);
+                    }
+                    break;
+                case true:
+                    if (DeviceInfo.Platform == DevicePlatform.WinUI)
+                    {
+                        string filename = await Application.Current.MainPage.DisplayPromptAsync("File Name", "Type File Name");
+                        string extension = await Application.Current.MainPage.DisplayActionSheet("File extension", null, null, new string[] { ".bmp", ".jpg", ".png" });
+                        if (filename == null || filename == String.Empty || extension == null || extension == String.Empty)
+                        {
+                            await Application.Current.MainPage.DisplayAlert("Alert", "Invalid filename/extension", "Cancel");
+                            return;
+                        }
+                        var fp = await FolderPicker.Default.PickAsync();
+                        string path;
+                        if (fp.IsSuccessful)
+                        {
+                            path = fp.Folder.Path;
+                            string fullPath = path + "\\" + filename + extension;
+                            if (OpenedImagesWindowsList[index].winImg.ColorImage != null && OpenedImagesWindowsList[index].winImg.Type == ImgType.RGB)
+                            {
+                                OpenedImagesWindowsList[index].winImg.ColorImage.Save(fullPath);
+                            }
+                            if (OpenedImagesWindowsList[index].winImg.GrayImage != null && OpenedImagesWindowsList[index].winImg.Type == ImgType.Gray)
+                            {
+                                OpenedImagesWindowsList[index].winImg.GrayImage.Save(fullPath);
+                            }
+                        }
+                        else
+                        {
+                            await Application.Current.MainPage.DisplayAlert("Alert", "Path not valid", "Cancel");
+                            return;
+                        }
+                    }
+                    break;
             }
-            if (OpenedImagesWindowsList[index].winImg.GrayImage != null)
-            {
-                OpenedImagesWindowsList[index].winImg.ColorImage.Save("C:\\Users\\chris\\source\\repos\\APOMaui\\APOMaui\\resgray.bmp");
-            }
+
         }
         public static async void OpenPhotoWinIMG()
         {
@@ -51,7 +91,7 @@ namespace APOMaui
                     if (output == fileName) duplicates++;
                 }
                 fileName += $".{duplicates}";
-                OpenNewWindowWinIMG(img, fileName);
+                OpenNewWindowWinIMG(img, fileName, FileFullPath);
                 OnWinIMGClosingOpeningEvent?.Invoke();
 
             }
@@ -60,9 +100,10 @@ namespace APOMaui
                 //TODO
             }
         }
-        public static void OpenNewWindowWinIMG(dynamic img, string title) //Argument is dynamic cuz' dont want to make overload for GrayScale/Color.
+        public static void OpenNewWindowWinIMG(dynamic img, string title, string path) //Argument is dynamic cuz' dont want to make overload for GrayScale/Color.
         {
             WinIMG page = new WinIMG(img, OpenedImagesWindowsList.Count, title);
+            page.path = path;
             Window newWindow = new Window
             {
                 Page = page,
@@ -180,25 +221,25 @@ namespace APOMaui
             Image<Hsv, Byte> hsvimg = new(OpenedImagesWindowsList[index].winImg.ColorImage.Width, OpenedImagesWindowsList[index].winImg.ColorImage.Height);
             CvInvoke.CvtColor(OpenedImagesWindowsList[index].winImg.ColorImage, hsvimg, ColorConversion.Bgr2HsvFull);
             Image<Gray, Byte>[] channels = hsvimg.Split();
-            OpenNewWindowWinIMG(channels[0], OpenedImagesWindowsList[index].window.Title + " Hue");
-            OpenNewWindowWinIMG(channels[1], OpenedImagesWindowsList[index].window.Title + " Saturation");
-            OpenNewWindowWinIMG(channels[2], OpenedImagesWindowsList[index].window.Title + " Value");
+            OpenNewWindowWinIMG(channels[0], OpenedImagesWindowsList[index].window.Title + " Hue", String.Empty);
+            OpenNewWindowWinIMG(channels[1], OpenedImagesWindowsList[index].window.Title + " Saturation", String.Empty);
+            OpenNewWindowWinIMG(channels[2], OpenedImagesWindowsList[index].window.Title + " Value", String.Empty);
         }
         public static void ConvertRgbToLab(int index)
         {
             Image<Lab, Byte> labimg = new(OpenedImagesWindowsList[index].winImg.ColorImage.Width, OpenedImagesWindowsList[index].winImg.ColorImage.Height);
             CvInvoke.CvtColor(OpenedImagesWindowsList[index].winImg.ColorImage, labimg, ColorConversion.Bgr2Lab);
             Image<Gray, Byte>[] channels = labimg.Split();
-            OpenNewWindowWinIMG(channels[0], OpenedImagesWindowsList[index].window.Title + " L");
-            OpenNewWindowWinIMG(channels[1], OpenedImagesWindowsList[index].window.Title + " a");
-            OpenNewWindowWinIMG(channels[2], OpenedImagesWindowsList[index].window.Title + " b");
+            OpenNewWindowWinIMG(channels[0], OpenedImagesWindowsList[index].window.Title + " L", String.Empty);
+            OpenNewWindowWinIMG(channels[1], OpenedImagesWindowsList[index].window.Title + " a", String.Empty);
+            OpenNewWindowWinIMG(channels[2], OpenedImagesWindowsList[index].window.Title + " b", String.Empty);
         }
         public static void SplitChannels(int index)
         {
             Image<Gray, Byte>[] channels = OpenedImagesWindowsList[index].winImg.ColorImage.Split();
-            OpenNewWindowWinIMG(channels[0], OpenedImagesWindowsList[index].window.Title + " Blue");
-            OpenNewWindowWinIMG(channels[1], OpenedImagesWindowsList[index].window.Title + " Green");
-            OpenNewWindowWinIMG(channels[2], OpenedImagesWindowsList[index].window.Title + " Red");
+            OpenNewWindowWinIMG(channels[0], OpenedImagesWindowsList[index].window.Title + " Blue", String.Empty);
+            OpenNewWindowWinIMG(channels[1], OpenedImagesWindowsList[index].window.Title + " Green", String.Empty);
+            OpenNewWindowWinIMG(channels[2], OpenedImagesWindowsList[index].window.Title + " Red", String.Empty);
         }
         public static void HistEqualization(int index)
         {
@@ -420,7 +461,7 @@ namespace APOMaui
                     return;
             }
             string title = Main.OpenedImagesWindowsList[index1].winImg.GetTitle + " " + arg.ToString() + " " + Main.OpenedImagesWindowsList[index2].winImg.GetTitle;
-            OpenNewWindowWinIMG(res, title);
+            OpenNewWindowWinIMG(res, title, String.Empty);
         }
         public static void TwoStage233(int index, BorderType border, BuiltInFilters stage1, Matrix<float> stage2)
         {
@@ -766,7 +807,7 @@ namespace APOMaui
             Application.Current.OpenWindow(w);
             //CvInvoke.Imshow("sd", cntImg);
         }
-        public static void Thresh(Image<Gray, Byte> img, int index, ThreshType type, int t1, ActionType action)
+        public static void Thresh(Image<Gray, Byte> img, int index, ThreshType type, int t1)
         {
             Image<Gray, Byte> res = new Image<Gray, Byte>(img.Size);
             switch (type)
@@ -783,19 +824,7 @@ namespace APOMaui
                 default:
                     break;
             }
-
-            switch(action)
-            {
-                case ActionType.PREVIEW:
-                    Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
-                    break;
-                case ActionType.ACCEPT:
-                    //To chyba ostatecznie nie jest potrzebne
-                    break;
-                case ActionType.CANCEL:
-                    Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
-                    break;
-            }
+            Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
         }
     }
 }

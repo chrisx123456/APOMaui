@@ -43,10 +43,4 @@ namespace APOMaui
         ADAPTIVE,
         OTSU
     }
-    public enum ActionType
-    {
-        PREVIEW,
-        CANCEL,
-        ACCEPT,
-    }
 }

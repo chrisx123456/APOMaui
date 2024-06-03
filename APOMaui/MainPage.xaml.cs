@@ -33,9 +33,30 @@
                 return;
             }
             int index = (int)Main.selectedWindow;
-            Main.SaveImage(index);
+            try
+            {
+                Main.SaveImage(index, false);
+            }
+            catch(InvalidOperationException ex)
+            {
+                await DisplayAlert("Alert", ex.Message, "Ok");
+            }
         }
-
+        private async void OnSaveAsButtonClicked(object sender, EventArgs e)
+        {
+            if (Main.selectedWindow == null)
+            {
+                await DisplayAlert("Alert", "None image is selected!", "Ok");
+                return;
+            }
+            int index = (int)Main.selectedWindow;
+            Main.SaveImage(index, true);
+        }
+        private async void OnAboutButtonClicked(object sender, EventArgs e)
+        {
+            string msg = "APO Projekt \n\nAutor: Maciej Lacek";
+            await DisplayAlert("About", msg, "Ok");
+        }
 
 
     }

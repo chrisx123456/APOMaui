@@ -15,6 +15,7 @@ public partial class WinIMG : ContentPage
     public ImageSource ImageSource { get; set; }
 
     string title;
+    public string path;
     public string GetTitle
     {
         get => title;

@@ -5,9 +5,11 @@
     <ScrollView>
         <VerticalStackLayout IsVisible="True" x:Name="FileTab">
             
-            <Button x:Name="ButtonOpen" Text="Otwórz" Clicked="OnOpenButtonClicked" StyleClass="MainPageButton"/>
-            <Button x:Name="ButtonClose" Text="Zamknij" Clicked="OnCloseButtonClicked" StyleClass="MainPageButton"/>
-            <Button x:Name="ButtonSave" Text="Zapisz" Clicked="OnSaveButtonClicked" StyleClass="MainPageButton"/>
+            <Button x:Name="ButtonOpen" Text="Open" Clicked="OnOpenButtonClicked" StyleClass="MainPageButton"/>
+            <Button x:Name="ButtonClose" Text="Close" Clicked="OnCloseButtonClicked" StyleClass="MainPageButton"/>
+            <Button x:Name="ButtonSave" Text="Save" Clicked="OnSaveButtonClicked" StyleClass="MainPageButton"/>
+            <Button x:Name="ButtonSaveAs" Text="Save As" Clicked="OnSaveAsButtonClicked" StyleClass="MainPageButton"/>
+            <Button x:Name="ButtonAbout" Text="About" Clicked="OnAboutButtonClicked" StyleClass="MainPageButton"/>
 
         </VerticalStackLayout>
     </ScrollView>
