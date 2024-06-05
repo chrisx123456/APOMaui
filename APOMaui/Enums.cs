@@ -7,9 +7,7 @@ namespace APOMaui
     public enum ImgType
     {
         RGB,
-        HSV,
         Gray,
-        Lab,
     }
     public enum BuiltInFilters
     {
@@ -42,5 +40,10 @@ namespace APOMaui
         MANUAL,
         ADAPTIVE,
         OTSU
+    }
+    public enum PyramidType
+    {
+        UP,
+        DOWN
     }
 }

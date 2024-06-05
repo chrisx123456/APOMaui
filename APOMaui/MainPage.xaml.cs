@@ -57,7 +57,16 @@
             string msg = "APO Projekt \n\nAutor: Maciej Lacek";
             await DisplayAlert("About", msg, "Ok");
         }
-
+        private async void OnRLEButtonClicked(object sender, EventArgs e)
+        {
+            if (Main.selectedWindow == null)
+            {
+                await DisplayAlert("Alert", "None image is selected!", "Ok");
+                return;
+            }
+            int index = (int)Main.selectedWindow;
+            Main.CompressRLE(index);
+        }
 
     }
 

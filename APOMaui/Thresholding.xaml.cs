@@ -9,8 +9,9 @@ public partial class Thresholding : ContentPage
 	private ThreshType? _selected = null;
 	private Image<Gray, Byte>? _img = null;
 	private int? _imgindex = null;
-	private int _sliderValue = 0;
-	public Thresholding()
+	private int _slider1Value = 0;
+    private int _slider2Value = 0;
+    public Thresholding()
 	{
 		InitializeComponent();
         AddPickersItems();
@@ -30,6 +31,7 @@ public partial class Thresholding : ContentPage
 	{
 		System.Diagnostics.Debug.WriteLine("Thresh Updating img");
         ResetSlider();
+        OnButtonThreshCancelClicked(new object(), new EventArgs());
         //this.ThreshTypePicker.SelectedIndex = 0;
         if (Main.selectedWindow != null)
 		{
@@ -38,8 +40,9 @@ public partial class Thresholding : ContentPage
                 this._imgindex = Main.selectedWindow;
                 this._img = Main.OpenedImagesWindowsList[(int)_imgindex].winImg.GrayImage.Clone();
 				this.ThreshTypePicker.IsEnabled = true;
-                this.Slider.IsEnabled = true;
-				this.ButtonThreshAccept.IsEnabled = true;
+                this.Slider1.IsEnabled = true;
+                this.Slider2.IsEnabled = true;
+                this.ButtonThreshAccept.IsEnabled = true;
 				this.ButtonThreshCancel.IsEnabled = true;
 				this.ButtonThreshPreview.IsEnabled = true;
             }
@@ -54,28 +57,35 @@ public partial class Thresholding : ContentPage
 			this.ThreshTypePicker.Items.Add(type);
 		}
 	}
-	private void OnSliderValueChanged(object sender, ValueChangedEventArgs e)
+	private void OnSlider1ValueChanged(object sender, ValueChangedEventArgs e)
 	{
 		int val = (int)e.NewValue;
-		_sliderValue = val;
-        displayLabel.Text = String.Format("The Slider value is {0}", (int)val);
+		_slider1Value = val;
+        displayLabel1.Text = String.Format("The T1 value is {0}", (int)val);
+
+    }
+    private void OnSlider2ValueChanged(object sender, ValueChangedEventArgs e)
+    {
+        int val = (int)e.NewValue;
+        _slider2Value = val;
+        displayLabel2.Text = String.Format("The MaxValue value is {0}", (int)val);
 
     }
 
-	private void OnButtonThreshPreviewClicked(object sender, EventArgs e)
+    private void OnButtonThreshPreviewClicked(object sender, EventArgs e)
 	{
         if (this._img != null && this._imgindex != null && this._selected != null)
         {
             switch (_selected)
             {
                 case ThreshType.MANUAL:
-                    Main.Thresh(this._img, (int)this._imgindex, ThreshType.MANUAL, _sliderValue);
+                    Main.Thresh(this._img, (int)this._imgindex, ThreshType.MANUAL, _slider1Value, _slider2Value);
                     break;
                 case ThreshType.ADAPTIVE:
-                    Main.Thresh(this._img, (int)this._imgindex, ThreshType.ADAPTIVE, -1);
+                    Main.Thresh(this._img, (int)this._imgindex, ThreshType.ADAPTIVE, -1, -1);
                     break;
                 case ThreshType.OTSU:
-                    Main.Thresh(this._img, (int)this._imgindex, ThreshType.OTSU, -1);
+                    Main.Thresh(this._img, (int)this._imgindex, ThreshType.OTSU, -1, -1);
                     break;
             }
         }
@@ -83,16 +93,22 @@ public partial class Thresholding : ContentPage
     private void OnThreshTypePickerIndexChanged(object sender, EventArgs e)
 	{
 		OnButtonThreshCancelClicked(sender, e);
-        this.Slider.IsEnabled = false;
-        this.Slider.IsVisible = false;
-        this.displayLabel.IsVisible = false;
+        this.Slider1.IsEnabled = false;
+        this.Slider1.IsVisible = false;
+        this.displayLabel1.IsVisible = false;
+        this.Slider2.IsEnabled = false;
+        this.Slider2.IsVisible = false;
+        this.displayLabel2.IsVisible = false;
         switch (this.ThreshTypePicker.SelectedItem) 
 		{
 			case "Manual":
 				_selected = ThreshType.MANUAL;
-				this.Slider.IsEnabled = true;
-				this.Slider.IsVisible = true;
-				this.displayLabel.IsVisible = true;
+				this.Slider1.IsEnabled = true;
+				this.Slider1.IsVisible = true;
+				this.displayLabel1.IsVisible = true;
+                this.Slider2.IsEnabled = true;
+                this.Slider2.IsVisible = true;
+                this.displayLabel2.IsVisible = true;
                 break;
 			case "Adaptive":
 				_selected = ThreshType.ADAPTIVE;
@@ -117,16 +133,25 @@ public partial class Thresholding : ContentPage
     }
 	private void ResetSlider()
 	{
-		this.Slider.ValueChanged -= OnSliderValueChanged;
-        this.Slider.Value = 0; //Visual
-		this._sliderValue = 0; //In-code value
-        displayLabel.Text = String.Format("The Slider value is {0}", 0);
-        this.Slider.ValueChanged += OnSliderValueChanged;
+		this.Slider1.ValueChanged -= OnSlider1ValueChanged;
+        this.Slider2.ValueChanged -= OnSlider2ValueChanged;
+
+        this.Slider1.Value = 0; //Visual
+		this._slider1Value = 0; //In-code value
+        displayLabel1.Text = String.Format("The T1 value is {0}", 0);
+
+        this.Slider2.Value = 0; //Visual
+        this._slider2Value = 0; //In-code value
+        displayLabel2.Text = String.Format("The MaxValue value is {0}", 0);
+
+        this.Slider1.ValueChanged += OnSlider1ValueChanged;
+        this.Slider2.ValueChanged += OnSlider2ValueChanged;
     }
 	private void DisableAll()
 	{
         System.Diagnostics.Debug.WriteLine("Thresh nulling img");
-        this.Slider.IsEnabled = false;
+        this.Slider1.IsEnabled = false;
+        this.Slider2.IsEnabled = false;
         this.ThreshTypePicker.IsEnabled = false;
         this.ButtonThreshAccept.IsEnabled = false;
         this.ButtonThreshCancel.IsEnabled = false;

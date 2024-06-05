@@ -133,19 +133,19 @@ public partial class Operations : ContentPage
             return;
         }
         int index = (int)Main.selectedWindow;
-        if (Main.OpenedImagesWindowsList[index].winImg.Type != ImgType.Gray)
-        {
-            await DisplayAlert("Alert", "Selected image is not GrayScale", "Ok");
-            return;
-        }
+        //if (Main.OpenedImagesWindowsList[index].winImg.Type != ImgType.Gray)
+        //{
+        //    await DisplayAlert("Alert", "Selected image is not GrayScale", "Ok");
+        //    return;
+        //}
         var result = await DisplayActionSheet("Choose", "Cancel", null, new string[] { "Up", "Down" });
         if(result == "Up") 
         {
-            Main.PyrUp(index);
+            Main.Pyramid(index, PyramidType.UP);
         }
         else
         {
-            Main.PyrDown(index);
+            Main.Pyramid(index, PyramidType.DOWN);
         }
     }
     private async void OnButtonInpaintClick(object sender, EventArgs e)

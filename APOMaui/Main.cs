@@ -157,6 +157,36 @@ namespace APOMaui
             System.Diagnostics.Debug.WriteLine($"Selected {index}");
             OnWinIMGSelectionChanged?.Invoke();
         }
+
+        public async static void CompressRLE(int index)
+        {
+            Image<Gray, Byte> image = Main.OpenedImagesWindowsList[index].winImg.GrayImage;
+            var compressed = new List<(byte, byte)>();
+            byte[] data = image.Bytes;
+            byte currPixel = data[0];
+            byte samePixelCount = 1;
+            for(int i = 0; i < data.Length-1; i++)
+            {
+                byte nextPixel= data[i+1];
+                if (nextPixel == currPixel && samePixelCount < byte.MaxValue)
+                {
+                    samePixelCount++;
+                }
+                else
+                {
+                    compressed.Add((currPixel, samePixelCount));
+                    samePixelCount = 1;
+                    currPixel = nextPixel;
+                }
+
+            }
+            compressed.Add((currPixel, samePixelCount)); //Last Pixel
+            int orgSize = image.Bytes.Length;
+            int compressedSize = compressed.Count * (sizeof(byte) + sizeof(ushort));
+            double sk = (double)orgSize / (double)compressedSize; //??
+            string msg = $"Original size: {orgSize} Bytes\n\nCompressed size: {compressedSize} Bytes\n\nSK: {sk}";
+            await Application.Current.MainPage.DisplayAlert("SK", msg, "Ok");
+        }
         public static int[] CalcHistValues(byte[] rawData)
         {
             int threads = Environment.ProcessorCount;
@@ -677,19 +707,38 @@ namespace APOMaui
 
 
         } 
-        public static void PyrUp(int index)
+        public static void Pyramid(int index, PyramidType pt)
         {
-            Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage;
+            Mat img = new Mat();
             Mat res = new();
-            CvInvoke.PyrUp(img, res, BorderType.Reflect101);
-            Main.OpenedImagesWindowsList[index].winImg.GrayImage = res.ToImage<Gray, Byte>();
-        }
-        public static void PyrDown(int index)
-        {
-            Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage;
-            Mat res = new();
-            CvInvoke.PyrDown(img, res, BorderType.Reflect101);
-            Main.OpenedImagesWindowsList[index].winImg.GrayImage = res.ToImage<Gray, Byte>();
+            if (Main.OpenedImagesWindowsList[index].winImg.Type == ImgType.RGB)
+            {
+                img = Main.OpenedImagesWindowsList[index].winImg.ColorImage.Mat;
+                if(pt == PyramidType.UP)
+                {
+                    CvInvoke.PyrUp(img, res, BorderType.Reflect101);
+                }
+                else
+                {
+                    CvInvoke.PyrDown(img, res, BorderType.Reflect101);
+                }
+                Main.OpenedImagesWindowsList[index].winImg.ColorImage = res.ToImage<Bgr, Byte>();
+            }
+            else
+            {
+                img = Main.OpenedImagesWindowsList[index].winImg.GrayImage.Mat;
+                if (pt == PyramidType.UP)
+                {
+                    CvInvoke.PyrUp(img, res, BorderType.Reflect101);
+                }
+                else
+                {
+                    CvInvoke.PyrDown(img, res, BorderType.Reflect101);
+                }
+                Main.OpenedImagesWindowsList[index].winImg.GrayImage = res.ToImage<Gray, Byte>();
+            }
+            Main.OpenedImagesWindowsList[index].window.Height = res.Height + windowHeightFix;
+            Main.OpenedImagesWindowsList[index].window.Width = res.Width + windowWidthFix;
         }
         public static void GrabCut(int index, Rectangle rect)
         {
@@ -807,13 +856,13 @@ namespace APOMaui
             Application.Current.OpenWindow(w);
             //CvInvoke.Imshow("sd", cntImg);
         }
-        public static void Thresh(Image<Gray, Byte> img, int index, ThreshType type, int t1)
+        public static void Thresh(Image<Gray, Byte> img, int index, ThreshType type, int t1, int t2)
         {
             Image<Gray, Byte> res = new Image<Gray, Byte>(img.Size);
             switch (type)
             {
                 case ThreshType.MANUAL:
-                    CvInvoke.Threshold(img, res, t1, 255, ThresholdType.Binary);
+                    CvInvoke.Threshold(img, res, t1, t2, ThresholdType.Binary);
                     break;
                 case ThreshType.ADAPTIVE:
                     CvInvoke.AdaptiveThreshold(img, res, 255, AdaptiveThresholdType.GaussianC, ThresholdType.Binary, 3, 1); //Ostatnie idk co to jest
