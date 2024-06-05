@@ -5,14 +5,8 @@ using System.Diagnostics;
 
 namespace APOMaui;
 
-public partial class Kernels : ContentPage
+public partial class KernelTab : ContentPage
 {
-    private static readonly List<string> _stage1Options = new List<string> {"Blur", "GaussianBlur" };
-    private static readonly List<string> _stage2Options = new List<string> { "LaplacianSharpen1", "LaplacianSharpen2", "LaplacianSharpen3" };
-    private static readonly List<string> _borderOptions = new List<string> { "Isolated", "Reflect", "Replicate" };
-    private static readonly List<string> _kernelSizes = new() { "3", "5", "7" };
-    private static readonly List<string> _filtersOptions = new List<string> {"Median", "Blur", "GaussianBlur", "SobelX","SobelY", "LaplacianEdge", "Canny","LaplacianSharpen1",
-        "LaplacianSharpen2", "LaplacianSharpen3", "PrewittE", "PrewittSE", "PrewittS", "PrewittSW", "PrewittW", "PrewittNW", "PrewittN", "PrewittNE"};
     private static readonly Dictionary<string, float[,]> _filtersDictionary = new() 
 	{
         {"Median",
@@ -32,16 +26,16 @@ public partial class Kernels : ContentPage
         {"GaussianBlur",
             new float[,]
             {
-            { 1f, 2f, 1f },
-            { 2f, 4f, 2f },
-            { 1f, 2f, 1f }
+                { 1f, 2f, 1f },
+                { 2f, 4f, 2f },
+                { 1f, 2f, 1f }
             }},
         {"Blur",
             new float[,]
             {
-            { 1f, 1f, 1f },
-            { 1f, 1f, 1f },
-            { 1f, 1f, 1f }
+                { 1f, 1f, 1f },
+                { 1f, 1f, 1f },
+                { 1f, 1f, 1f }
             }},
         {"SobelX",
             new float[,]
@@ -147,7 +141,7 @@ public partial class Kernels : ContentPage
                 {0f,-1f,-1f}
             }},
 
-    };//Blur:0, GBlur:1, Canny:2<->In-Built functions so untypical matrix to identify later on
+    };
     private static readonly Dictionary<string, Emgu.CV.CvEnum.BorderType> _bordersDictionary = new()
     {
         {"Isolated", Emgu.CV.CvEnum.BorderType.Isolated },
@@ -156,6 +150,10 @@ public partial class Kernels : ContentPage
     };
 
     private static List<Entry> _entries = new List<Entry>();
+    private static List<Entry> _entries2 = new List<Entry>();
+    private static List<Entry> _entries3 = new List<Entry>();
+
+
     private static Emgu.CV.CvEnum.BorderType? _selectedBorder = null;
     private static float[,]? _selectedFilter = null;
     private static string? _selectedBuiltInFilter = null;
@@ -163,25 +161,34 @@ public partial class Kernels : ContentPage
     private static string? _stage2SelectedFilter = null;
     private static int _matrixSize;
 
-    public Kernels()
+    public KernelTab()
 	{
 		InitializeComponent();
-        SizePicker.IsEnabled = false;
+        ViewInit();
+    }
+    private void ViewInit()
+    {
         SizePicker.IsVisible = false;
-        SizePickerLabel.IsEnabled = false;
         SizePickerLabel.IsVisible = false;
-		EdgePicker.ItemsSource = _borderOptions;
-		FilterPicker.ItemsSource = _filtersOptions;
-        SizePicker.ItemsSource = _kernelSizes;
-        Stage1Picker.ItemsSource = _stage1Options;
-        Stage2Picker.ItemsSource= _stage2Options;
+        MatrixGrid2Layout.IsVisible = false;
+        MatrixGrid3.IsVisible = false;
         _selectedBorder = null;
         _selectedFilter = null;
         _matrixSize = 3;
-        //SizePicker.SelectedIndex = 0;
-        CreateMatrix(_matrixSize, false);
 
+        EdgePicker.ItemsSource = new List<string> { "Isolated", "Reflect", "Replicate" };
+        SizePicker.ItemsSource = new List<string> { "3", "5", "7" };
+        Stage1Picker.ItemsSource = new List<string> { "Blur", "GaussianBlur" };
+        Stage2Picker.ItemsSource = new List<string> { "LaplacianSharpen1", "LaplacianSharpen2", "LaplacianSharpen3" };
+        foreach(KeyValuePair<string, float[,]> el in _filtersDictionary)
+        {
+            FilterPicker.Items.Add(el.Key);
+        }
+        CreateMatrix(_matrixSize, false, ref this.MatrixGrid, ref _entries);
+        CreateMatrix(3, false, ref this.MatrixGrid2, ref _entries2);
+        CreateMatrix(5, false, ref this.MatrixGrid3, ref _entries3);
     }
+
     private void IsTwoStageCheckedChanged(object sender, EventArgs e)
     {
         if(IsTwoStage.IsChecked == true)
@@ -192,8 +199,7 @@ public partial class Kernels : ContentPage
             FilterPicker.IsVisible = false;
             FilterPickerLabel.IsEnabled = false;
             FilterPickerLabel.IsVisible = false;
-            //MatrixGrid.IsVisible = false;
-            //MatrixGrid.IsEnabled = false;
+
 
             Stage1Picker.IsEnabled = true;
             Stage1Picker.IsVisible = true;
@@ -203,6 +209,10 @@ public partial class Kernels : ContentPage
             Stage1PickerLabel.IsVisible = true;
             Stage2PickerLabel.IsEnabled = true;
             Stage2PickerLabel.IsVisible = true;
+
+
+            MatrixGrid2Layout.IsVisible = true;
+            MatrixGrid3.IsVisible = true;
         } 
         else
         {
@@ -222,28 +232,55 @@ public partial class Kernels : ContentPage
             Stage1PickerLabel.IsVisible = false;
             Stage2PickerLabel.IsEnabled = false;
             Stage2PickerLabel.IsVisible = false;
+
+            MatrixGrid2Layout.IsVisible = false;
+            MatrixGrid3.IsVisible = false;
         }
     }
+    private void IsCustomKernelCheckedChanged(object sender, EventArgs e)
+    {
+        if (IsCustomKernel.IsChecked == true)
+        {
+            SizePicker.SelectedIndex = 0;
+            IsTwoStage.IsChecked = false;
+            ClearEntriesValues_ResetCheckedValues();
+            foreach (Entry entry in _entries) entry.IsEnabled = true;
+
+            FilterPicker.IsVisible = false;
+            FilterPickerLabel.IsVisible = false;
+
+            SizePicker.IsVisible = true;
+            SizePickerLabel.IsVisible = true;
+        }
+        else
+        {
+            ClearEntriesValues_ResetCheckedValues();
+            _matrixSize = 3; //def val
+            CreateMatrix(_matrixSize, false, ref MatrixGrid, ref _entries);
+
+            FilterPicker.IsVisible = true;
+            FilterPickerLabel.IsVisible = true;
+
+            SizePicker.IsVisible = false;
+            SizePickerLabel.IsVisible = false;
+
+        }
+    }
+
     private void OnFilterPickerSelectedIndexChanged(object sender, EventArgs e)
     {
         if (FilterPicker.SelectedIndex != -1 && FilterPicker.SelectedItem != null && 
             _filtersDictionary[FilterPicker.SelectedItem.ToString()].GetLength(0) == 3 && 
-            _filtersDictionary[FilterPicker.SelectedItem.ToString()].GetLength(1) == 3)
+            _filtersDictionary[FilterPicker.SelectedItem.ToString()].GetLength(1) == 3) //Check if filter is EmguCv separate method
         {
             _selectedFilter = _filtersDictionary[FilterPicker.SelectedItem.ToString()];
             _selectedBuiltInFilter = null;
-            FillKernel(_selectedFilter);
-            if (FilterPicker.SelectedItem.ToString() == "SobelX" || FilterPicker.SelectedItem.ToString() == "SobelY" ||
-                FilterPicker.SelectedItem.ToString() == "Blur" || FilterPicker.SelectedItem.ToString() == "GaussianBlur")
-            {
-                _selectedBuiltInFilter = FilterPicker.SelectedItem.ToString();
-                _selectedFilter = null;
-            }
+            FillKernel(_selectedFilter, ref _entries);
         }
         else
         {
             _selectedFilter = null;
-            _selectedBuiltInFilter = FilterPicker.SelectedItem.ToString();
+            _selectedBuiltInFilter = FilterPicker.SelectedItem?.ToString();
             foreach (Entry entry in _entries) entry.Text = null;
         }
         System.Diagnostics.Debug.WriteLine(_selectedFilter);
@@ -257,50 +294,14 @@ public partial class Kernels : ContentPage
             _selectedBorder = _bordersDictionary[EdgePicker.SelectedItem.ToString()];
             System.Diagnostics.Debug.WriteLine(_selectedBorder);
         }
-
     }
-    private void IsCustomKernelCheckedChanged(object sender, EventArgs e)
-    {
-        if (IsCustomKernel.IsChecked == true)
-        {
-            SizePicker.SelectedIndex = 0;
-            IsTwoStage.IsChecked = false;
-            ClearEntriesValues_ResetCheckedValues();
-            foreach(Entry entry in _entries) entry.IsEnabled = true;
-          
-            FilterPicker.IsEnabled = false;
-            FilterPicker.IsVisible = false;
-            FilterPickerLabel.IsVisible = false;
-            FilterPickerLabel.IsEnabled = false;
-   
-            SizePicker.IsEnabled = true;
-            SizePicker.IsVisible = true;
-            SizePickerLabel.IsEnabled = true;
-            SizePickerLabel.IsVisible = true;
-        }
-        else
-        {
-            ClearEntriesValues_ResetCheckedValues();
-            _matrixSize = 3; //def val
-            CreateMatrix(_matrixSize, false);
 
-            FilterPicker.IsEnabled = true;
-            FilterPicker.IsVisible = true;
-            FilterPickerLabel.IsVisible = true;
-            FilterPickerLabel.IsEnabled = true;
-
-            SizePicker.IsEnabled = false;
-            SizePicker.IsVisible = false;
-            SizePickerLabel.IsEnabled = false;
-            SizePickerLabel.IsVisible = false;
-
-        }
-    }
     private void OnStage1PickerSelectedIndexChanged(object sender, EventArgs e)
     {
         if(Stage1Picker.SelectedItem != null && Stage1Picker.SelectedIndex != -1) 
         {
             _stage1SelectedFilter = Stage1Picker.SelectedItem.ToString();
+            FillKernel(_filtersDictionary[_stage1SelectedFilter], ref _entries2);
         }
     }
     private void OnStage2PickerSelectedIndexChanged(object sender, EventArgs e)
@@ -308,12 +309,23 @@ public partial class Kernels : ContentPage
         if (Stage2Picker.SelectedItem != null && Stage2Picker.SelectedIndex != -1)
         {
             _stage2SelectedFilter = Stage2Picker.SelectedItem.ToString();
-            FillKernel(_filtersDictionary[_stage2SelectedFilter]);
+            FillKernel(_filtersDictionary[_stage2SelectedFilter], ref _entries);
         }
     }
+    private void OnSizePickerSelectedIndexChanged(object sender, EventArgs e)
+    {
+        if(IsCustomKernel.IsChecked == true && int.TryParse(SizePicker.SelectedItem.ToString(), out int size)){
+            _matrixSize = size;
+        }
+        CreateMatrix(_matrixSize, true, ref this.MatrixGrid, ref _entries);
+    }
+
     private void ClearEntriesValues_ResetCheckedValues()
     {
-        foreach(Entry e in _entries) e.Text = null;
+        foreach (Entry e in _entries) e.Text = null;
+        foreach (Entry e in _entries2) e.Text = null;
+        foreach (Entry e in _entries3) e.Text = null;
+
         //Disabling events in order to change selected index without calling method
         FilterPicker.SelectedIndexChanged -= OnFilterPickerSelectedIndexChanged;
         SizePicker.SelectedIndexChanged -= OnSizePickerSelectedIndexChanged;
@@ -327,25 +339,18 @@ public partial class Kernels : ContentPage
         SizePicker.SelectedIndexChanged += OnSizePickerSelectedIndexChanged;
         EdgePicker.SelectedIndexChanged += OnEdgePickerSelectedIndexChanged;
     }
-    private void OnSizePickerSelectedIndexChanged(object sender, EventArgs e)
+    private void CreateMatrix(int size, bool editable, ref Grid grid, ref List<Entry> listentry)
     {
-        if(IsCustomKernel.IsChecked == true && int.TryParse(SizePicker.SelectedItem.ToString(), out int size)){
-            _matrixSize = size;
-        }
-        CreateMatrix(_matrixSize, true);
-    }
-    private void CreateMatrix(int size, bool editable)
-    {
-        MatrixGrid.RowDefinitions.Clear();
-        MatrixGrid.ColumnDefinitions.Clear();
-        MatrixGrid.ClearLogicalChildren();
-        MatrixGrid.Clear();
-        _entries.Clear();
+        grid.RowDefinitions.Clear();
+        grid.ColumnDefinitions.Clear();
+        grid.ClearLogicalChildren();
+        grid.Clear();
+        listentry.Clear();
 
         for (int i = 0; i < size; i++)
         {
-            MatrixGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Star });
-            MatrixGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Star });
+            grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Star });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Star });
         }
         for(int row = 0; row < size; row++)
         {
@@ -354,13 +359,12 @@ public partial class Kernels : ContentPage
                 Entry e = new Entry();
                 e.IsEnabled = editable;
                 e.SetDynamicResource(Entry.StyleProperty, "EntryKernel");
-                MatrixGrid.Add(e, col, row);
-                _entries.Add(e);
+                grid.Add(e, col, row);
+                listentry.Add(e);
             }
         }
-
     }
-    private void FillKernel(float[,] kernel)
+    private void FillKernel(float[,] kernel, ref List<Entry> list)
     {
         int rows = MatrixGrid.RowDefinitions.Count;
         int cols = MatrixGrid.ColumnDefinitions.Count;
@@ -369,19 +373,19 @@ public partial class Kernels : ContentPage
             int size = cols;
             int krow = 0;
             int kcol = 0;
-            for (int i = 0; i < _entries.Count; i++)
+            for (int i = 0; i < list.Count; i++)
             {
                 if(kcol == size)
                 {
                     krow++;
                     kcol = 0;
                 }
-                _entries[i].Text = kernel[krow, kcol].ToString();
+                list[i].Text = kernel[krow, kcol].ToString();
                 kcol++;
             }
         } else
         {
-            foreach (Entry e in _entries) e.Text = null;
+            foreach (Entry e in list) e.Text = null;
         }
     }
     private float[,] ReadKernel()
@@ -408,11 +412,6 @@ public partial class Kernels : ContentPage
             }
         }
         else return null;
-
-        float sum = kernel.Cast<float>().Sum();
-        for (int i = 0; i < rows; i++)
-            for (int j = 0; j < cols; j++)
-                kernel[i, j] = kernel[i, j] / sum;
         return kernel;
     }
     public async void OnKernelButtonClicked(object sender, EventArgs e)
@@ -423,7 +422,7 @@ public partial class Kernels : ContentPage
             return;
         }
         int index = (int)Main.selectedWindow;
-        if (Main.OpenedImagesWindowsList[index].winImg.Type != ImgType.Gray)
+        if (Main.OpenedImagesList[index].ImagePage.Type != ImgType.Gray)
         {
             await DisplayAlert("Alert", "Selected image is not GrayScale", "Ok");
             return;
@@ -467,6 +466,7 @@ public partial class Kernels : ContentPage
         }
         BuiltInFilters stage1;
         float[,] stage2kernel;
+        stage2kernel = _filtersDictionary[_stage2SelectedFilter];
         switch (_stage1SelectedFilter)
         {
             case "Blur":
@@ -478,8 +478,6 @@ public partial class Kernels : ContentPage
             default:
                 return;
         }
-        stage2kernel = _filtersDictionary[_stage2SelectedFilter];
-        //Main.TwoStage233(index, border, stage1, new Matrix<float>(stage2kernel));
         string result = await DisplayActionSheet("Option", "Cancel", null, "2*3x3 Kernel", "5x5 Kernel");
         switch(result)
         {
@@ -514,15 +512,6 @@ public partial class Kernels : ContentPage
         }
         switch (_selectedBuiltInFilter)
         {
-            case "SobelX":
-                Main.EdgeDetectionFilters(index, BuiltInFilters.SobelX, border, -1, -1);
-                break;
-            case "SobelY":
-                Main.EdgeDetectionFilters(index, BuiltInFilters.SobelY, border, -1, -1);
-                break;
-            case "LaplacianEdge":
-                Main.EdgeDetectionFilters(index, BuiltInFilters.LaplacianEdge, border, -1, -1);
-                break;
             case "Canny":
                 int ths1, ths2;
                 if (!int.TryParse(await DisplayPromptAsync("Threshold 1", "Type Threshold 1 value"), out ths1) && ths1>=0 && ths1<=255)
@@ -535,7 +524,7 @@ public partial class Kernels : ContentPage
                     await DisplayAlert("Alert", "Threshold 2 value not valid", "Ok");
                     return;
                 }
-                Main.EdgeDetectionFilters(index, BuiltInFilters.Canny, border, ths1, ths2);
+                Main.Canny(index, border, ths1, ths2);
                 break;
             case "Median":
                 string[] options = { "3", "5", "7" };
@@ -546,12 +535,6 @@ public partial class Kernels : ContentPage
                     return;
                 }
                 Main.MedianFilter(index, ksize, border, (int)(ksize / 2));
-                break;
-            case "GaussianBlur":
-                Main.BlurFilrers(index, BuiltInFilters.GaussianBlur, border);
-                break;
-            case "Blur":
-                Main.BlurFilrers(index, BuiltInFilters.Blur, border);
                 break;
             default:
                 Main.ApplyKernel(index, _selectedFilter, border);

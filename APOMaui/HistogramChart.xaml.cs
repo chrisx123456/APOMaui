@@ -5,12 +5,11 @@ using SkiaSharp;
 
 namespace APOMaui;
 
-public partial class Chart : ContentPage, IDisposable
+public partial class HistogramChart : ContentPage, IDisposable
 {
-    public Window? window;
     public int indexOfImg;
     public ISeries[]? Series { get; set; }
-    public Chart(int[] values, int indexOfImg)
+    public HistogramChart(int[] values, int indexOfImg)
 	{
 		InitializeComponent();
         myChart.AutoUpdateEnabled = true;
@@ -61,7 +60,7 @@ public partial class Chart : ContentPage, IDisposable
             AddElementsToTableChart(values);
         });
         this.Series = CreateISeries(values);
-        System.Diagnostics.Debug.WriteLine($"Chart of {Main.OpenedImagesWindowsList[indexOfImg].window.Title} Updated");
+        System.Diagnostics.Debug.WriteLine($"Chart of {Main.OpenedImagesList[indexOfImg].ImagePageWindow.Title} Updated");
         BindingContext = this;
 
         //this.Dispatcher.Dispatch(() => {  //Img sets while hist is done
@@ -96,10 +95,10 @@ public partial class Chart : ContentPage, IDisposable
         this.myChart.ClearLogicalChildren();
         this.TableHistogram = null;
         this.myChart = null;
-        Main.OpenedImagesWindowsList[indexOfImg].chart = null;
-        this.window.ClearLogicalChildren();
-        Application.Current.CloseWindow(window);
-        this.window = null;
+        Main.OpenedImagesList[indexOfImg].HistogramChart = null;
+        Main.OpenedImagesList[indexOfImg].HistogramChartWindow.ClearLogicalChildren();
+        Application.Current.CloseWindow(Main.OpenedImagesList[indexOfImg].HistogramChartWindow);
+        Main.OpenedImagesList[indexOfImg].HistogramChartWindow = null;
     }
     public void AddElementsToTableChart(int[] tab)
     {

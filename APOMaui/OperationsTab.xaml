@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="APOMaui.Operations"
-             Title="Operations">
+             x:Class="APOMaui.OperationsTab"
+             Title="Other">
     <VerticalStackLayout>
-        <Button x:Name="ButtonGrayScale" Text="RGB to Grayscale 8bit" Clicked="OnButtonGrayScaleClick" StyleClass="MainPageButton"/>
-        <Button x:Name="ButtonHSV" Text="RGB To HSV Channels" Clicked="OnButtonHSVClick" StyleClass="MainPageButton"/>
-        <Button x:Name="ButtonLab" Text="RGB To Lab Channels" Clicked="OnButtonLabClick" StyleClass="MainPageButton"/>
         <Button x:Name="ButtonSplit" Text="Split RGB" Clicked="OnButtonSplitClick" StyleClass="MainPageButton"/>
         <Button x:Name="ButtonNegative" Text="Negative" Clicked="OnButtonNegativeClick" StyleClass="MainPageButton"/>
         <Button x:Name="ButtonPosterize" Text="Posterize" Clicked="OnButtonPosterizeClick" StyleClass="MainPageButton"/>

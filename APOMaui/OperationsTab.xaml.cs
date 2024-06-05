@@ -1,26 +1,12 @@
 namespace APOMaui;
 
-public partial class Operations : ContentPage
+public partial class OperationsTab : ContentPage
 {
-	public Operations()
+	public OperationsTab()
 	{
 		InitializeComponent();
 	}
-	public async void OnButtonGrayScaleClick(object sender, EventArgs e)
-	{
-        if (Main.selectedWindow == null)
-        {
-            await DisplayAlert("Alert", "None image is selected!", "Ok");
-            return;
-        }
-        int index = (int)Main.selectedWindow;
-        if (Main.OpenedImagesWindowsList[index].winImg.Type != ImgType.RGB)
-        {
-            await DisplayAlert("Alert", "Selected image is not RGB", "Ok");
-            return;
-        }
-        Main.ConvertRgbToGray(index);
-    }
+
     public async void OnButtonSplitClick(object sender, EventArgs e)
     {
         if (Main.selectedWindow == null)
@@ -29,43 +15,12 @@ public partial class Operations : ContentPage
             return;
         }
         int index = (int)Main.selectedWindow;
-        if (Main.OpenedImagesWindowsList[index].winImg.Type != ImgType.RGB)
+        if (Main.OpenedImagesList[index].ImagePage.Type != ImgType.RGB)
         {
             await DisplayAlert("Alert", "Selected image is not RGB", "Ok");
             return;
         }
         Main.SplitChannels(index);
-    }
-    public async void OnButtonHSVClick(object sender, EventArgs e)
-    {
-        if (Main.selectedWindow == null)
-        {
-            await DisplayAlert("Alert", "None image is selected!", "Ok");
-            return;
-        }
-        int index = (int)Main.selectedWindow;
-        if (Main.OpenedImagesWindowsList[index].winImg.Type != ImgType.RGB)
-        {
-            await DisplayAlert("Alert", "Selected image is not RGB", "Ok"); //Tu musi byc kolejny warunek ze jest juz HSV, albo ze jest szary
-            return;
-        }
-        Main.ConvertRgbToHsv(index);
-    }
-    public async void OnButtonLabClick(object sender, EventArgs e)
-    {
-        if (Main.selectedWindow == null)
-        {
-            await DisplayAlert("Alert", "None image is selected!", "Ok");
-            return;
-        }
-        int index = (int)Main.selectedWindow;
-        if (Main.OpenedImagesWindowsList[index].winImg.Type != ImgType.RGB)
-        {
-            await DisplayAlert("Alert", "Selected image is not RGB", "Ok"); //Tu musi byc kolejny warunek ze jest juz HSV, albo ze jest szary
-            return;
-        }
-        Main.ConvertRgbToLab(index);
-
     }
     public async void OnButtonNegativeClick(object sender, EventArgs e)
     {
@@ -75,7 +30,7 @@ public partial class Operations : ContentPage
             return;
         }
         int index = (int)Main.selectedWindow;
-        if (Main.OpenedImagesWindowsList[index].winImg.Type != ImgType.Gray)
+        if (Main.OpenedImagesList[index].ImagePage.Type != ImgType.Gray)
         {
             await DisplayAlert("Alert", "Selected image is not GrayScale", "Ok");
             return;
@@ -91,7 +46,7 @@ public partial class Operations : ContentPage
             return;
         }
         int index = (int)Main.selectedWindow;
-        if (Main.OpenedImagesWindowsList[index].winImg.Type != ImgType.Gray)
+        if (Main.OpenedImagesList[index].ImagePage.Type != ImgType.Gray)
         {
             await DisplayAlert("Alert", "Selected image is not GrayScale", "Ok");
             return;
@@ -118,7 +73,7 @@ public partial class Operations : ContentPage
             return;
         }
         int index = (int)Main.selectedWindow;
-        if (Main.OpenedImagesWindowsList[index].winImg.Type != ImgType.Gray)
+        if (Main.OpenedImagesList[index].ImagePage.Type != ImgType.Gray)
         {
             await DisplayAlert("Alert", "Selected image is not GrayScale", "Ok");
             return;

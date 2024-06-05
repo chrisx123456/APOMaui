@@ -2,19 +2,22 @@
 {
     internal class WindowImageObject : IDisposable
     {
-        public WinIMG winImg;
-        public Window window;
-        public Chart? chart;
-        public WindowImageObject(WinIMG img, Window window)
+        public ImagePage ImagePage;
+        public Window ImagePageWindow;
+
+        public HistogramChart? HistogramChart;
+        public Window? HistogramChartWindow;
+
+        public WindowImageObject(ImagePage img, Window window)
         {
-            this.winImg = img;
-            this.window = window;
+            this.ImagePage = img;
+            this.ImagePageWindow = window;
         }
         public void Dispose()
         {
-            winImg = null;
-            window = null;
-            chart = null;
+            ImagePage = null;
+            ImagePageWindow = null;
+            HistogramChart = null;
             GC.Collect();
         }
 

@@ -17,8 +17,8 @@ namespace APOMaui
             Window window = base.CreateWindow(activationState);
             window.Destroying += Window_Destroying;
 
-            const int newWidth = 550;
-            const int newHeight = 700;
+            const int newWidth = 450;
+            const int newHeight = 600;
 
             window.Width = newWidth;
             window.Height = newHeight;

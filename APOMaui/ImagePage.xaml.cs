@@ -6,7 +6,7 @@ using SkiaSharp.Views.Maui;
 using System.Diagnostics;
 namespace APOMaui;
 
-public partial class WinIMG : ContentPage
+public partial class ImagePage : ContentPage
 {
     //Add backup 4 color images!
     private Image<Gray, Byte>? backupGray;
@@ -66,7 +66,7 @@ public partial class WinIMG : ContentPage
             System.Diagnostics.Debug.WriteLine("Setter Done");
         }
     }   // Setter&Getter to refresh content after RGB->Grayscale, Dispose other img, Set new ImageSource
-    public WinIMG(Image<Bgr, Byte> img, int index, string title)
+    public ImagePage(Image<Bgr, Byte> img, int index, string title)
     {
         InitializeComponent();
         
@@ -80,7 +80,7 @@ public partial class WinIMG : ContentPage
         //setDrawBoxSize(img.Width, img.Height);
         BindingContext = this;
     }
-    public WinIMG(Image<Gray, Byte> img, int index, string title)
+    public ImagePage(Image<Gray, Byte> img, int index, string title)
     {
         InitializeComponent();
         this.title = title;
@@ -142,14 +142,14 @@ public partial class WinIMG : ContentPage
         Type = ImgType.Gray;
         _ = Task.Run(() =>
         {
-            if (Main.OpenedImagesWindowsList[index].chart != null)
+            if (Main.OpenedImagesList[index].HistogramChart != null)
             {
 
                 byte[] bytes = grayImage.Bytes;
                 int[] hist = Main.CalcHistValues(bytes);
 
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
-                Main.OpenedImagesWindowsList[index].chart.UpdateChart(hist);
+                Main.OpenedImagesList[index].HistogramChart.UpdateChart(hist);
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
                 System.Diagnostics.Debug.WriteLine("Task chart updating done");
             }
@@ -163,15 +163,15 @@ public partial class WinIMG : ContentPage
     }
     private void ZoomIn(object sender, EventArgs e)
     {
-        Main.OpenedImagesWindowsList[index].window.Height += (int)((20 * imgScale) + 0.5); // Approx. Height
-        Main.OpenedImagesWindowsList[index].window.Width += 20;
+        Main.OpenedImagesList[index].ImagePageWindow.Height += (int)((20 * imgScale) + 0.5); // Approx. Height
+        Main.OpenedImagesList[index].ImagePageWindow.Width += 20;
         winImgBox.WidthRequest = winImgBox.Width + 20;
 
     }
     private void ZoomOut(object sender, EventArgs e)
     {
-        Main.OpenedImagesWindowsList[index].window.Height -= (int)((20 * imgScale) + 0.5); // Approx. Height
-        Main.OpenedImagesWindowsList[index].window.Width -= 20;
+        Main.OpenedImagesList[index].ImagePageWindow.Height -= (int)((20 * imgScale) + 0.5); // Approx. Height
+        Main.OpenedImagesList[index].ImagePageWindow.Width -= 20;
         winImgBox.WidthRequest = winImgBox.Width - 20;
 
     }

@@ -11,10 +11,10 @@ namespace APOMaui
 {
     internal static class Main
     {
-        public static event Action? OnWinIMGClosingOpeningEvent;
-        public static event Action? OnWinIMGSelectionChanged;
+        public static event Action? OnImageClosingOpeningEvent;
+        public static event Action? OnImageSelectionChanged;
 
-        public static List<WindowImageObject> OpenedImagesWindowsList = new();
+        public static List<WindowImageObject> OpenedImagesList = new();
         public static int? selectedWindow = null;
         public const int windowHeightFix = 100;
         public const int windowWidthFix = 26;
@@ -23,14 +23,14 @@ namespace APOMaui
             switch (saveAs)
             {
                 case false:
-                    if (OpenedImagesWindowsList[index].winImg.path == String.Empty) throw new InvalidOperationException(@"Image has no path. Save this image via ""Save as""");
-                    if (OpenedImagesWindowsList[index].winImg.ColorImage != null && OpenedImagesWindowsList[index].winImg.Type == ImgType.RGB)
+                    if (OpenedImagesList[index].ImagePage.path == String.Empty) throw new InvalidOperationException(@"Image has no path. Save this image via ""Save as""");
+                    if (OpenedImagesList[index].ImagePage.ColorImage != null && OpenedImagesList[index].ImagePage.Type == ImgType.RGB)
                     {
-                        OpenedImagesWindowsList[index].winImg.ColorImage.Save(OpenedImagesWindowsList[index].winImg.path);
+                        OpenedImagesList[index].ImagePage.ColorImage.Save(OpenedImagesList[index].ImagePage.path);
                     }
-                    if (OpenedImagesWindowsList[index].winImg.GrayImage != null && OpenedImagesWindowsList[index].winImg.Type == ImgType.Gray)
+                    if (OpenedImagesList[index].ImagePage.GrayImage != null && OpenedImagesList[index].ImagePage.Type == ImgType.Gray)
                     {
-                        OpenedImagesWindowsList[index].winImg.GrayImage.Save(OpenedImagesWindowsList[index].winImg.path);
+                        OpenedImagesList[index].ImagePage.GrayImage.Save(OpenedImagesList[index].ImagePage.path);
                     }
                     break;
                 case true:
@@ -49,13 +49,13 @@ namespace APOMaui
                         {
                             path = fp.Folder.Path;
                             string fullPath = path + "\\" + filename + extension;
-                            if (OpenedImagesWindowsList[index].winImg.ColorImage != null && OpenedImagesWindowsList[index].winImg.Type == ImgType.RGB)
+                            if (OpenedImagesList[index].ImagePage.ColorImage != null && OpenedImagesList[index].ImagePage.Type == ImgType.RGB)
                             {
-                                OpenedImagesWindowsList[index].winImg.ColorImage.Save(fullPath);
+                                OpenedImagesList[index].ImagePage.ColorImage.Save(fullPath);
                             }
-                            if (OpenedImagesWindowsList[index].winImg.GrayImage != null && OpenedImagesWindowsList[index].winImg.Type == ImgType.Gray)
+                            if (OpenedImagesList[index].ImagePage.GrayImage != null && OpenedImagesList[index].ImagePage.Type == ImgType.Gray)
                             {
-                                OpenedImagesWindowsList[index].winImg.GrayImage.Save(fullPath);
+                                OpenedImagesList[index].ImagePage.GrayImage.Save(fullPath);
                             }
                         }
                         else
@@ -82,9 +82,9 @@ namespace APOMaui
                 var img = ImageLoader.LoadImage(FileFullPath); // Important!! Type Image<Bgr, Byte> or Image<Gray, Byte> depends on file type detected in FileLoader
                 string fileName = FileFullPath.Substring(FileFullPath.LastIndexOf('\\') + 1);
                 int duplicates = 0;
-                foreach(WindowImageObject wio in OpenedImagesWindowsList) //Sketchy
+                foreach(WindowImageObject wio in OpenedImagesList) //Sketchy
                 {
-                    string s = wio.winImg.GetTitle;
+                    string s = wio.ImagePage.GetTitle;
                     int dotIndex = s.LastIndexOf('.');
                     if (dotIndex == -1) break;
                     string output = s.Substring(0, dotIndex);
@@ -92,7 +92,7 @@ namespace APOMaui
                 }
                 fileName += $".{duplicates}";
                 OpenNewWindowWinIMG(img, fileName, FileFullPath);
-                OnWinIMGClosingOpeningEvent?.Invoke();
+                OnImageClosingOpeningEvent?.Invoke();
 
             }
             else if(DeviceInfo.Platform == DevicePlatform.Android)
@@ -102,7 +102,7 @@ namespace APOMaui
         }
         public static void OpenNewWindowWinIMG(dynamic img, string title, string path) //Argument is dynamic cuz' dont want to make overload for GrayScale/Color.
         {
-            WinIMG page = new WinIMG(img, OpenedImagesWindowsList.Count, title);
+            ImagePage page = new ImagePage(img, OpenedImagesList.Count, title);
             page.path = path;
             Window newWindow = new Window
             {
@@ -122,10 +122,10 @@ namespace APOMaui
             });
 
             WindowImageObject windowImageObject = new(page, newWindow);
-            OpenedImagesWindowsList.Add(windowImageObject);
-            ChangeSelectedtWinIMG(OpenedImagesWindowsList.Count - 1);
+            OpenedImagesList.Add(windowImageObject);
+            ChangeSelectedtWinIMG(OpenedImagesList.Count - 1);
 #pragma warning disable 8602
-            Application.Current.OpenWindow(OpenedImagesWindowsList[(int)selectedWindow].window);
+            Application.Current.OpenWindow(OpenedImagesList[(int)selectedWindow].ImagePageWindow);
 #pragma warning restore 8602
         }
         public static void OnCloseEventWinIMG(int index)
@@ -133,33 +133,33 @@ namespace APOMaui
             System.Diagnostics.Debug.WriteLine($"CloseEventWinIMG: {index}");
             selectedWindow = null;
 #pragma warning disable 8602, 8604
-            if (OpenedImagesWindowsList[index].chart != null && OpenedImagesWindowsList[index].chart.window != null)
+            if (OpenedImagesList[index].HistogramChart != null && OpenedImagesList[index].HistogramChartWindow != null)
             {
-                Application.Current.CloseWindow(OpenedImagesWindowsList[index].chart.window);
+                Application.Current.CloseWindow(OpenedImagesList[index].HistogramChartWindow);
             }
 #pragma warning restore 8602, 8604
-            for(int i = index; i < OpenedImagesWindowsList.Count; i++)
+            for(int i = index; i < OpenedImagesList.Count; i++)
             {
-                OpenedImagesWindowsList[i].winImg.index--;
+                OpenedImagesList[i].ImagePage.index--;
             }
-            OpenedImagesWindowsList[index].winImg = null;
-            OpenedImagesWindowsList[index].window.ClearLogicalChildren();
-            OpenedImagesWindowsList[index].chart = null;
-            Application.Current.CloseWindow(OpenedImagesWindowsList[index].window);
-            OpenedImagesWindowsList[index].Dispose();
-            OpenedImagesWindowsList.RemoveAt(index);
+            OpenedImagesList[index].ImagePage = null;
+            OpenedImagesList[index].ImagePageWindow.ClearLogicalChildren();
+            OpenedImagesList[index].HistogramChart = null;
+            Application.Current.CloseWindow(OpenedImagesList[index].ImagePageWindow);
+            OpenedImagesList[index].Dispose();
+            OpenedImagesList.RemoveAt(index);
             GC.Collect();
-            OnWinIMGClosingOpeningEvent?.Invoke();
+            OnImageClosingOpeningEvent?.Invoke();
         }
         public static void ChangeSelectedtWinIMG(int index)
         {
             selectedWindow = index;
             System.Diagnostics.Debug.WriteLine($"Selected {index}");
-            OnWinIMGSelectionChanged?.Invoke();
+            OnImageSelectionChanged?.Invoke();
         }
         public async static void CompressRLE(int index)
         {
-            Image<Gray, Byte> image = Main.OpenedImagesWindowsList[index].winImg.GrayImage;
+            Image<Gray, Byte> image = Main.OpenedImagesList[index].ImagePage.GrayImage;
             var compressed = new List<(byte, byte)>();
             byte[] data = image.Bytes;
             byte currPixel = data[0];
@@ -215,64 +215,62 @@ namespace APOMaui
         }
         public static void CreateHistogramChart(int index)
         {
-            Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage; //Cant be null, checked in Charts.xaml.cs
+            Image<Gray, Byte> img = Main.OpenedImagesList[index].ImagePage.GrayImage; //Cant be null, checked in Charts.xaml.cs
             byte[] rawData = img.Bytes;
             int[] GrayScaleHist = CalcHistValues(rawData);
-            var page = new Chart(GrayScaleHist, index);
-            OpenedImagesWindowsList[index].chart = page;
+            var page = new HistogramChart(GrayScaleHist, index);
+            OpenedImagesList[index].HistogramChart = page;
             int width = 830, height = 350;
             var newWindow = new Window
             {
-                Page = OpenedImagesWindowsList[index].chart,
+                Page = OpenedImagesList[index].HistogramChart,
                 Width = width,
                 Height = height,
                 MinimumWidth = width,
                 MaximumWidth = width,
                 MinimumHeight = height,
                 MaximumHeight = height,
-                Title = OpenedImagesWindowsList[index].window.Title + " Histogram"
+                Title = OpenedImagesList[index].ImagePageWindow.Title + " Histogram"
             };
-            page.window = newWindow;
-#pragma warning disable 8602
-            Application.Current.OpenWindow(page.window);
-#pragma warning restore 8602
+            OpenedImagesList[index].HistogramChartWindow = newWindow;
+            Application.Current?.OpenWindow(OpenedImagesList[index].HistogramChartWindow);
         }
         public static void ConvertRgbToGray(int index)
         {
-            Image<Gray, Byte> grayImage = new(OpenedImagesWindowsList[index].winImg.ColorImage.Width, OpenedImagesWindowsList[index].winImg.ColorImage.Height);
-            CvInvoke.CvtColor(OpenedImagesWindowsList[index].winImg.ColorImage, grayImage, ColorConversion.Bgr2Gray);
-            OpenedImagesWindowsList[index].winImg.GrayImage = grayImage;
-            OpenedImagesWindowsList[index].winImg.Type = ImgType.Gray;
-            OnWinIMGSelectionChanged?.Invoke();
+            Image<Gray, Byte> grayImage = new(OpenedImagesList[index].ImagePage.ColorImage.Width, OpenedImagesList[index].ImagePage.ColorImage.Height);
+            CvInvoke.CvtColor(OpenedImagesList[index].ImagePage.ColorImage, grayImage, ColorConversion.Bgr2Gray);
+            OpenedImagesList[index].ImagePage.GrayImage = grayImage;
+            OpenedImagesList[index].ImagePage.Type = ImgType.Gray;
+            OnImageSelectionChanged?.Invoke();
         }
         public static void ConvertRgbToHsv(int index) 
         {
-            Image<Hsv, Byte> hsvimg = new(OpenedImagesWindowsList[index].winImg.ColorImage.Width, OpenedImagesWindowsList[index].winImg.ColorImage.Height);
-            CvInvoke.CvtColor(OpenedImagesWindowsList[index].winImg.ColorImage, hsvimg, ColorConversion.Bgr2HsvFull);
+            Image<Hsv, Byte> hsvimg = new(OpenedImagesList[index].ImagePage.ColorImage.Width, OpenedImagesList[index].ImagePage.ColorImage.Height);
+            CvInvoke.CvtColor(OpenedImagesList[index].ImagePage.ColorImage, hsvimg, ColorConversion.Bgr2HsvFull);
             Image<Gray, Byte>[] channels = hsvimg.Split();
-            OpenNewWindowWinIMG(channels[0], OpenedImagesWindowsList[index].window.Title + " Hue", String.Empty);
-            OpenNewWindowWinIMG(channels[1], OpenedImagesWindowsList[index].window.Title + " Saturation", String.Empty);
-            OpenNewWindowWinIMG(channels[2], OpenedImagesWindowsList[index].window.Title + " Value", String.Empty);
+            OpenNewWindowWinIMG(channels[0], OpenedImagesList[index].ImagePageWindow.Title + " Hue", String.Empty);
+            OpenNewWindowWinIMG(channels[1], OpenedImagesList[index].ImagePageWindow.Title + " Saturation", String.Empty);
+            OpenNewWindowWinIMG(channels[2], OpenedImagesList[index].ImagePageWindow.Title + " Value", String.Empty);
         }
         public static void ConvertRgbToLab(int index)
         {
-            Image<Lab, Byte> labimg = new(OpenedImagesWindowsList[index].winImg.ColorImage.Width, OpenedImagesWindowsList[index].winImg.ColorImage.Height);
-            CvInvoke.CvtColor(OpenedImagesWindowsList[index].winImg.ColorImage, labimg, ColorConversion.Bgr2Lab);
+            Image<Lab, Byte> labimg = new(OpenedImagesList[index].ImagePage.ColorImage.Width, OpenedImagesList[index].ImagePage.ColorImage.Height);
+            CvInvoke.CvtColor(OpenedImagesList[index].ImagePage.ColorImage, labimg, ColorConversion.Bgr2Lab);
             Image<Gray, Byte>[] channels = labimg.Split();
-            OpenNewWindowWinIMG(channels[0], OpenedImagesWindowsList[index].window.Title + " L", String.Empty);
-            OpenNewWindowWinIMG(channels[1], OpenedImagesWindowsList[index].window.Title + " a", String.Empty);
-            OpenNewWindowWinIMG(channels[2], OpenedImagesWindowsList[index].window.Title + " b", String.Empty);
+            OpenNewWindowWinIMG(channels[0], OpenedImagesList[index].ImagePageWindow.Title + " L", String.Empty);
+            OpenNewWindowWinIMG(channels[1], OpenedImagesList[index].ImagePageWindow.Title + " a", String.Empty);
+            OpenNewWindowWinIMG(channels[2], OpenedImagesList[index].ImagePageWindow.Title + " b", String.Empty);
         }
         public static void SplitChannels(int index)
         {
-            Image<Gray, Byte>[] channels = OpenedImagesWindowsList[index].winImg.ColorImage.Split();
-            OpenNewWindowWinIMG(channels[0], OpenedImagesWindowsList[index].window.Title + " Blue", String.Empty);
-            OpenNewWindowWinIMG(channels[1], OpenedImagesWindowsList[index].window.Title + " Green", String.Empty);
-            OpenNewWindowWinIMG(channels[2], OpenedImagesWindowsList[index].window.Title + " Red", String.Empty);
+            Image<Gray, Byte>[] channels = OpenedImagesList[index].ImagePage.ColorImage.Split();
+            OpenNewWindowWinIMG(channels[0], OpenedImagesList[index].ImagePageWindow.Title + " Blue", String.Empty);
+            OpenNewWindowWinIMG(channels[1], OpenedImagesList[index].ImagePageWindow.Title + " Green", String.Empty);
+            OpenNewWindowWinIMG(channels[2], OpenedImagesList[index].ImagePageWindow.Title + " Red", String.Empty);
         }
         public static void HistEqualization(int index)
         {
-            Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage; 
+            Image<Gray, Byte> img = Main.OpenedImagesList[index].ImagePage.GrayImage; 
             byte[] rawData = img.Bytes;
             int[] count = new int[256];
             int[] CDF = new int[256];
@@ -290,12 +288,12 @@ namespace APOMaui
 
             Image<Gray, Byte> res = new(img.Width, img.Height);
             res.Bytes = rawData;
-            Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
+            Main.OpenedImagesList[index].ImagePage.GrayImage = res;
             img.Dispose();
         }
         public static void HistStretch(int index)
         {
-            Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage;
+            Image<Gray, Byte> img = Main.OpenedImagesList[index].ImagePage.GrayImage;
            
             byte[] rawData = img.Bytes;
             byte max = rawData.Max();
@@ -306,23 +304,23 @@ namespace APOMaui
             }
             Image<Gray, Byte> res = new(img.Width, img.Height);
             res.Bytes = rawData;
-            Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
+            Main.OpenedImagesList[index].ImagePage.GrayImage = res;
             img.Dispose();
         }
         public static void ImageNegative(int index)
         {
-            Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage;
+            Image<Gray, Byte> img = Main.OpenedImagesList[index].ImagePage.GrayImage;
             byte[] rawData = img.Bytes;
             for (int i = 0; i < rawData.Length; i++) rawData[i] = (byte)(255 - rawData[i]);
             Image<Gray, Byte> res = new(img.Width, img.Height);
             res.Bytes = rawData;
-            Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
+            Main.OpenedImagesList[index].ImagePage.GrayImage = res;
             img.Dispose();
 
         }
         public static void HistStretchInRange(int index, byte p1, byte p2, byte q3, byte q4) //TODO: Optimize//fix
         {
-            Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage;
+            Image<Gray, Byte> img = Main.OpenedImagesList[index].ImagePage.GrayImage;
             byte[] rawData = img.Bytes;
 
             for (int i = 0; i < rawData.Length; i++)
@@ -336,13 +334,13 @@ namespace APOMaui
             }
             Image<Gray, Byte> res = new(img.Width, img.Height);
             res.Bytes = rawData;
-            Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
+            Main.OpenedImagesList[index].ImagePage.GrayImage = res;
             img.Dispose();
 
         }
         public static void Posterize(int index, byte levels)
         {
-            Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage;
+            Image<Gray, Byte> img = Main.OpenedImagesList[index].ImagePage.GrayImage;
             byte[] rawData = img.Bytes;
             int step = 255 / levels;
             byte[] borders = new byte[levels];
@@ -386,12 +384,12 @@ namespace APOMaui
 
             Image<Gray, Byte> res = new(img.Width, img.Height);
             res.Bytes = rawData;
-            Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
+            Main.OpenedImagesList[index].ImagePage.GrayImage = res;
             img.Dispose();
         }
         public static void MedianFilter(int index, int ksize, Emgu.CV.CvEnum.BorderType border, int pixelOffset)
         {
-            Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage;
+            Image<Gray, Byte> img = Main.OpenedImagesList[index].ImagePage.GrayImage;
             Image<Gray, Byte> temp = new( img.Width+2*pixelOffset, img.Height+2*pixelOffset);
 
             //Image<Gray, Byte> res = new(img.Width, img.Height);
@@ -400,69 +398,49 @@ namespace APOMaui
             CvInvoke.CopyMakeBorder(img, temp, pixelOffset, pixelOffset, pixelOffset, pixelOffset, border, default);
             CvInvoke.MedianBlur(temp, res, ksize);
 
-            Main.OpenedImagesWindowsList[index].winImg.GrayImage = new Image<Gray, Byte>(res);
+            Main.OpenedImagesList[index].ImagePage.GrayImage = new Image<Gray, Byte>(res);
             //Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
 
             img.Dispose();
             temp.Dispose();
         }
-        public static void EdgeDetectionFilters(int index, BuiltInFilters filterType, Emgu.CV.CvEnum.BorderType border, int ths1, int ths2)
+        public static void Canny(int index, Emgu.CV.CvEnum.BorderType border, int ths1, int ths2)
         {
             //Sobel X, Sobel Y, LaplacianEdge, Canny
-            Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage;
+            Image<Gray, Byte> img = Main.OpenedImagesList[index].ImagePage.GrayImage;
             Mat res = new(new System.Drawing.Size(img.Width, img.Height), DepthType.Cv64F, 1);
-            switch(filterType)
-            {
-                case BuiltInFilters.SobelX:
-                    CvInvoke.Sobel(img, res, DepthType.Cv64F, 1, 0, 3, 1, 0, border);
-                        break;
-                case BuiltInFilters.SobelY:
-                    CvInvoke.Sobel(img, res, DepthType.Cv64F, 0, 1, 3, 1, 0, border);
-                        break;
-                case BuiltInFilters.LaplacianEdge:
-                    CvInvoke.Laplacian(img, res, DepthType.Cv64F, 1, 1, 0, border);
-                        break;
-                case BuiltInFilters.Canny:
-                    Mat cannyWBorder = new Mat();
-                    CvInvoke.CopyMakeBorder(img, cannyWBorder, 1, 1, 1, 1, border, default);
-                    CvInvoke.Canny(cannyWBorder, res, ths1, ths2, 3, false);
-                        break;
-            }
+            Mat cannyWBorder = new Mat();
+            CvInvoke.CopyMakeBorder(img, cannyWBorder, 1, 1, 1, 1, border, default);
+            CvInvoke.Canny(cannyWBorder, res, ths1, ths2, 3, false);
             Mat final = new();
             CvInvoke.ConvertScaleAbs(res, final, 1, 0);
-            Main.OpenedImagesWindowsList[index].winImg.GrayImage = new Image<Gray, Byte>(final);
+            Main.OpenedImagesList[index].ImagePage.GrayImage = new Image<Gray, Byte>(final);
             img.Dispose();
 
         }
-        public static void BlurFilrers(int index, BuiltInFilters filterType, Emgu.CV.CvEnum.BorderType border)
-        {
-            Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage;
-            Image<Gray, Byte> res = new(img.Width, img.Height);
-            switch (filterType)
-            {
-                case BuiltInFilters.Blur:
-                    CvInvoke.Blur(img, res, new System.Drawing.Size(3, 3), new System.Drawing.Point(-1, -1), border);
-                        break;
-                case BuiltInFilters.GaussianBlur:
-                    CvInvoke.GaussianBlur(img, res, new System.Drawing.Size(3, 3), 0, 0, border);
-                        break;
-            }
-            Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
-            img.Dispose();
-        }
         public static void ApplyKernel(int index, float[,] kernel, Emgu.CV.CvEnum.BorderType border)
         {
-            Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage;
-            Image<Gray, Byte> res = new(img.Width, img.Height);
+            float sum = kernel.Cast<float>().Sum();
+            if(sum != 0)
+                for (int i = 0; i < kernel.GetLength(0); i++)
+                    for (int j = 0; j < kernel.GetLength(1); j++)
+                        kernel[i, j] = kernel[i, j] / sum;
+
+            Image<Gray, Byte> img = Main.OpenedImagesList[index].ImagePage.GrayImage;
+            Mat res = new(new System.Drawing.Size(img.Width, img.Height), DepthType.Cv64F, 1);
+
             Matrix<float> inputArray = new(kernel);
             CvInvoke.Filter2D(img, res, inputArray, new System.Drawing.Point(-1, -1), 0, border);
-            Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
+
+            Mat final = new();
+            CvInvoke.ConvertScaleAbs(res, final, 1, 0);
+            Main.OpenedImagesList[index].ImagePage.GrayImage = new Image<Gray, Byte>(final);
             img.Dispose();
         }
         public static void TwoArgsOperations(int index1, int index2, TwoArgsOps arg, double w1, double w2)
         {
-            Image<Gray, Byte> img1 = Main.OpenedImagesWindowsList[index1].winImg.GrayImage;
-            Image<Gray, Byte> img2 = Main.OpenedImagesWindowsList[index2].winImg.GrayImage;
+            Image<Gray, Byte> img1 = Main.OpenedImagesList[index1].ImagePage.GrayImage;
+            Image<Gray, Byte> img2 = Main.OpenedImagesList[index2].ImagePage.GrayImage;
             Image<Gray, Byte> res = new(img1.Width, img1.Height);
             switch (arg)
             {
@@ -486,15 +464,15 @@ namespace APOMaui
                     break;
                 case TwoArgsOps.NOT:
                     CvInvoke.BitwiseNot(img1, res, null);
-                    Main.OpenedImagesWindowsList[index1].winImg.GrayImage = res;
+                    Main.OpenedImagesList[index1].ImagePage.GrayImage = res;
                     return;
             }
-            string title = Main.OpenedImagesWindowsList[index1].winImg.GetTitle + " " + arg.ToString() + " " + Main.OpenedImagesWindowsList[index2].winImg.GetTitle;
+            string title = Main.OpenedImagesList[index1].ImagePage.GetTitle + " " + arg.ToString() + " " + Main.OpenedImagesList[index2].ImagePage.GetTitle;
             OpenNewWindowWinIMG(res, title, String.Empty);
         }
         public static void TwoStage233(int index, BorderType border, BuiltInFilters stage1, Matrix<float> stage2)
         {
-            Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage;
+            Image<Gray, Byte> img = Main.OpenedImagesList[index].ImagePage.GrayImage;
             Image<Gray, Byte> stage1res = new(img.Width, img.Height);
             Image<Gray, Byte> final = new(img.Width, img.Height);
             switch (stage1)
@@ -510,7 +488,7 @@ namespace APOMaui
                     return;
             }
             CvInvoke.Filter2D(stage1res, final, stage2, new System.Drawing.Point(-1, -1), 0, border);
-            Main.OpenedImagesWindowsList[index].winImg.GrayImage = final;
+            Main.OpenedImagesList[index].ImagePage.GrayImage = final;
         }
         public static void TwoStage55(int index, BorderType border, BuiltInFilters stage1, Matrix<float> stage2)
         {
@@ -542,16 +520,16 @@ namespace APOMaui
                     Debug.WriteLine("Wrong builtinfilter at TwoStage55 main.cs");
                     return ;
             }
-            Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage;
+            Image<Gray, Byte> img = Main.OpenedImagesList[index].ImagePage.GrayImage;
             Image<Gray, Byte> res = new(img.Width, img.Height);
             CvInvoke.Filter2D(img, res, finalkernel5x5, new System.Drawing.Point(-1, -1), 0, border);
-            Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
+            Main.OpenedImagesList[index].ImagePage.GrayImage = res;
 
         }
         public static void ProfileLine(int index, System.Drawing.Point pt1, System.Drawing.Point pt2)
         {
             //Debug.WriteLine($"{pt1.X}, {pt1.Y}, {pt2.X}, {pt2.Y}");
-            Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage.Clone();
+            Image<Gray, Byte> img = Main.OpenedImagesList[index].ImagePage.GrayImage.Clone();
             //CvInvoke.Line(img, pt1, pt2, new MCvScalar(0,0,255), 1, LineType.EightConnected, 0);
             LineIterator it = new(img.Mat, pt1, pt2, 8, false);
             byte[,,] data = img.Data;
@@ -573,24 +551,24 @@ namespace APOMaui
                 MaximumWidth = width,
                 MinimumHeight = height,
                 MaximumHeight = height,
-                Title = OpenedImagesWindowsList[index].window.Title + " Profile Line"
+                Title = OpenedImagesList[index].ImagePageWindow.Title + " Profile Line"
             };
             Application.Current.OpenWindow(plcw);
 
         }
         public static void MathMorph(int index, MorphOp mop, ElementShape es, BorderType border, MCvScalar constant)
         {
-            Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage;
+            Image<Gray, Byte> img = Main.OpenedImagesList[index].ImagePage.GrayImage;
             Image<Gray, Byte> res = new(img.Width, img.Height);
             Mat structElement = CvInvoke.GetStructuringElement(es, new System.Drawing.Size(3, 3), new System.Drawing.Point(-1, -1));
 
             CvInvoke.MorphologyEx(img, res, mop, structElement, new System.Drawing.Point(-1, -1), 1, border, constant);
             
-            Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
+            Main.OpenedImagesList[index].ImagePage.GrayImage = res;
         }
         public static void Skeletonize(int index, ElementShape es, BorderType border, MCvScalar constant)
         {
-            Image<Gray, byte> imgcopy = Main.OpenedImagesWindowsList[index].winImg.GrayImage.Clone();
+            Image<Gray, byte> imgcopy = Main.OpenedImagesList[index].ImagePage.GrayImage.Clone();
             Image<Gray, byte> skel = new(imgcopy.Size);
             skel.SetValue(0);
 
@@ -612,13 +590,13 @@ namespace APOMaui
                 imgcopy = eroded.Clone();
                 if (CvInvoke.CountNonZero(imgcopy)==0) break;
             }
-            Main.OpenedImagesWindowsList[index].winImg.GrayImage = skel;
+            Main.OpenedImagesList[index].ImagePage.GrayImage = skel;
            
         }
         public static void Watershed(int index)
         {
 
-            Image<Gray, Byte> input = Main.OpenedImagesWindowsList[index].winImg.GrayImage;
+            Image<Gray, Byte> input = Main.OpenedImagesList[index].ImagePage.GrayImage;
             Image<Bgr, Byte> img = new(input.Size);
             CvInvoke.CvtColor(input, img, ColorConversion.Gray2Bgr, 0);
             Image<Gray, byte> gray = img.Convert<Gray, Byte>();
@@ -659,12 +637,12 @@ namespace APOMaui
             CvInvoke.Compare(markers, zeros, mask, CmpType.Equal);
             mask.ConvertTo(mask, Emgu.CV.CvEnum.DepthType.Cv8U); 
 
-            Main.OpenedImagesWindowsList[index].winImg.GrayImage = mask.ToImage<Gray, Byte>();
+            Main.OpenedImagesList[index].ImagePage.GrayImage = mask.ToImage<Gray, Byte>();
 
         } //Chyba dziala, na pewno musze dodac komenatrze i zrozumiec co tu sie wgle dzieje
         public static void HoughLines(int index)
         {
-            Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage;
+            Image<Gray, Byte> img = Main.OpenedImagesList[index].ImagePage.GrayImage;
             Mat canny = new();
             Image<Bgr, Byte> res = new(img.Size);
             CvInvoke.CvtColor(img, res, ColorConversion.Gray2Bgr, 0);
@@ -699,7 +677,7 @@ namespace APOMaui
 
                 lines = linesList.ToArray();
             }
-            Main.OpenedImagesWindowsList[index].winImg.ColorImage = res;
+            Main.OpenedImagesList[index].ImagePage.ColorImage = res;
 
 
 
@@ -710,9 +688,9 @@ namespace APOMaui
         {
             Mat img = new Mat();
             Mat res = new();
-            if (Main.OpenedImagesWindowsList[index].winImg.Type == ImgType.RGB)
+            if (Main.OpenedImagesList[index].ImagePage.Type == ImgType.RGB)
             {
-                img = Main.OpenedImagesWindowsList[index].winImg.ColorImage.Mat;
+                img = Main.OpenedImagesList[index].ImagePage.ColorImage.Mat;
                 if(pt == PyramidType.UP)
                 {
                     CvInvoke.PyrUp(img, res, BorderType.Reflect101);
@@ -721,11 +699,11 @@ namespace APOMaui
                 {
                     CvInvoke.PyrDown(img, res, BorderType.Reflect101);
                 }
-                Main.OpenedImagesWindowsList[index].winImg.ColorImage = res.ToImage<Bgr, Byte>();
+                Main.OpenedImagesList[index].ImagePage.ColorImage = res.ToImage<Bgr, Byte>();
             }
             else
             {
-                img = Main.OpenedImagesWindowsList[index].winImg.GrayImage.Mat;
+                img = Main.OpenedImagesList[index].ImagePage.GrayImage.Mat;
                 if (pt == PyramidType.UP)
                 {
                     CvInvoke.PyrUp(img, res, BorderType.Reflect101);
@@ -734,14 +712,14 @@ namespace APOMaui
                 {
                     CvInvoke.PyrDown(img, res, BorderType.Reflect101);
                 }
-                Main.OpenedImagesWindowsList[index].winImg.GrayImage = res.ToImage<Gray, Byte>();
+                Main.OpenedImagesList[index].ImagePage.GrayImage = res.ToImage<Gray, Byte>();
             }
-            Main.OpenedImagesWindowsList[index].window.Height = res.Height + windowHeightFix;
-            Main.OpenedImagesWindowsList[index].window.Width = res.Width + windowWidthFix;
+            Main.OpenedImagesList[index].ImagePageWindow.Height = res.Height + windowHeightFix;
+            Main.OpenedImagesList[index].ImagePageWindow.Width = res.Width + windowWidthFix;
         }
         public static void GrabCut(int index, Rectangle rect)
         {
-            Image<Bgr, Byte> img = Main.OpenedImagesWindowsList[index].winImg.ColorImage;
+            Image<Bgr, Byte> img = Main.OpenedImagesList[index].ImagePage.ColorImage;
             Image<Gray, Byte> mask = new Image<Gray, Byte>(img.Size);
             mask.SetZero();
             Matrix<double> bg = new Matrix<double>(1, 65);
@@ -767,29 +745,29 @@ namespace APOMaui
 
             }
             img = img.Mul(mask.Convert<Bgr, Byte>());
-            Main.OpenedImagesWindowsList[index].winImg.ColorImage = img.Clone();
+            Main.OpenedImagesList[index].ImagePage.ColorImage = img.Clone();
             }
         public static async void Inpainting(int index)
         {
-            if (!Main.OpenedImagesWindowsList[index].winImg.GetDrawBoxState())
+            if (!Main.OpenedImagesList[index].ImagePage.GetDrawBoxState())
             {
-                Main.OpenedImagesWindowsList[index].winImg.ToggleDrawBox(true);
+                Main.OpenedImagesList[index].ImagePage.ToggleDrawBox(true);
             }
             else
             {
                 Debug.WriteLine("Getting Canvas Image");
-                Image<Gray, Byte> mask = await Main.OpenedImagesWindowsList[index].winImg.GetImageFromCanvas();
+                Image<Gray, Byte> mask = await Main.OpenedImagesList[index].ImagePage.GetImageFromCanvas();
                 //CvInvoke.Imshow("dsd", mask);
-                if (Main.OpenedImagesWindowsList[index].winImg.ColorImage != null)
+                if (Main.OpenedImagesList[index].ImagePage.ColorImage != null)
                 {
-                    Image<Bgr, Byte> img = Main.OpenedImagesWindowsList[index].winImg.ColorImage;
+                    Image<Bgr, Byte> img = Main.OpenedImagesList[index].ImagePage.ColorImage;
                     Image<Bgr, Byte> res = new(img.Size);
                     //CvInvoke.Inpaint(img, mask, res, 3.0, InpaintType.Telea);
                     //Main.OpenedImagesWindowsList[index].winImg.ColorImage = res;
                 }
-                else if(Main.OpenedImagesWindowsList[index].winImg.GrayImage != null)
+                else if(Main.OpenedImagesList[index].ImagePage.GrayImage != null)
                 {
-                    Image<Gray, Byte> img = Main.OpenedImagesWindowsList[index].winImg.GrayImage;
+                    Image<Gray, Byte> img = Main.OpenedImagesList[index].ImagePage.GrayImage;
                     Image<Gray, Byte> res = new(img.Size);
                     //CvInvoke.Inpaint(img, mask, res, 3.0, InpaintType.Telea);
                     //Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
@@ -801,14 +779,14 @@ namespace APOMaui
         {
             List<AnalysisResult> results = new List<AnalysisResult>();
             Mat img = new();
-            string title = Main.OpenedImagesWindowsList[index].winImg.Title;
-            if (Main.OpenedImagesWindowsList[index].winImg.ColorImage != null)
+            string title = Main.OpenedImagesList[index].ImagePage.Title;
+            if (Main.OpenedImagesList[index].ImagePage.ColorImage != null)
             {
-                CvInvoke.CvtColor(Main.OpenedImagesWindowsList[index].winImg.ColorImage, img, ColorConversion.Bgr2Gray, 0);
+                CvInvoke.CvtColor(Main.OpenedImagesList[index].ImagePage.ColorImage, img, ColorConversion.Bgr2Gray, 0);
             }
             else
             {
-                img = Main.OpenedImagesWindowsList[index].winImg.GrayImage.Mat;
+                img = Main.OpenedImagesList[index].ImagePage.GrayImage.Mat;
             }
             Mat cntImg = new(img.Size, DepthType.Cv8U, 3);
 
@@ -851,7 +829,7 @@ namespace APOMaui
                 Width = 700
             };
             //OpenNewWindowWinIMG(new Image<Bgr, Byte>(cntImg), $"{title} Contours");
-            Main.OpenedImagesWindowsList[index].winImg.ColorImage = new Image<Bgr, Byte>(cntImg);
+            Main.OpenedImagesList[index].ImagePage.ColorImage = new Image<Bgr, Byte>(cntImg);
             Application.Current.OpenWindow(w);
             //CvInvoke.Imshow("sd", cntImg);
         }
@@ -872,7 +850,7 @@ namespace APOMaui
                 default:
                     break;
             }
-            Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
+            Main.OpenedImagesList[index].ImagePage.GrayImage = res;
         }
     }
 }

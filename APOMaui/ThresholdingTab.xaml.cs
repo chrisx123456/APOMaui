@@ -3,7 +3,7 @@ using Emgu.CV.Structure;
 
 namespace APOMaui;
 
-public partial class Thresholding : ContentPage
+public partial class ThresholdingTab : ContentPage
 {
 	private static List<string> _types = new List<string> { "Manual", "Adaptive", "Otsu" };
 	private ThreshType? _selected = null;
@@ -11,15 +11,15 @@ public partial class Thresholding : ContentPage
 	private int? _imgindex = null;
 	private int _slider1Value = 0;
     private int _slider2Value = 0;
-    public Thresholding()
+    public ThresholdingTab()
 	{
 		InitializeComponent();
         AddPickersItems();
         this.ThreshTypePicker.SelectedIndex = 0;
         UpdateImg();
         ResetSlider();
-        Main.OnWinIMGClosingOpeningEvent += this.UpdateImg;
-		Main.OnWinIMGSelectionChanged += this.UpdateImg;
+        Main.OnImageClosingOpeningEvent += this.UpdateImg;
+		Main.OnImageSelectionChanged += this.UpdateImg;
 	}
 	protected override void OnDisappearing()
 	{
@@ -35,10 +35,10 @@ public partial class Thresholding : ContentPage
         //this.ThreshTypePicker.SelectedIndex = 0;
         if (Main.selectedWindow != null)
 		{
-			if (Main.selectedWindow!= null && Main.OpenedImagesWindowsList[(int)Main.selectedWindow].winImg.Type == ImgType.Gray)
+			if (Main.selectedWindow!= null && Main.OpenedImagesList[(int)Main.selectedWindow].ImagePage.Type == ImgType.Gray)
 			{
                 this._imgindex = Main.selectedWindow;
-                this._img = Main.OpenedImagesWindowsList[(int)_imgindex].winImg.GrayImage.Clone();
+                this._img = Main.OpenedImagesList[(int)_imgindex].ImagePage.GrayImage.Clone();
 				this.ThreshTypePicker.IsEnabled = true;
                 this.Slider1.IsEnabled = true;
                 this.Slider2.IsEnabled = true;
@@ -122,7 +122,7 @@ public partial class Thresholding : ContentPage
 	{
         if (this._img != null && this._imgindex != null)
 		{
-			Main.OpenedImagesWindowsList[(int)_imgindex].winImg.GrayImage = this._img.Clone();
+			Main.OpenedImagesList[(int)_imgindex].ImagePage.GrayImage = this._img.Clone();
 		}
 		ResetSlider();
     }

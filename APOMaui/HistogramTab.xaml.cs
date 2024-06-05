@@ -1,8 +1,8 @@
 namespace APOMaui;
 
-public partial class Charts : ContentPage
+public partial class HistogramTab : ContentPage
 {
-	public Charts()
+	public HistogramTab()
 	{
 		InitializeComponent();
 		BindingContext = this;
@@ -16,12 +16,12 @@ public partial class Charts : ContentPage
 			return;
 		}
 		int index = (int)Main.selectedWindow;
-		if (Main.OpenedImagesWindowsList[index].winImg.Type == ImgType.RGB || Main.OpenedImagesWindowsList[index].winImg.GrayImage == null)
+		if (Main.OpenedImagesList[index].ImagePage.Type == ImgType.RGB || Main.OpenedImagesList[index].ImagePage.GrayImage == null)
 		{
 			await DisplayAlert("Alert", "Selected image is RGB, Histogram is only supported for grayscale images", "Ok");
 			return;
 		}
-		if (Main.OpenedImagesWindowsList[index].chart != null)
+		if (Main.OpenedImagesList[index].HistogramChart != null)
 		{
             await DisplayAlert("Alert", "Histogram is already displayed", "Ok");
             return;
@@ -37,7 +37,7 @@ public partial class Charts : ContentPage
                 return;
             }
             int index = (int)Main.selectedWindow;
-            if (Main.OpenedImagesWindowsList[index].winImg.Type != ImgType.Gray)
+            if (Main.OpenedImagesList[index].ImagePage.Type != ImgType.Gray)
             {
                 await DisplayAlert("Alert", "Selected image is not GrayScale", "Ok");
                 return;
@@ -78,7 +78,7 @@ public partial class Charts : ContentPage
             return;
         }
         int index = (int)Main.selectedWindow;
-        if (Main.OpenedImagesWindowsList[index].winImg.Type != ImgType.Gray)
+        if (Main.OpenedImagesList[index].ImagePage.Type != ImgType.Gray)
         {
             await DisplayAlert("Alert", "Selected image is not GrayScale", "Ok");
             return;
@@ -93,7 +93,7 @@ public partial class Charts : ContentPage
             return;
         }
         int index = (int)Main.selectedWindow;
-        if (Main.OpenedImagesWindowsList[index].winImg.Type != ImgType.Gray)
+        if (Main.OpenedImagesList[index].ImagePage.Type != ImgType.Gray)
         {
             await DisplayAlert("Alert", "Selected image is not GrayScale", "Ok");
             return;

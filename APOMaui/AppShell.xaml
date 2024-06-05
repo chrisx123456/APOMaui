@@ -4,37 +4,49 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:APOMaui"
-    Shell.FlyoutBehavior="Disabled"
+    Shell.NavBarIsVisible="True"
+    Shell.FlyoutBehavior="Flyout"
+    Shell.FlyoutWidth="280"
     Title="APOMaui">
 
-    <TabBar Route="File">
-        <ShellContent
-            Title="File"
-            ContentTemplate="{DataTemplate local:MainPage}"
-            Route="MainPage" />
-        <ShellContent
-            Title="Operacje"
-            ContentTemplate="{DataTemplate local:Operations}"
-            Route="Operations" />
-        <ShellContent
-            Title="Hist"
-            ContentTemplate="{DataTemplate local:Charts}"
-            Route="Charts" />
-        <ShellContent
-            Title="Filters"
-            ContentTemplate="{DataTemplate local:Kernels}"
-            Route="Kernels" />
-        <ShellContent
-            Title="2-Arg ops."
-            ContentTemplate="{DataTemplate local:TwoArgument}"
-            Route="TwoArgument" />
-        <ShellContent
-           Title="Morph"
-           ContentTemplate="{DataTemplate local:Morph}"
-           Route="Morph" />
-        <ShellContent
-           Title="Thresh"
-           ContentTemplate="{DataTemplate local:Thresholding}"
-           Route="Thresholding" />
-    </TabBar>
+    <FlyoutItem Title="File">
+        <Tab>
+            <ShellContent ContentTemplate="{DataTemplate local:MainPage}" />
+        </Tab>
+    </FlyoutItem>
+    <FlyoutItem Title="Color conversion">
+        <Tab>
+            <ShellContent ContentTemplate="{DataTemplate local:ConversionTab}"/>
+        </Tab>
+    </FlyoutItem>
+    <FlyoutItem Title="Histogram">
+        <Tab>
+            <ShellContent ContentTemplate="{DataTemplate local:HistogramTab}" />
+        </Tab>
+    </FlyoutItem>
+    <FlyoutItem Title="Filters">
+        <Tab>
+            <ShellContent ContentTemplate="{DataTemplate local:KernelTab}" />
+        </Tab>
+    </FlyoutItem>
+    <FlyoutItem Title="Two-argument operations">
+        <Tab>
+            <ShellContent ContentTemplate="{DataTemplate local:TwoArgumentTab}" />
+        </Tab>
+    </FlyoutItem>
+    <FlyoutItem Title="Morphological operations">
+        <Tab>
+            <ShellContent ContentTemplate="{DataTemplate local:MorphologyTab}" />
+        </Tab>
+    </FlyoutItem>
+    <FlyoutItem Title="Thresholding">
+        <Tab>
+            <ShellContent ContentTemplate="{DataTemplate local:ThresholdingTab}" />
+        </Tab>
+    </FlyoutItem>
+    <FlyoutItem Title="Other">
+        <Tab>
+            <ShellContent ContentTemplate="{DataTemplate local:OperationsTab}"/>
+        </Tab>
+    </FlyoutItem>
 </Shell>

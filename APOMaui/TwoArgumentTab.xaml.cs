@@ -3,20 +3,20 @@ using System.Diagnostics;
 
 namespace APOMaui;
 
-public partial class TwoArgument : ContentPage
+public partial class TwoArgumentTab : ContentPage
 {
     private readonly List<string> _operations = new List<string>() {"ADD","SUBSTRACT","BLEND","AND","OR","NOT","XOR"};
     private Dictionary<string, int> _imageList = new Dictionary<string, int>();
 	private TwoArgsOps? _selectedOperation = null;
 	private int? _selectedImage1 = null;
 	private int? _selectedImage2 = null;
-	public TwoArgument()
+	public TwoArgumentTab()
 	{
 		InitializeComponent();
         OperationPicker.ItemsSource = _operations;
 		_imageList = GetImagesList();
 		AddPickersItems();
-		Main.OnWinIMGClosingOpeningEvent += this.UpdatePickersItems;
+		Main.OnImageClosingOpeningEvent += this.UpdatePickersItems;
         //Zmienic w kernelach zeby wsm tak samo sie do pickera dodawalo jak tutaj
 
     }
@@ -49,10 +49,10 @@ public partial class TwoArgument : ContentPage
     private Dictionary<string, int> GetImagesList()
 	{
 		Dictionary<string, int> res = new();
-        foreach (WindowImageObject wio in Main.OpenedImagesWindowsList)
+        foreach (WindowImageObject wio in Main.OpenedImagesList)
 		{
-			string s = wio.winImg.GetTitle;
-			int i = wio.winImg.index;
+			string s = wio.ImagePage.GetTitle;
+			int i = wio.ImagePage.index;
 			res.Add(s, i);
 		}
 		return res;
@@ -111,8 +111,8 @@ public partial class TwoArgument : ContentPage
 			await DisplayAlert("Alert", "Image 1/2 or operation not selected", "Ok");
 			return;
 		}
-        if (Main.OpenedImagesWindowsList[(int)_selectedImage1].winImg.Type != ImgType.Gray 
-			|| (_selectedImage2 != null && Main.OpenedImagesWindowsList[(int)_selectedImage2].winImg.Type != ImgType.Gray))
+        if (Main.OpenedImagesList[(int)_selectedImage1].ImagePage.Type != ImgType.Gray 
+			|| (_selectedImage2 != null && Main.OpenedImagesList[(int)_selectedImage2].ImagePage.Type != ImgType.Gray))
         {
             await DisplayAlert("Alert", "Selected image 1/2 is not GrayScale", "Ok");
             return;

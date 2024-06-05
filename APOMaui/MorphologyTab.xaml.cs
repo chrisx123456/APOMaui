@@ -4,13 +4,13 @@ using System.Diagnostics;
 
 namespace APOMaui;
 
-public partial class Morph : ContentPage
+public partial class MorphologyTab : ContentPage
 {
 	private Emgu.CV.CvEnum.ElementShape? _structElement;
 	private Emgu.CV.CvEnum.MorphOp? _morphOp;
 	private Emgu.CV.CvEnum.BorderType? _borderType;
 	private MorphOpExtend? _morphOpExtend;
-    public Morph()
+    public MorphologyTab()
 	{
 		InitializeComponent();
 		setPickers();
@@ -137,7 +137,7 @@ public partial class Morph : ContentPage
             return;
         }
         int index = (int)Main.selectedWindow;
-        if (Main.OpenedImagesWindowsList[index].winImg.Type != ImgType.Gray)
+        if (Main.OpenedImagesList[index].ImagePage.Type != ImgType.Gray)
         {
             await DisplayAlert("Alert", "Selected image is not GrayScale", "Ok");
             return;

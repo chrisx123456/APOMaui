@@ -85,8 +85,29 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Update="WinIMG.xaml.cs">
-	    <DependentUpon>WinIMG.xaml</DependentUpon>
+	  <Compile Update="HistogramChart.xaml.cs">
+	    <DependentUpon>HistogramChart.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="HistogramTab.xaml.cs">
+	    <DependentUpon>HistogramTab.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="ImagePage.xaml.cs">
+	    <DependentUpon>ImagePage.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="KernelTab.xaml.cs">
+	    <DependentUpon>KernelTab.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="MorphologyTab.xaml.cs">
+	    <DependentUpon>MorphologyTab.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="OperationsTab.xaml.cs">
+	    <DependentUpon>OperationsTab.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="ThresholdingTab.xaml.cs">
+	    <DependentUpon>ThresholdingTab.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="TwoArgumentTab.xaml.cs">
+	    <DependentUpon>TwoArgumentTab.xaml</DependentUpon>
 	  </Compile>
 	</ItemGroup>
 
@@ -94,31 +115,34 @@
 	  <MauiXaml Update="AnalysisResultPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Chart.xaml">
+	  <MauiXaml Update="ConversionTab.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Charts.xaml">
+	  <MauiXaml Update="HistogramChart.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Kernels.xaml">
+	  <MauiXaml Update="HistogramTab.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Morph.xaml">
+	  <MauiXaml Update="KernelTab.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Operations.xaml">
+	  <MauiXaml Update="MorphologyTab.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="OperationsTab.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="ProfileLineChart.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Thresholding.xaml">
+	  <MauiXaml Update="ThresholdingTab.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="TwoArgument.xaml">
+	  <MauiXaml Update="TwoArgumentTab.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="WinIMG.xaml">
+	  <MauiXaml Update="ImagePage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>
