@@ -157,7 +157,6 @@ namespace APOMaui
             System.Diagnostics.Debug.WriteLine($"Selected {index}");
             OnWinIMGSelectionChanged?.Invoke();
         }
-
         public async static void CompressRLE(int index)
         {
             Image<Gray, Byte> image = Main.OpenedImagesWindowsList[index].winImg.GrayImage;
