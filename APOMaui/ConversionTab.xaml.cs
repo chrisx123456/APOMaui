@@ -8,48 +8,48 @@ public partial class ConversionTab : ContentPage
 	}
     public async void OnButtonGrayScaleClick(object sender, EventArgs e)
     {
-        if (Main.selectedWindow == null)
+        if (ImageProc.selectedWindow == null)
         {
             await DisplayAlert("Alert", "None image is selected!", "Ok");
             return;
         }
-        int index = (int)Main.selectedWindow;
-        if (Main.OpenedImagesList[index].ImagePage.Type != ImgType.RGB)
+        int index = (int)ImageProc.selectedWindow;
+        if (ImageProc.OpenedImagesList[index].ImagePage.Type != ImgType.RGB)
         {
             await DisplayAlert("Alert", "Selected image is not RGB", "Ok");
             return;
         }
-        Main.ConvertRgbToGray(index);
+        ImageProc.ConvertRgbToGray(index);
     }
     public async void OnButtonHSVClick(object sender, EventArgs e)
     {
-        if (Main.selectedWindow == null)
+        if (ImageProc.selectedWindow == null)
         {
             await DisplayAlert("Alert", "None image is selected!", "Ok");
             return;
         }
-        int index = (int)Main.selectedWindow;
-        if (Main.OpenedImagesList[index].ImagePage.Type != ImgType.RGB)
+        int index = (int)ImageProc.selectedWindow;
+        if (ImageProc.OpenedImagesList[index].ImagePage.Type != ImgType.RGB)
         {
             await DisplayAlert("Alert", "Selected image is not RGB", "Ok"); //Tu musi byc kolejny warunek ze jest juz HSV, albo ze jest szary
             return;
         }
-        Main.ConvertRgbToHsv(index);
+        ImageProc.ConvertRgbToHsv(index);
     }
     public async void OnButtonLabClick(object sender, EventArgs e)
     {
-        if (Main.selectedWindow == null)
+        if (ImageProc.selectedWindow == null)
         {
             await DisplayAlert("Alert", "None image is selected!", "Ok");
             return;
         }
-        int index = (int)Main.selectedWindow;
-        if (Main.OpenedImagesList[index].ImagePage.Type != ImgType.RGB)
+        int index = (int)ImageProc.selectedWindow;
+        if (ImageProc.OpenedImagesList[index].ImagePage.Type != ImgType.RGB)
         {
             await DisplayAlert("Alert", "Selected image is not RGB", "Ok"); //Tu musi byc kolejny warunek ze jest juz HSV, albo ze jest szary
             return;
         }
-        Main.ConvertRgbToLab(index);
+        ImageProc.ConvertRgbToLab(index);
 
     }
 }

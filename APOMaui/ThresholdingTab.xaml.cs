@@ -18,8 +18,8 @@ public partial class ThresholdingTab : ContentPage
         this.ThreshTypePicker.SelectedIndex = 0;
         UpdateImg();
         ResetSlider();
-        Main.OnImageClosingOpeningEvent += this.UpdateImg;
-		Main.OnImageSelectionChanged += this.UpdateImg;
+        ImageProc.OnImageClosingOpeningEvent += this.UpdateImg;
+		ImageProc.OnImageSelectionChanged += this.UpdateImg;
 	}
 	protected override void OnDisappearing()
 	{
@@ -33,12 +33,12 @@ public partial class ThresholdingTab : ContentPage
         ResetSlider();
         OnButtonThreshCancelClicked(new object(), new EventArgs());
         //this.ThreshTypePicker.SelectedIndex = 0;
-        if (Main.selectedWindow != null)
+        if (ImageProc.selectedWindow != null)
 		{
-			if (Main.selectedWindow!= null && Main.OpenedImagesList[(int)Main.selectedWindow].ImagePage.Type == ImgType.Gray)
+			if (ImageProc.selectedWindow!= null && ImageProc.OpenedImagesList[(int)ImageProc.selectedWindow].ImagePage.Type == ImgType.Gray)
 			{
-                this._imgindex = Main.selectedWindow;
-                this._img = Main.OpenedImagesList[(int)_imgindex].ImagePage.GrayImage.Clone();
+                this._imgindex = ImageProc.selectedWindow;
+                this._img = ImageProc.OpenedImagesList[(int)_imgindex].ImagePage.GrayImage.Clone();
 				this.ThreshTypePicker.IsEnabled = true;
                 this.Slider1.IsEnabled = true;
                 this.Slider2.IsEnabled = true;
@@ -79,13 +79,13 @@ public partial class ThresholdingTab : ContentPage
             switch (_selected)
             {
                 case ThreshType.MANUAL:
-                    Main.Thresh(this._img, (int)this._imgindex, ThreshType.MANUAL, _slider1Value, _slider2Value);
+                    ImageProc.Thresh(this._img, (int)this._imgindex, ThreshType.MANUAL, _slider1Value, _slider2Value);
                     break;
                 case ThreshType.ADAPTIVE:
-                    Main.Thresh(this._img, (int)this._imgindex, ThreshType.ADAPTIVE, -1, -1);
+                    ImageProc.Thresh(this._img, (int)this._imgindex, ThreshType.ADAPTIVE, -1, -1);
                     break;
                 case ThreshType.OTSU:
-                    Main.Thresh(this._img, (int)this._imgindex, ThreshType.OTSU, -1, -1);
+                    ImageProc.Thresh(this._img, (int)this._imgindex, ThreshType.OTSU, -1, -1);
                     break;
             }
         }
@@ -122,7 +122,7 @@ public partial class ThresholdingTab : ContentPage
 	{
         if (this._img != null && this._imgindex != null)
 		{
-			Main.OpenedImagesList[(int)_imgindex].ImagePage.GrayImage = this._img.Clone();
+			ImageProc.OpenedImagesList[(int)_imgindex].ImagePage.GrayImage = this._img.Clone();
 		}
 		ResetSlider();
     }

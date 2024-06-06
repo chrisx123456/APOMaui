@@ -10,34 +10,34 @@ public partial class HistogramTab : ContentPage
 	}
 	private async void OnButtonChartClicked(object sender, EventArgs e)
 	{
-		if(Main.selectedWindow == null)
+		if(ImageProc.selectedWindow == null)
 		{
 			await DisplayAlert("Alert", "None image is selected!", "Ok");
 			return;
 		}
-		int index = (int)Main.selectedWindow;
-		if (Main.OpenedImagesList[index].ImagePage.Type == ImgType.RGB || Main.OpenedImagesList[index].ImagePage.GrayImage == null)
+		int index = (int)ImageProc.selectedWindow;
+		if (ImageProc.OpenedImagesList[index].ImagePage.Type == ImgType.RGB || ImageProc.OpenedImagesList[index].ImagePage.GrayImage == null)
 		{
 			await DisplayAlert("Alert", "Selected image is RGB, Histogram is only supported for grayscale images", "Ok");
 			return;
 		}
-		if (Main.OpenedImagesList[index].HistogramChart != null)
+		if (ImageProc.OpenedImagesList[index].HistogramChart != null)
 		{
             await DisplayAlert("Alert", "Histogram is already displayed", "Ok");
             return;
         }
-		Main.CreateHistogramChart(index);
+		ImageProc.CreateHistogramChart(index);
     }
     public async void OnButtonQ3Q4Click(object sender, EventArgs e)
     {
         {
-            if (Main.selectedWindow == null)
+            if (ImageProc.selectedWindow == null)
             {
                 await DisplayAlert("Alert", "None image is selected!", "Ok");
                 return;
             }
-            int index = (int)Main.selectedWindow;
-            if (Main.OpenedImagesList[index].ImagePage.Type != ImgType.Gray)
+            int index = (int)ImageProc.selectedWindow;
+            if (ImageProc.OpenedImagesList[index].ImagePage.Type != ImgType.Gray)
             {
                 await DisplayAlert("Alert", "Selected image is not GrayScale", "Ok");
                 return;
@@ -67,38 +67,38 @@ public partial class HistogramTab : ContentPage
                 return;
             }
 
-            Main.HistStretchInRange(index, p1, p2, q3, q4);
+            ImageProc.HistStretchInRange(index, p1, p2, q3, q4);
         }
     }
     public async void OnButtonEqualizationClick(object sender, EventArgs e)
     {
-        if (Main.selectedWindow == null)
+        if (ImageProc.selectedWindow == null)
         {
             await DisplayAlert("Alert", "None image is selected!", "Ok");
             return;
         }
-        int index = (int)Main.selectedWindow;
-        if (Main.OpenedImagesList[index].ImagePage.Type != ImgType.Gray)
+        int index = (int)ImageProc.selectedWindow;
+        if (ImageProc.OpenedImagesList[index].ImagePage.Type != ImgType.Gray)
         {
             await DisplayAlert("Alert", "Selected image is not GrayScale", "Ok");
             return;
         }
-        Main.HistEqualization(index);
+        ImageProc.HistEqualization(index);
     }
     public async void OnButtonStretchClick(object sender, EventArgs e)
     {
-        if (Main.selectedWindow == null)
+        if (ImageProc.selectedWindow == null)
         {
             await DisplayAlert("Alert", "None image is selected!", "Ok");
             return;
         }
-        int index = (int)Main.selectedWindow;
-        if (Main.OpenedImagesList[index].ImagePage.Type != ImgType.Gray)
+        int index = (int)ImageProc.selectedWindow;
+        if (ImageProc.OpenedImagesList[index].ImagePage.Type != ImgType.Gray)
         {
             await DisplayAlert("Alert", "Selected image is not GrayScale", "Ok");
             return;
         }
-        Main.HistStretch(index);
+        ImageProc.HistStretch(index);
     }
     protected override void OnAppearing()
     {

@@ -157,8 +157,10 @@ public partial class KernelTab : ContentPage
     private static Emgu.CV.CvEnum.BorderType? _selectedBorder = null;
     private static float[,]? _selectedFilter = null;
     private static string? _selectedBuiltInFilter = null;
+
     private static string? _stage1SelectedFilter = null;
     private static string? _stage2SelectedFilter = null;
+
     private static int _matrixSize;
 
     public KernelTab()
@@ -172,6 +174,7 @@ public partial class KernelTab : ContentPage
         SizePickerLabel.IsVisible = false;
         MatrixGrid2Layout.IsVisible = false;
         MatrixGrid3.IsVisible = false;
+        Stage2Label.IsVisible = false;
         _selectedBorder = null;
         _selectedFilter = null;
         _matrixSize = 3;
@@ -193,45 +196,35 @@ public partial class KernelTab : ContentPage
     {
         if(IsTwoStage.IsChecked == true)
         {
-            foreach (Entry entry in _entries) entry.Text = null;
+            ClearEntriesValues_ResetCheckedValues();
+
             IsCustomKernel.IsChecked = false;
-            FilterPicker.IsEnabled = false;
+
             FilterPicker.IsVisible = false;
-            FilterPickerLabel.IsEnabled = false;
             FilterPickerLabel.IsVisible = false;
 
-
-            Stage1Picker.IsEnabled = true;
             Stage1Picker.IsVisible = true;
-            Stage2Picker.IsEnabled = true;
             Stage2Picker.IsVisible = true;
-            Stage1PickerLabel.IsEnabled = true;
             Stage1PickerLabel.IsVisible = true;
-            Stage2PickerLabel.IsEnabled = true;
             Stage2PickerLabel.IsVisible = true;
 
-
+            Stage2Label.IsVisible = true;
             MatrixGrid2Layout.IsVisible = true;
             MatrixGrid3.IsVisible = true;
         } 
         else
         {
-            foreach (Entry entry in _entries) entry.Text = null;
-            FilterPicker.IsEnabled = true;
+            ClearEntriesValues_ResetCheckedValues();
+
             FilterPicker.IsVisible = true;
-            FilterPickerLabel.IsEnabled = true;
             FilterPickerLabel.IsVisible = true;
             MatrixGrid.IsVisible = true;
-            MatrixGrid.IsEnabled = true;
 
-            Stage1Picker.IsEnabled = false;
             Stage1Picker.IsVisible = false;
-            Stage2Picker.IsEnabled = false;
             Stage2Picker.IsVisible = false;
-            Stage1PickerLabel.IsEnabled = false;
             Stage1PickerLabel.IsVisible = false;
-            Stage2PickerLabel.IsEnabled = false;
             Stage2PickerLabel.IsVisible = false;
+            Stage2Label.IsVisible = false; //kernel label
 
             MatrixGrid2Layout.IsVisible = false;
             MatrixGrid3.IsVisible = false;
@@ -242,6 +235,7 @@ public partial class KernelTab : ContentPage
         if (IsCustomKernel.IsChecked == true)
         {
             SizePicker.SelectedIndex = 0;
+            
             IsTwoStage.IsChecked = false;
             ClearEntriesValues_ResetCheckedValues();
             foreach (Entry entry in _entries) entry.IsEnabled = true;
@@ -251,6 +245,8 @@ public partial class KernelTab : ContentPage
 
             SizePicker.IsVisible = true;
             SizePickerLabel.IsVisible = true;
+
+            Stage2Label.IsVisible = false;
         }
         else
         {
@@ -263,7 +259,7 @@ public partial class KernelTab : ContentPage
 
             SizePicker.IsVisible = false;
             SizePickerLabel.IsVisible = false;
-
+            Stage2Label.IsVisible = false;
         }
     }
 
@@ -275,7 +271,7 @@ public partial class KernelTab : ContentPage
         {
             _selectedFilter = _filtersDictionary[FilterPicker.SelectedItem.ToString()];
             _selectedBuiltInFilter = null;
-            FillKernel(_selectedFilter, ref _entries);
+            FillKernel(_selectedFilter, ref _entries, ref this.MatrixGrid);
         }
         else
         {
@@ -295,13 +291,13 @@ public partial class KernelTab : ContentPage
             System.Diagnostics.Debug.WriteLine(_selectedBorder);
         }
     }
-
     private void OnStage1PickerSelectedIndexChanged(object sender, EventArgs e)
     {
         if(Stage1Picker.SelectedItem != null && Stage1Picker.SelectedIndex != -1) 
         {
             _stage1SelectedFilter = Stage1Picker.SelectedItem.ToString();
-            FillKernel(_filtersDictionary[_stage1SelectedFilter], ref _entries2);
+            FillKernel(_filtersDictionary[_stage1SelectedFilter], ref _entries2, ref MatrixGrid2);
+            Get5x5Kernel(true);
         }
     }
     private void OnStage2PickerSelectedIndexChanged(object sender, EventArgs e)
@@ -309,7 +305,8 @@ public partial class KernelTab : ContentPage
         if (Stage2Picker.SelectedItem != null && Stage2Picker.SelectedIndex != -1)
         {
             _stage2SelectedFilter = Stage2Picker.SelectedItem.ToString();
-            FillKernel(_filtersDictionary[_stage2SelectedFilter], ref _entries);
+            FillKernel(_filtersDictionary[_stage2SelectedFilter], ref _entries, ref MatrixGrid);
+            Get5x5Kernel(true);
         }
     }
     private void OnSizePickerSelectedIndexChanged(object sender, EventArgs e)
@@ -330,14 +327,20 @@ public partial class KernelTab : ContentPage
         FilterPicker.SelectedIndexChanged -= OnFilterPickerSelectedIndexChanged;
         SizePicker.SelectedIndexChanged -= OnSizePickerSelectedIndexChanged;
         EdgePicker.SelectedIndexChanged -= OnEdgePickerSelectedIndexChanged;
+        Stage1Picker.SelectedIndexChanged -= OnStage1PickerSelectedIndexChanged;
+        Stage2Picker.SelectedIndexChanged -= OnStage2PickerSelectedIndexChanged;
 
         FilterPicker.SelectedIndex = -1;
         EdgePicker.SelectedIndex = -1;
         SizePicker.SelectedIndex = -1;
+        Stage1Picker.SelectedIndex = -1;
+        Stage2Picker.SelectedIndex = -1;
         //Re-enabling events
         FilterPicker.SelectedIndexChanged += OnFilterPickerSelectedIndexChanged;
         SizePicker.SelectedIndexChanged += OnSizePickerSelectedIndexChanged;
         EdgePicker.SelectedIndexChanged += OnEdgePickerSelectedIndexChanged;
+        Stage1Picker.SelectedIndexChanged += OnStage1PickerSelectedIndexChanged;
+        Stage2Picker.SelectedIndexChanged += OnStage2PickerSelectedIndexChanged;
     }
     private void CreateMatrix(int size, bool editable, ref Grid grid, ref List<Entry> listentry)
     {
@@ -364,11 +367,11 @@ public partial class KernelTab : ContentPage
             }
         }
     }
-    private void FillKernel(float[,] kernel, ref List<Entry> list)
+    private void FillKernel(float[,] kernel, ref List<Entry> list, ref Grid grid)
     {
-        int rows = MatrixGrid.RowDefinitions.Count;
-        int cols = MatrixGrid.ColumnDefinitions.Count;
-        if (rows == cols && kernel.GetLength(0) == kernel.GetLength(1) && kernel.GetLength(0) == _matrixSize && rows == _matrixSize)
+        int rows = grid.RowDefinitions.Count;
+        int cols = grid.ColumnDefinitions.Count;
+        if (rows == cols && kernel.GetLength(0) == rows && kernel.GetLength(0) == cols)
         {
             int size = cols;
             int krow = 0;
@@ -414,15 +417,30 @@ public partial class KernelTab : ContentPage
         else return null;
         return kernel;
     }
+    private float[,] Get5x5Kernel(bool fill)
+    {
+        if (_stage1SelectedFilter == null || _stage2SelectedFilter == null) return null;
+        foreach (Entry e in _entries3) e.Text = null;
+        Matrix<float> stage1 = new Matrix<float>(_filtersDictionary[_stage1SelectedFilter]);
+        Matrix<float> stage2 = new Matrix<float>(_filtersDictionary[_stage2SelectedFilter]);
+        CvInvoke.CopyMakeBorder(stage1, stage1, 1, 1, 1, 1, BorderType.Constant, new Emgu.CV.Structure.MCvScalar(0, 0, 0, 0));
+        CvInvoke.CopyMakeBorder(stage2, stage2, 1, 1, 1, 1, BorderType.Constant, new Emgu.CV.Structure.MCvScalar(0, 0, 0, 0));
+        Matrix<float> res5x5 = new Matrix<float>(new float[5, 5]);
+        CvInvoke.Filter2D(stage1, res5x5, stage2, new System.Drawing.Point(-1, -1), 0 , BorderType.Constant);
+        if(fill) FillKernel(res5x5.Data, ref _entries3, ref MatrixGrid3);
+        return res5x5.Data;
+    }
+
+
     public async void OnKernelButtonClicked(object sender, EventArgs e)
     {
-        if (Main.selectedWindow == null)
+        if (WindowFileManager.selectedWindow == null)
         {
             await DisplayAlert("Alert", "None image is selected!", "Ok");
             return;
         }
-        int index = (int)Main.selectedWindow;
-        if (Main.OpenedImagesList[index].ImagePage.Type != ImgType.Gray)
+        int index = (int)WindowFileManager.selectedWindow;
+        if (WindowFileManager.OpenedImagesList[index].ImagePage.Type != ImgType.Gray)
         {
             await DisplayAlert("Alert", "Selected image is not GrayScale", "Ok");
             return;
@@ -464,33 +482,22 @@ public partial class KernelTab : ContentPage
             await DisplayAlert("Alert", "Stage 1/2 not selected", "Ok");
             return;
         }
-        BuiltInFilters stage1;
+        float[,] stage1kernel;
         float[,] stage2kernel;
+        stage1kernel = _filtersDictionary[_stage1SelectedFilter];
         stage2kernel = _filtersDictionary[_stage2SelectedFilter];
-        switch (_stage1SelectedFilter)
-        {
-            case "Blur":
-                stage1 = BuiltInFilters.Blur;
-                break;
-            case "GaussianBlur":
-                stage1 = BuiltInFilters.GaussianBlur;
-                break;
-            default:
-                return;
-        }
         string result = await DisplayActionSheet("Option", "Cancel", null, "2*3x3 Kernel", "5x5 Kernel");
         switch(result)
         {
             case "Cancel":
                 return;
             case "2*3x3 Kernel":
-                Main.TwoStage233(index, border, stage1, new Matrix<float>(stage2kernel));
+                ImageProc.TwoStage233(index, border, new Matrix<float>(stage1kernel), new Matrix<float>(stage2kernel));
                 break;
             case "5x5 Kernel":
-                Main.TwoStage55(index, border, stage1, new Matrix<float>(stage2kernel));
+                ImageProc.TwoStage55(index, border, new Matrix<float>(Get5x5Kernel(false)));
                 break;
         }
-
     }
     private async void ApplyCustomKernel(int index, BorderType border)
     {
@@ -501,7 +508,7 @@ public partial class KernelTab : ContentPage
             await DisplayAlert("Alert", "Entered kernel not valid", "Ok");
             return;
         }
-        Main.ApplyKernel(index, customKernel, border);
+        ImageProc.ApplyKernel(index, customKernel, border);
     }
     private async void ApplyFilter(int index, BorderType border)
     {
@@ -524,7 +531,7 @@ public partial class KernelTab : ContentPage
                     await DisplayAlert("Alert", "Threshold 2 value not valid", "Ok");
                     return;
                 }
-                Main.Canny(index, border, ths1, ths2);
+                ImageProc.Canny(index, border, ths1, ths2);
                 break;
             case "Median":
                 string[] options = { "3", "5", "7" };
@@ -534,10 +541,10 @@ public partial class KernelTab : ContentPage
                     await DisplayAlert("Alert", "Error, kernel size not valid", "Ok");
                     return;
                 }
-                Main.MedianFilter(index, ksize, border, (int)(ksize / 2));
+                ImageProc.MedianFilter(index, ksize, border, (int)(ksize / 2));
                 break;
             default:
-                Main.ApplyKernel(index, _selectedFilter, border);
+                ImageProc.ApplyKernel(index, _selectedFilter, border);
                 break;
         }
     }

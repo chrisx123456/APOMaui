@@ -16,7 +16,7 @@ public partial class TwoArgumentTab : ContentPage
         OperationPicker.ItemsSource = _operations;
 		_imageList = GetImagesList();
 		AddPickersItems();
-		Main.OnImageClosingOpeningEvent += this.UpdatePickersItems;
+		ImageProc.OnImageClosingOpeningEvent += this.UpdatePickersItems;
         //Zmienic w kernelach zeby wsm tak samo sie do pickera dodawalo jak tutaj
 
     }
@@ -49,7 +49,7 @@ public partial class TwoArgumentTab : ContentPage
     private Dictionary<string, int> GetImagesList()
 	{
 		Dictionary<string, int> res = new();
-        foreach (WindowImageObject wio in Main.OpenedImagesList)
+        foreach (WindowImageObject wio in ImageProc.OpenedImagesList)
 		{
 			string s = wio.ImagePage.GetTitle;
 			int i = wio.ImagePage.index;
@@ -111,8 +111,8 @@ public partial class TwoArgumentTab : ContentPage
 			await DisplayAlert("Alert", "Image 1/2 or operation not selected", "Ok");
 			return;
 		}
-        if (Main.OpenedImagesList[(int)_selectedImage1].ImagePage.Type != ImgType.Gray 
-			|| (_selectedImage2 != null && Main.OpenedImagesList[(int)_selectedImage2].ImagePage.Type != ImgType.Gray))
+        if (ImageProc.OpenedImagesList[(int)_selectedImage1].ImagePage.Type != ImgType.Gray 
+			|| (_selectedImage2 != null && ImageProc.OpenedImagesList[(int)_selectedImage2].ImagePage.Type != ImgType.Gray))
         {
             await DisplayAlert("Alert", "Selected image 1/2 is not GrayScale", "Ok");
             return;
@@ -129,15 +129,15 @@ public partial class TwoArgumentTab : ContentPage
                 await DisplayAlert("Alert", "Weight 2 value not valid", "Ok");
                 return;
             }
-            Main.TwoArgsOperations((int)_selectedImage1, (int)_selectedImage2, (TwoArgsOps)_selectedOperation, w1, w2);
+            ImageProc.TwoArgsOperations((int)_selectedImage1, (int)_selectedImage2, (TwoArgsOps)_selectedOperation, w1, w2);
         }
 		else if(_selectedOperation == TwoArgsOps.NOT)
 		{
-            Main.TwoArgsOperations((int)_selectedImage1, (int)_selectedImage1, (TwoArgsOps)_selectedOperation, -1, -1);
+            ImageProc.TwoArgsOperations((int)_selectedImage1, (int)_selectedImage1, (TwoArgsOps)_selectedOperation, -1, -1);
         }
         else
 		{
-			Main.TwoArgsOperations((int)_selectedImage1, (int)_selectedImage2, (TwoArgsOps)_selectedOperation, -1, -1);
+			ImageProc.TwoArgsOperations((int)_selectedImage1, (int)_selectedImage2, (TwoArgsOps)_selectedOperation, -1, -1);
 		}
 		
     }

@@ -11,12 +11,7 @@ namespace APOMaui
     }
     public enum BuiltInFilters
     {
-        SobelX,
-        SobelY,
-        LaplacianEdge,
         Canny,
-        Blur,
-        GaussianBlur,
         Median
     }
     public enum TwoArgsOps

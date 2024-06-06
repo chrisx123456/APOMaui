@@ -60,7 +60,7 @@ public partial class HistogramChart : ContentPage, IDisposable
             AddElementsToTableChart(values);
         });
         this.Series = CreateISeries(values);
-        System.Diagnostics.Debug.WriteLine($"Chart of {Main.OpenedImagesList[indexOfImg].ImagePageWindow.Title} Updated");
+        System.Diagnostics.Debug.WriteLine($"Chart of {ImageProc.OpenedImagesList[indexOfImg].ImagePageWindow.Title} Updated");
         BindingContext = this;
 
         //this.Dispatcher.Dispatch(() => {  //Img sets while hist is done
@@ -95,10 +95,10 @@ public partial class HistogramChart : ContentPage, IDisposable
         this.myChart.ClearLogicalChildren();
         this.TableHistogram = null;
         this.myChart = null;
-        Main.OpenedImagesList[indexOfImg].HistogramChart = null;
-        Main.OpenedImagesList[indexOfImg].HistogramChartWindow.ClearLogicalChildren();
-        Application.Current.CloseWindow(Main.OpenedImagesList[indexOfImg].HistogramChartWindow);
-        Main.OpenedImagesList[indexOfImg].HistogramChartWindow = null;
+        ImageProc.OpenedImagesList[indexOfImg].HistogramChart = null;
+        ImageProc.OpenedImagesList[indexOfImg].HistogramChartWindow.ClearLogicalChildren();
+        Application.Current.CloseWindow(ImageProc.OpenedImagesList[indexOfImg].HistogramChartWindow);
+        ImageProc.OpenedImagesList[indexOfImg].HistogramChartWindow = null;
     }
     public void AddElementsToTableChart(int[] tab)
     {

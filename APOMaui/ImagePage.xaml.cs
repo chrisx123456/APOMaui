@@ -142,14 +142,14 @@ public partial class ImagePage : ContentPage
         Type = ImgType.Gray;
         _ = Task.Run(() =>
         {
-            if (Main.OpenedImagesList[index].HistogramChart != null)
+            if (ImageProc.OpenedImagesList[index].HistogramChart != null)
             {
 
                 byte[] bytes = grayImage.Bytes;
-                int[] hist = Main.CalcHistValues(bytes);
+                int[] hist = ImageProc.CalcHistValues(bytes);
 
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
-                Main.OpenedImagesList[index].HistogramChart.UpdateChart(hist);
+                ImageProc.OpenedImagesList[index].HistogramChart.UpdateChart(hist);
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
                 System.Diagnostics.Debug.WriteLine("Task chart updating done");
             }
@@ -159,19 +159,19 @@ public partial class ImagePage : ContentPage
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
-        Main.OnCloseEventWinIMG(index);
+        ImageProc.OnCloseImagePage(index);
     }
     private void ZoomIn(object sender, EventArgs e)
     {
-        Main.OpenedImagesList[index].ImagePageWindow.Height += (int)((20 * imgScale) + 0.5); // Approx. Height
-        Main.OpenedImagesList[index].ImagePageWindow.Width += 20;
+        ImageProc.OpenedImagesList[index].ImagePageWindow.Height += (int)((20 * imgScale) + 0.5); // Approx. Height
+        ImageProc.OpenedImagesList[index].ImagePageWindow.Width += 20;
         winImgBox.WidthRequest = winImgBox.Width + 20;
 
     }
     private void ZoomOut(object sender, EventArgs e)
     {
-        Main.OpenedImagesList[index].ImagePageWindow.Height -= (int)((20 * imgScale) + 0.5); // Approx. Height
-        Main.OpenedImagesList[index].ImagePageWindow.Width -= 20;
+        ImageProc.OpenedImagesList[index].ImagePageWindow.Height -= (int)((20 * imgScale) + 0.5); // Approx. Height
+        ImageProc.OpenedImagesList[index].ImagePageWindow.Width -= 20;
         winImgBox.WidthRequest = winImgBox.Width - 20;
 
     }
@@ -195,7 +195,7 @@ public partial class ImagePage : ContentPage
         tgr.Tapped += (s, e) =>
         {
 
-            Main.ChangeSelectedtWinIMG(this.index);
+            ImageProc.ChangeSelectedImagePage(this.index);
             var img = s as Microsoft.Maui.Controls.Image;
             var tappedEvent = e as TappedEventArgs;
             Microsoft.Maui.Graphics.Point? tapPos = e.GetPosition(img);
@@ -225,7 +225,7 @@ public partial class ImagePage : ContentPage
                 {
                     p2.X = pixelX;
                     p2.Y = pixelY;
-                    Main.ProfileLine(index, p1, p2);
+                    ImageProc.ProfileLine(index, p1, p2);
                     this.winImgBox.GestureRecognizers.Clear();
                 }
             }
@@ -246,7 +246,7 @@ public partial class ImagePage : ContentPage
         tgr.Tapped += (s, e) =>
         {
 
-            Main.ChangeSelectedtWinIMG(this.index);
+            ImageProc.ChangeSelectedImagePage(this.index);
             var img = s as Microsoft.Maui.Controls.Image;
             var tappedEvent = e as TappedEventArgs;
             Microsoft.Maui.Graphics.Point? tapPos = e.GetPosition(img);
@@ -288,7 +288,7 @@ public partial class ImagePage : ContentPage
                     System.Drawing.Rectangle rectangle = new System.Drawing.Rectangle(x, y, width, height);
                     Debug.WriteLine("Calling GrabCut in main");
 
-                    Main.GrabCut(index, rectangle);
+                    ImageProc.GrabCut(index, rectangle);
                     this.winImgBox.GestureRecognizers.Clear();
                 }
             }

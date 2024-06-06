@@ -108,7 +108,8 @@ public partial class MorphologyTab : ContentPage
                 break;
             default:
 				_morphOp = null;
-				break;
+				_morphOpExtend = null;
+                break;
 		}
 	}
     private void OnStructPickerSelectedIndexChanged(object sender, EventArgs e)
@@ -131,13 +132,13 @@ public partial class MorphologyTab : ContentPage
     }
 	private async void OnMorphButtonClicked(object sender, EventArgs e)
 	{
-        if (Main.selectedWindow == null)
+        if (WindowFileManager.selectedWindow == null)
         {
             await DisplayAlert("Alert", "None image is selected!", "Ok");
             return;
         }
-        int index = (int)Main.selectedWindow;
-        if (Main.OpenedImagesList[index].ImagePage.Type != ImgType.Gray)
+        int index = (int)WindowFileManager.selectedWindow;
+        if (WindowFileManager.OpenedImagesList[index].ImagePage.Type != ImgType.Gray)
         {
             await DisplayAlert("Alert", "Selected image is not GrayScale", "Ok");
             return;
@@ -158,15 +159,15 @@ public partial class MorphologyTab : ContentPage
         }
 		if(_morphOp != null && _morphOpExtend == null)
 		{
-			Main.MathMorph(index, (MorphOp)_morphOp, (ElementShape)_structElement, (BorderType)_borderType, new Emgu.CV.Structure.MCvScalar(constB, constB, constB, constB));
+			ImageProc.MathMorph(index, (MorphOp)_morphOp, (ElementShape)_structElement, (BorderType)_borderType, new Emgu.CV.Structure.MCvScalar(constB, constB, constB, constB));
         }
 		if(_morphOp == null && _morphOpExtend == MorphOpExtend.SKELETONIZE)
 		{
-            Main.Skeletonize(index, (ElementShape)_structElement, (BorderType)_borderType, new Emgu.CV.Structure.MCvScalar(constB, constB, constB, constB));
+            ImageProc.Skeletonize(index, (ElementShape)_structElement, (BorderType)_borderType, new Emgu.CV.Structure.MCvScalar(constB, constB, constB, constB));
         }
         if (_morphOp == null && _morphOpExtend == MorphOpExtend.WATERSHED)
 		{
-			Main.Watershed(index);
+			ImageProc.Watershed(index);
 		}
 
 

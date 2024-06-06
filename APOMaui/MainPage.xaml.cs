@@ -22,20 +22,20 @@
 
         private void OnOpenButtonClicked(object sender, EventArgs e)
         {
-            Main.OpenPhotoWinIMG();
+            ImageProc.CreateImagePage();
             //Main.OpenPhotoInNewWindow();
         }
         private async void OnSaveButtonClicked(object sender, EventArgs e)
         {
-            if (Main.selectedWindow == null)
+            if (ImageProc.selectedWindow == null)
             {
                 await DisplayAlert("Alert", "None image is selected!", "Ok");
                 return;
             }
-            int index = (int)Main.selectedWindow;
+            int index = (int)ImageProc.selectedWindow;
             try
             {
-                Main.SaveImage(index, false);
+                ImageProc.SaveImage(index, false);
             }
             catch(InvalidOperationException ex)
             {
@@ -44,13 +44,13 @@
         }
         private async void OnSaveAsButtonClicked(object sender, EventArgs e)
         {
-            if (Main.selectedWindow == null)
+            if (ImageProc.selectedWindow == null)
             {
                 await DisplayAlert("Alert", "None image is selected!", "Ok");
                 return;
             }
-            int index = (int)Main.selectedWindow;
-            Main.SaveImage(index, true);
+            int index = (int)ImageProc.selectedWindow;
+            ImageProc.SaveImage(index, true);
         }
         private async void OnAboutButtonClicked(object sender, EventArgs e)
         {
@@ -59,13 +59,13 @@
         }
         private async void OnRLEButtonClicked(object sender, EventArgs e)
         {
-            if (Main.selectedWindow == null)
+            if (ImageProc.selectedWindow == null)
             {
                 await DisplayAlert("Alert", "None image is selected!", "Ok");
                 return;
             }
-            int index = (int)Main.selectedWindow;
-            Main.CompressRLE(index);
+            int index = (int)ImageProc.selectedWindow;
+            ImageProc.CompressRLE(index);
         }
 
     }
