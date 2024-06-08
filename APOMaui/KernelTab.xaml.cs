@@ -440,7 +440,7 @@ public partial class KernelTab : ContentPage
             return;
         }
         int index = (int)WindowFileManager.selectedWindow;
-        if (WindowFileManager.OpenedImagesList[index].ImagePage.Type != ImgType.Gray)
+        if (WindowFileManager.OpenedImagesList[index].CollectivePage.ImagePage.Type != ImgType.Gray)
         {
             await DisplayAlert("Alert", "Selected image is not GrayScale", "Ok");
             return;

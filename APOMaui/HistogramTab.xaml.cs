@@ -10,18 +10,18 @@ public partial class HistogramTab : ContentPage
 	}
 	private async void OnButtonChartClicked(object sender, EventArgs e)
 	{
-		if(ImageProc.selectedWindow == null)
+		if(WindowFileManager.selectedWindow == null)
 		{
 			await DisplayAlert("Alert", "None image is selected!", "Ok");
 			return;
 		}
-		int index = (int)ImageProc.selectedWindow;
-		if (ImageProc.OpenedImagesList[index].ImagePage.Type == ImgType.RGB || ImageProc.OpenedImagesList[index].ImagePage.GrayImage == null)
+		int index = (int)WindowFileManager.selectedWindow;
+		if (WindowFileManager.OpenedImagesList[index].CollectivePage.ImagePage.Type == ImgType.RGB || WindowFileManager.OpenedImagesList[index].CollectivePage.ImagePage.GrayImage == null)
 		{
 			await DisplayAlert("Alert", "Selected image is RGB, Histogram is only supported for grayscale images", "Ok");
 			return;
 		}
-		if (ImageProc.OpenedImagesList[index].HistogramChart != null)
+		if (WindowFileManager.OpenedImagesList[index].CollectivePage.HistogramChart != null)
 		{
             await DisplayAlert("Alert", "Histogram is already displayed", "Ok");
             return;
@@ -31,13 +31,13 @@ public partial class HistogramTab : ContentPage
     public async void OnButtonQ3Q4Click(object sender, EventArgs e)
     {
         {
-            if (ImageProc.selectedWindow == null)
+            if (WindowFileManager.selectedWindow == null)
             {
                 await DisplayAlert("Alert", "None image is selected!", "Ok");
                 return;
             }
-            int index = (int)ImageProc.selectedWindow;
-            if (ImageProc.OpenedImagesList[index].ImagePage.Type != ImgType.Gray)
+            int index = (int)WindowFileManager.selectedWindow;
+            if (WindowFileManager.OpenedImagesList[index].CollectivePage.ImagePage.Type != ImgType.Gray)
             {
                 await DisplayAlert("Alert", "Selected image is not GrayScale", "Ok");
                 return;
@@ -72,13 +72,13 @@ public partial class HistogramTab : ContentPage
     }
     public async void OnButtonEqualizationClick(object sender, EventArgs e)
     {
-        if (ImageProc.selectedWindow == null)
+        if (WindowFileManager.selectedWindow == null)
         {
             await DisplayAlert("Alert", "None image is selected!", "Ok");
             return;
         }
-        int index = (int)ImageProc.selectedWindow;
-        if (ImageProc.OpenedImagesList[index].ImagePage.Type != ImgType.Gray)
+        int index = (int)WindowFileManager.selectedWindow;
+        if (WindowFileManager.OpenedImagesList[index].CollectivePage.ImagePage.Type != ImgType.Gray)
         {
             await DisplayAlert("Alert", "Selected image is not GrayScale", "Ok");
             return;
@@ -87,13 +87,13 @@ public partial class HistogramTab : ContentPage
     }
     public async void OnButtonStretchClick(object sender, EventArgs e)
     {
-        if (ImageProc.selectedWindow == null)
+        if (WindowFileManager.selectedWindow == null)
         {
             await DisplayAlert("Alert", "None image is selected!", "Ok");
             return;
         }
-        int index = (int)ImageProc.selectedWindow;
-        if (ImageProc.OpenedImagesList[index].ImagePage.Type != ImgType.Gray)
+        int index = (int)WindowFileManager.selectedWindow;
+        if (WindowFileManager.OpenedImagesList[index].CollectivePage.ImagePage.Type != ImgType.Gray)
         {
             await DisplayAlert("Alert", "Selected image is not GrayScale", "Ok");
             return;

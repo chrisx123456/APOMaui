@@ -2,7 +2,7 @@ using System.Collections.ObjectModel;
 
 namespace APOMaui;
 
-public partial class AnalysisResultPage : ContentPage
+public partial class AnalysisResultPage : ContentPage, IDisposable
 {
     public ObservableCollection<AnalysisResult> AnalysisCollection { get; set; }
 
@@ -12,7 +12,10 @@ public partial class AnalysisResultPage : ContentPage
         AnalysisCollection = [..res];
         analysisResultsListView.ItemsSource = AnalysisCollection;
         BindingContext = this;
-
     }
 
+    public void Dispose()
+    {
+        this.ClearLogicalChildren();
+    }
 }

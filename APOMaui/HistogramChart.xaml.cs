@@ -1,7 +1,8 @@
-using LiveChartsCore.SkiaSharpView;
+﻿using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore;
 using LiveChartsCore.SkiaSharpView.Painting;
 using SkiaSharp;
+using System.Diagnostics;
 
 namespace APOMaui;
 
@@ -16,39 +17,38 @@ public partial class HistogramChart : ContentPage, IDisposable
         this.Series = CreateISeries(values);
         this.indexOfImg = indexOfImg;
         AddElementsToTableChart(values);
+        setAxes();
+
         BindingContext = this;
 	}
+    private void setAxes()
+    {
+        this.myChart.XAxes = new List<Axis>
+        {
+            new Axis
+            {
+                MinLimit = 0,
+                TextSize = 12,
+                Padding = new LiveChartsCore.Drawing.Padding(2d)
+            }
+        };
+        this.myChart.YAxes = new List<Axis>
+        {
+            new Axis
+            {
+                MinLimit = 0,
+                TextSize = 12,
+                Padding = new LiveChartsCore.Drawing.Padding(2d)
+            }
+        };
+    }
+
     public void Dispose()
     {
         BindingContext = null;  
         this.TableHistogram.Clear();
         this.Series = null;
         System.Diagnostics.Debug.WriteLine($"Chart of {indexOfImg} Disposed");
-
-        //To ma isc do ondsp
-
-
-        //this.myChart.Legend = null;
-        //foreach (var series in myChart.Series) series.Values = null;
-        //this.Series = null;
-        //this.TableHistogram.ClearLogicalChildren();
-        //this.TableHistogram.Children.Clear();
-        //this.TableHistogram.Clear();
-        //this.Series = null;
-        //this.BindingContext = null;
-        //myChart.BindingContext = null;
-        //myChart.Legend = null;
-        //myChart.ClearLogicalChildren();
-        //myChart.Series = null;
-        //TableHistogram.Children.Clear();
-        //Main.OpenedImagesWindowsList[indexOfImg].chart = null;
-        //System.Diagnostics.Debug.WriteLine($"Chart of {indexOfImg} Disposed");
-        //window.ClearLogicalChildren();
-        //Application.Current.CloseWindow(window);
-        //this.window = null;
-        //GC.Collect();
-        //GC.ReRegisterForFinalize(this);
-        //GC.Collect(2, GCCollectionMode.Forced);
     }
     public async void UpdateChart(int[] values)
     {
@@ -60,7 +60,7 @@ public partial class HistogramChart : ContentPage, IDisposable
             AddElementsToTableChart(values);
         });
         this.Series = CreateISeries(values);
-        System.Diagnostics.Debug.WriteLine($"Chart of {ImageProc.OpenedImagesList[indexOfImg].ImagePageWindow.Title} Updated");
+        //System.Diagnostics.Debug.WriteLine($"Chart of {WindowFileManager.OpenedImagesList[indexOfImg].ImagePageWindow.Title} Updated");
         BindingContext = this;
 
         //this.Dispatcher.Dispatch(() => {  //Img sets while hist is done
@@ -83,22 +83,11 @@ public partial class HistogramChart : ContentPage, IDisposable
                 MaxBarWidth=10,
                 Padding=0,
                 EasingFunction = null,
-                IsHoverable = false,
+                IsHoverable = false,   
             }
+            
         };
         return series;
-    }
-    protected override void OnDisappearing()
-    {
-        base.OnDisappearing();
-        this.Dispose();
-        this.myChart.ClearLogicalChildren();
-        this.TableHistogram = null;
-        this.myChart = null;
-        ImageProc.OpenedImagesList[indexOfImg].HistogramChart = null;
-        ImageProc.OpenedImagesList[indexOfImg].HistogramChartWindow.ClearLogicalChildren();
-        Application.Current.CloseWindow(ImageProc.OpenedImagesList[indexOfImg].HistogramChartWindow);
-        ImageProc.OpenedImagesList[indexOfImg].HistogramChartWindow = null;
     }
     public void AddElementsToTableChart(int[] tab)
     {

@@ -12,7 +12,7 @@
             <Button x:Name="ButtonSaveAs" Text="Save As" Clicked="OnSaveAsButtonClicked" StyleClass="MainPageButton"/>
             <Button x:Name="ButtonRLE" Text="RLE" Clicked="OnRLEButtonClicked" StyleClass="MainPageButton"/>
             <Button x:Name="ButtonAbout" Text="About" Clicked="OnAboutButtonClicked" StyleClass="MainPageButton"/>
-
+            
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

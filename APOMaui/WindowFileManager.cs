@@ -21,14 +21,14 @@ namespace APOMaui
             switch (saveAs)
             {
                 case false:
-                    if (OpenedImagesList[index].ImagePage.path == String.Empty) throw new InvalidOperationException(@"Image has no path. Save this image via ""Save as""");
-                    if (OpenedImagesList[index].ImagePage.ColorImage != null && OpenedImagesList[index].ImagePage.Type == ImgType.RGB)
+                    if (OpenedImagesList[index].CollectivePage.ImagePage.path == String.Empty) throw new InvalidOperationException(@"Image has no path. Save this image via ""Save as""");
+                    if (OpenedImagesList[index].CollectivePage.ImagePage.ColorImage != null && OpenedImagesList[index].CollectivePage.ImagePage.Type == ImgType.RGB)
                     {
-                        OpenedImagesList[index].ImagePage.ColorImage.Save(OpenedImagesList[index].ImagePage.path);
+                        OpenedImagesList[index].CollectivePage.ImagePage.ColorImage.Save(OpenedImagesList[index].CollectivePage.ImagePage.path);
                     }
-                    if (OpenedImagesList[index].ImagePage.GrayImage != null && OpenedImagesList[index].ImagePage.Type == ImgType.Gray)
+                    if (OpenedImagesList[index].CollectivePage.ImagePage.GrayImage != null && OpenedImagesList[index].CollectivePage.ImagePage.Type == ImgType.Gray)
                     {
-                        OpenedImagesList[index].ImagePage.GrayImage.Save(OpenedImagesList[index].ImagePage.path);
+                        OpenedImagesList[index].CollectivePage.ImagePage.GrayImage.Save(OpenedImagesList[index].CollectivePage.ImagePage.path);
                     }
                     break;
                 case true:
@@ -47,13 +47,13 @@ namespace APOMaui
                         {
                             path = fp.Folder.Path;
                             string fullPath = path + "\\" + filename + extension;
-                            if (OpenedImagesList[index].ImagePage.ColorImage != null && OpenedImagesList[index].ImagePage.Type == ImgType.RGB)
+                            if (OpenedImagesList[index].CollectivePage.ImagePage.ColorImage != null && OpenedImagesList[index].CollectivePage.ImagePage.Type == ImgType.RGB)
                             {
-                                OpenedImagesList[index].ImagePage.ColorImage.Save(fullPath);
+                                OpenedImagesList[index].CollectivePage.ImagePage.ColorImage.Save(fullPath);
                             }
-                            if (OpenedImagesList[index].ImagePage.GrayImage != null && OpenedImagesList[index].ImagePage.Type == ImgType.Gray)
+                            if (OpenedImagesList[index].CollectivePage.ImagePage.GrayImage != null && OpenedImagesList[index].CollectivePage.ImagePage.Type == ImgType.Gray)
                             {
-                                OpenedImagesList[index].ImagePage.GrayImage.Save(fullPath);
+                                OpenedImagesList[index].CollectivePage.ImagePage.GrayImage.Save(fullPath);
                             }
                         }
                         else
@@ -73,7 +73,7 @@ namespace APOMaui
                 var result = await FilePicker.PickAsync(new PickOptions
                 {
                     FileTypes = FilePickerFileType.Images,
-                    PickerTitle = "Wybierz plik"
+                    PickerTitle = "Choose File"
                 });
                 if (result == null) return;
                 string FileFullPath = result.FullPath.ToString();
@@ -82,14 +82,14 @@ namespace APOMaui
                 int duplicates = 0;
                 foreach (WindowImageObject wio in OpenedImagesList) //Sketchy
                 {
-                    string s = wio.ImagePage.GetTitle;
+                    string s = wio.CollectivePage.ImagePage.GetTitle;
                     int dotIndex = s.LastIndexOf('.');
                     if (dotIndex == -1) break;
                     string output = s.Substring(0, dotIndex);
                     if (output == fileName) duplicates++;
                 }
                 fileName += $".{duplicates}";
-                OpenNewWindowImagePage(img, fileName, FileFullPath);
+                OpenNewWindow(img, fileName, FileFullPath);
                 OnImageClosingOpeningEvent?.Invoke();
 
             }
@@ -98,19 +98,10 @@ namespace APOMaui
                 //TODO
             }
         }
-        public static void OpenNewWindowImagePage(dynamic img, string title, string path) //Argument is dynamic cuz' dont want to make overload for GrayScale/Color.
+        public static void OpenNewWindow(dynamic img, string title, string path) //Argument is dynamic cuz' dont want to make overload for GrayScale/Color.
         {
             ImagePage page = new ImagePage(img, OpenedImagesList.Count, title);
             page.path = path;
-            Window newWindow = new Window
-            {
-                Page = page,
-                Title = title,
-                Width = img.Width + windowWidthFix,
-                Height = img.Height + windowHeightFix,
-                MinimumWidth = 0,
-                MinimumHeight = 0,
-            };
             page.Content.GestureRecognizers.Add(new TapGestureRecognizer
             {
                 Command = new Command(() =>
@@ -118,32 +109,32 @@ namespace APOMaui
                     WindowFileManager.ChangeSelectedImagePage(page.index);
                 })
             });
+            CollectivePage collectivePage = new CollectivePage(page); //new
+            Window newWindow = new Window
+            {
+                Page = collectivePage,
+                Title = title,
+                Width = 650,
+                Height = 480,
+                MinimumWidth = 0,
+                MinimumHeight = 0,
+            };
 
-            WindowImageObject windowImageObject = new(page, newWindow);
+            WindowImageObject windowImageObject = new(collectivePage, newWindow);
+
             OpenedImagesList.Add(windowImageObject);
             ChangeSelectedImagePage(OpenedImagesList.Count - 1);
-#pragma warning disable 8602
-            Application.Current.OpenWindow(OpenedImagesList[(int)selectedWindow].ImagePageWindow);
-#pragma warning restore 8602
+            //Application.Current?.OpenWindow(OpenedImagesList[(int)selectedWindow].ImagePageWindow);
+            Application.Current?.OpenWindow(newWindow);
         }
-        public static void OnCloseImagePage(int index)
+        public static void OnCloseImagePage(int index) //To kurwa to w ogole jest do zmiany
         {
-            System.Diagnostics.Debug.WriteLine($"CloseEventWinIMG: {index}");
+            System.Diagnostics.Debug.WriteLine($"Closing Collective View: {index}");
             selectedWindow = null;
-#pragma warning disable 8602, 8604
-            if (OpenedImagesList[index].HistogramChart != null && OpenedImagesList[index].HistogramChartWindow != null)
-            {
-                Application.Current.CloseWindow(OpenedImagesList[index].HistogramChartWindow);
-            }
-#pragma warning restore 8602, 8604
             for (int i = index; i < OpenedImagesList.Count; i++)
             {
-                OpenedImagesList[i].ImagePage.index--;
+                OpenedImagesList[i].CollectivePage.ImagePage.index--;
             }
-            OpenedImagesList[index].ImagePage = null;
-            OpenedImagesList[index].ImagePageWindow.ClearLogicalChildren();
-            OpenedImagesList[index].HistogramChart = null;
-            Application.Current.CloseWindow(OpenedImagesList[index].ImagePageWindow);
             OpenedImagesList[index].Dispose();
             OpenedImagesList.RemoveAt(index);
             GC.Collect();

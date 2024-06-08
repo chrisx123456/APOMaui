@@ -16,7 +16,7 @@ public partial class TwoArgumentTab : ContentPage
         OperationPicker.ItemsSource = _operations;
 		_imageList = GetImagesList();
 		AddPickersItems();
-		ImageProc.OnImageClosingOpeningEvent += this.UpdatePickersItems;
+        WindowFileManager.OnImageClosingOpeningEvent += this.UpdatePickersItems;
         //Zmienic w kernelach zeby wsm tak samo sie do pickera dodawalo jak tutaj
 
     }
@@ -49,10 +49,10 @@ public partial class TwoArgumentTab : ContentPage
     private Dictionary<string, int> GetImagesList()
 	{
 		Dictionary<string, int> res = new();
-        foreach (WindowImageObject wio in ImageProc.OpenedImagesList)
+        foreach (WindowImageObject wio in WindowFileManager.OpenedImagesList)
 		{
-			string s = wio.ImagePage.GetTitle;
-			int i = wio.ImagePage.index;
+			string s = wio.CollectivePage.ImagePage.GetTitle;
+			int i = wio.CollectivePage.ImagePage.index;
 			res.Add(s, i);
 		}
 		return res;
@@ -111,8 +111,8 @@ public partial class TwoArgumentTab : ContentPage
 			await DisplayAlert("Alert", "Image 1/2 or operation not selected", "Ok");
 			return;
 		}
-        if (ImageProc.OpenedImagesList[(int)_selectedImage1].ImagePage.Type != ImgType.Gray 
-			|| (_selectedImage2 != null && ImageProc.OpenedImagesList[(int)_selectedImage2].ImagePage.Type != ImgType.Gray))
+        if (WindowFileManager.OpenedImagesList[(int)_selectedImage1].CollectivePage.ImagePage.Type != ImgType.Gray 
+			|| (_selectedImage2 != null && WindowFileManager.OpenedImagesList[(int)_selectedImage2].CollectivePage.ImagePage.Type != ImgType.Gray))
         {
             await DisplayAlert("Alert", "Selected image 1/2 is not GrayScale", "Ok");
             return;

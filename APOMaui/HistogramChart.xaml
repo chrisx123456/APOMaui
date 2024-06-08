@@ -4,17 +4,20 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:APOMaui;assembly=APOMaui"
     xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.Maui;assembly=LiveChartsCore.SkiaSharpView.Maui">
-    <StackLayout Orientation="Horizontal">
-        <Grid WidthRequest="700">
-            <lvc:CartesianChart 
-                  Series="{Binding Series}"
-                  x:Name="myChart">
-            </lvc:CartesianChart>
-        </Grid>
-        <Grid Grid.ColumnSpan="1">
-            <ScrollView WidthRequest="110">
-                <StackLayout x:Name="TableHistogram"></StackLayout>
-            </ScrollView>
-        </Grid>
-    </StackLayout>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="110" />
+        </Grid.ColumnDefinitions>
+
+        <lvc:CartesianChart Grid.Column="0"
+                            Series="{Binding Series}"
+                            x:Name="myChart"
+                            HorizontalOptions="FillAndExpand"
+                            Margin="10,10,10,10"
+                            />
+        <ScrollView Grid.Column="1">
+            <StackLayout x:Name="TableHistogram"></StackLayout>
+        </ScrollView>
+    </Grid>
 </ContentPage>

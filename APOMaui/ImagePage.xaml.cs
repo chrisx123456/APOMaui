@@ -6,7 +6,7 @@ using SkiaSharp.Views.Maui;
 using System.Diagnostics;
 namespace APOMaui;
 
-public partial class ImagePage : ContentPage
+public partial class ImagePage : ContentPage, IDisposable
 {
     //Add backup 4 color images!
     private Image<Gray, Byte>? backupGray;
@@ -94,6 +94,13 @@ public partial class ImagePage : ContentPage
         BindingContext = this;
 
     }
+    public void Dispose()
+    {
+        if(backupGray != null) backupGray.Dispose();
+        if(colorImage != null) colorImage.Dispose();
+        if(grayImage != null) grayImage.Dispose();
+        this.ClearLogicalChildren();
+    }
 
     public static ImageSource EmguImgToImageSource(Image<Bgr, Byte> img)
     {
@@ -142,38 +149,30 @@ public partial class ImagePage : ContentPage
         Type = ImgType.Gray;
         _ = Task.Run(() =>
         {
-            if (ImageProc.OpenedImagesList[index].HistogramChart != null)
+            if (WindowFileManager.OpenedImagesList[index].CollectivePage.HistogramChart != null)
             {
 
                 byte[] bytes = grayImage.Bytes;
                 int[] hist = ImageProc.CalcHistValues(bytes);
 
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-                ImageProc.OpenedImagesList[index].HistogramChart.UpdateChart(hist);
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
+                WindowFileManager.OpenedImagesList[index].CollectivePage.HistogramChart.UpdateChart(hist);
                 System.Diagnostics.Debug.WriteLine("Task chart updating done");
             }
         });
 
     }
-    protected override void OnDisappearing()
-    {
-        base.OnDisappearing();
-        ImageProc.OnCloseImagePage(index);
-    }
     private void ZoomIn(object sender, EventArgs e)
     {
-        ImageProc.OpenedImagesList[index].ImagePageWindow.Height += (int)((20 * imgScale) + 0.5); // Approx. Height
-        ImageProc.OpenedImagesList[index].ImagePageWindow.Width += 20;
+        WindowFileManager.OpenedImagesList[index].CollectivePageWindow.Height += (int)((20 * imgScale) + 0.5); // Approx. Height
+        WindowFileManager.OpenedImagesList[index].CollectivePageWindow.Width += 20;
         winImgBox.WidthRequest = winImgBox.Width + 20;
 
     }
     private void ZoomOut(object sender, EventArgs e)
     {
-        ImageProc.OpenedImagesList[index].ImagePageWindow.Height -= (int)((20 * imgScale) + 0.5); // Approx. Height
-        ImageProc.OpenedImagesList[index].ImagePageWindow.Width -= 20;
+        WindowFileManager.OpenedImagesList[index].CollectivePageWindow.Height -= (int)((20 * imgScale) + 0.5); // Approx. Height
+        WindowFileManager.OpenedImagesList[index].CollectivePageWindow.Width -= 20;
         winImgBox.WidthRequest = winImgBox.Width - 20;
-
     }
     private void Undo(object sender, EventArgs e)
     {
@@ -195,7 +194,7 @@ public partial class ImagePage : ContentPage
         tgr.Tapped += (s, e) =>
         {
 
-            ImageProc.ChangeSelectedImagePage(this.index);
+            WindowFileManager.ChangeSelectedImagePage(this.index);
             var img = s as Microsoft.Maui.Controls.Image;
             var tappedEvent = e as TappedEventArgs;
             Microsoft.Maui.Graphics.Point? tapPos = e.GetPosition(img);
@@ -246,7 +245,7 @@ public partial class ImagePage : ContentPage
         tgr.Tapped += (s, e) =>
         {
 
-            ImageProc.ChangeSelectedImagePage(this.index);
+            WindowFileManager.ChangeSelectedImagePage(this.index);
             var img = s as Microsoft.Maui.Controls.Image;
             var tappedEvent = e as TappedEventArgs;
             Microsoft.Maui.Graphics.Point? tapPos = e.GetPosition(img);
@@ -391,4 +390,6 @@ public partial class ImagePage : ContentPage
         }
         else return image;
     }
+
+
 }

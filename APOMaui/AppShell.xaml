@@ -8,8 +8,7 @@
     Shell.FlyoutBehavior="Flyout"
     Shell.FlyoutWidth="280"
     Title="APOMaui">
-
-    <FlyoutItem Title="File">
+    <FlyoutItem Title="File" Route="MainPage">
         <Tab>
             <ShellContent ContentTemplate="{DataTemplate local:MainPage}" />
         </Tab>
@@ -49,4 +48,9 @@
             <ShellContent ContentTemplate="{DataTemplate local:OperationsTab}"/>
         </Tab>
     </FlyoutItem>
+   
+    <MenuItem x:Name="ShellClose" Text="Close" StyleClass="ShellClose" Clicked="OnCloseClicked"/>
+
+    <MenuItem x:Name="ShellCloseAll" Text="Close All" StyleClass="ShellClose" Clicked="OnCloseAllClicked"/>
+
 </Shell>

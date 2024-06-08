@@ -65,6 +65,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="Resources\Images\analysisico.png" />
+	  <None Remove="Resources\Images\chartico.png" />
+	  <None Remove="Resources\Images\imageico.png" />
 	  <None Remove="Resources\Images\line.png" />
 	  <None Remove="Resources\Images\zoomin.png" />
 	  <None Remove="Resources\Images\zoomout.png" />
@@ -113,6 +116,9 @@
 
 	<ItemGroup>
 	  <MauiXaml Update="AnalysisResultPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="CollectivePage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="ConversionTab.xaml">

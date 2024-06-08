@@ -5,7 +5,7 @@ using SkiaSharp;
 
 namespace APOMaui;
 
-public partial class ProfileLineChart : ContentPage
+public partial class ProfileLineChart : ContentPage, IDisposable
 {
     public ISeries[]? Series { get; set; }
     public ProfileLineChart(int[] values)
@@ -13,7 +13,28 @@ public partial class ProfileLineChart : ContentPage
 		InitializeComponent();
         this.Series = CreateISeries(values);
         BindingContext = this;
-
+        setAxes();
+    }
+    private void setAxes()
+    {
+        this.myChart.XAxes = new List<Axis>
+        {
+            new Axis
+            {
+                MinLimit = 0,
+                TextSize = 12,
+                Padding = new LiveChartsCore.Drawing.Padding(2d)
+            }
+        };
+        this.myChart.YAxes = new List<Axis>
+        {
+            new Axis
+            {
+                MinLimit = 0,
+                TextSize = 12,
+                Padding = new LiveChartsCore.Drawing.Padding(2d)
+            }
+        };
     }
     private static ISeries[] CreateISeries(int[] values)
     {
@@ -32,9 +53,10 @@ public partial class ProfileLineChart : ContentPage
         };
         return series;
     }
-    protected override void OnDisappearing()
+
+    public void Dispose()
     {
-        base.OnDisappearing();
         this.Series = null;
+        this.ClearLogicalChildren();
     }
 }

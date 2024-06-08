@@ -22,20 +22,20 @@
 
         private void OnOpenButtonClicked(object sender, EventArgs e)
         {
-            ImageProc.CreateImagePage();
+            WindowFileManager.CreateImagePage();
             //Main.OpenPhotoInNewWindow();
         }
         private async void OnSaveButtonClicked(object sender, EventArgs e)
         {
-            if (ImageProc.selectedWindow == null)
+            if (WindowFileManager.selectedWindow == null)
             {
                 await DisplayAlert("Alert", "None image is selected!", "Ok");
                 return;
             }
-            int index = (int)ImageProc.selectedWindow;
+            int index = (int)WindowFileManager.selectedWindow;
             try
             {
-                ImageProc.SaveImage(index, false);
+                WindowFileManager.SaveImage(index, false);
             }
             catch(InvalidOperationException ex)
             {
@@ -44,13 +44,13 @@
         }
         private async void OnSaveAsButtonClicked(object sender, EventArgs e)
         {
-            if (ImageProc.selectedWindow == null)
+            if (WindowFileManager.selectedWindow == null)
             {
                 await DisplayAlert("Alert", "None image is selected!", "Ok");
                 return;
             }
-            int index = (int)ImageProc.selectedWindow;
-            ImageProc.SaveImage(index, true);
+            int index = (int)WindowFileManager.selectedWindow;
+            WindowFileManager.SaveImage(index, true);
         }
         private async void OnAboutButtonClicked(object sender, EventArgs e)
         {
@@ -59,15 +59,14 @@
         }
         private async void OnRLEButtonClicked(object sender, EventArgs e)
         {
-            if (ImageProc.selectedWindow == null)
+            if (WindowFileManager.selectedWindow == null)
             {
                 await DisplayAlert("Alert", "None image is selected!", "Ok");
                 return;
             }
-            int index = (int)ImageProc.selectedWindow;
+            int index = (int)WindowFileManager.selectedWindow;
             ImageProc.CompressRLE(index);
         }
-
     }
 
 }

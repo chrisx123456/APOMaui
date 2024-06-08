@@ -18,8 +18,8 @@ public partial class ThresholdingTab : ContentPage
         this.ThreshTypePicker.SelectedIndex = 0;
         UpdateImg();
         ResetSlider();
-        ImageProc.OnImageClosingOpeningEvent += this.UpdateImg;
-		ImageProc.OnImageSelectionChanged += this.UpdateImg;
+        WindowFileManager.OnImageClosingOpeningEvent += this.UpdateImg;
+        WindowFileManager.OnImageSelectionChanged += this.UpdateImg;
 	}
 	protected override void OnDisappearing()
 	{
@@ -33,12 +33,12 @@ public partial class ThresholdingTab : ContentPage
         ResetSlider();
         OnButtonThreshCancelClicked(new object(), new EventArgs());
         //this.ThreshTypePicker.SelectedIndex = 0;
-        if (ImageProc.selectedWindow != null)
+        if (WindowFileManager.selectedWindow != null)
 		{
-			if (ImageProc.selectedWindow!= null && ImageProc.OpenedImagesList[(int)ImageProc.selectedWindow].ImagePage.Type == ImgType.Gray)
+			if (WindowFileManager.selectedWindow!= null && WindowFileManager.OpenedImagesList[(int)WindowFileManager.selectedWindow].CollectivePage.ImagePage.Type == ImgType.Gray)
 			{
-                this._imgindex = ImageProc.selectedWindow;
-                this._img = ImageProc.OpenedImagesList[(int)_imgindex].ImagePage.GrayImage.Clone();
+                this._imgindex = WindowFileManager.selectedWindow;
+                this._img = WindowFileManager.OpenedImagesList[(int)_imgindex].CollectivePage.ImagePage.GrayImage.Clone();
 				this.ThreshTypePicker.IsEnabled = true;
                 this.Slider1.IsEnabled = true;
                 this.Slider2.IsEnabled = true;
@@ -122,7 +122,7 @@ public partial class ThresholdingTab : ContentPage
 	{
         if (this._img != null && this._imgindex != null)
 		{
-			ImageProc.OpenedImagesList[(int)_imgindex].ImagePage.GrayImage = this._img.Clone();
+            WindowFileManager.OpenedImagesList[(int)_imgindex].CollectivePage.ImagePage.GrayImage = this._img.Clone();
 		}
 		ResetSlider();
     }

@@ -15,7 +15,7 @@ public partial class OperationsTab : ContentPage
             return;
         }
         int index = (int)WindowFileManager.selectedWindow;
-        if (WindowFileManager.OpenedImagesList[index].ImagePage.Type != ImgType.RGB)
+        if (WindowFileManager.OpenedImagesList[index].CollectivePage.ImagePage.Type != ImgType.RGB)
         {
             await DisplayAlert("Alert", "Selected image is not RGB", "Ok");
             return;
@@ -30,7 +30,7 @@ public partial class OperationsTab : ContentPage
             return;
         }
         int index = (int)WindowFileManager.selectedWindow;
-        if (WindowFileManager.OpenedImagesList[index].ImagePage.Type != ImgType.Gray)
+        if (WindowFileManager.OpenedImagesList[index].CollectivePage.ImagePage.Type != ImgType.Gray)
         {
             await DisplayAlert("Alert", "Selected image is not GrayScale", "Ok");
             return;
@@ -46,7 +46,7 @@ public partial class OperationsTab : ContentPage
             return;
         }
         int index = (int)WindowFileManager.selectedWindow;
-        if (WindowFileManager.OpenedImagesList[index].ImagePage.Type != ImgType.Gray)
+        if (WindowFileManager.OpenedImagesList[index].CollectivePage.ImagePage.Type != ImgType.Gray)
         {
             await DisplayAlert("Alert", "Selected image is not GrayScale", "Ok");
             return;
@@ -73,7 +73,7 @@ public partial class OperationsTab : ContentPage
             return;
         }
         int index = (int)WindowFileManager.selectedWindow;
-        if (WindowFileManager.OpenedImagesList[index].ImagePage.Type != ImgType.Gray)
+        if (WindowFileManager.OpenedImagesList[index].CollectivePage.ImagePage.Type != ImgType.Gray)
         {
             await DisplayAlert("Alert", "Selected image is not GrayScale", "Ok");
             return;
@@ -111,7 +111,7 @@ public partial class OperationsTab : ContentPage
             return;
         }
         int index = (int)WindowFileManager.selectedWindow;
-        ImageProc.Inpainting(index);
+        //ImageProc.Inpainting(index);
     }
     private async void OnButtonAnalizeClick(object sender, EventArgs e)
     {
