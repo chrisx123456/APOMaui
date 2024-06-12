@@ -88,26 +88,29 @@ namespace APOMaui
             Image<Hsv, Byte> hsvimg = new(WindowFileManager.OpenedImagesList[index].CollectivePage.ImagePage.ColorImage.Width, WindowFileManager.OpenedImagesList[index].CollectivePage.ImagePage.ColorImage.Height);
             CvInvoke.CvtColor(WindowFileManager.OpenedImagesList[index].CollectivePage.ImagePage.ColorImage, hsvimg, ColorConversion.Bgr2HsvFull);
             Image<Gray, Byte>[] channels = hsvimg.Split();
-            WindowFileManager.OpenNewWindow(channels[0], WindowFileManager.OpenedImagesList[index].CollectivePageWindow.Title + " Hue", String.Empty);
-            WindowFileManager.OpenNewWindow(channels[1], WindowFileManager.OpenedImagesList[index].CollectivePageWindow.Title + " Saturation", String.Empty);
-            WindowFileManager.OpenNewWindow(channels[2], WindowFileManager.OpenedImagesList[index].CollectivePageWindow.Title + " Value", String.Empty);
+            string title = WindowFileManager.OpenedImagesList[index].CollectivePage.Title;
+            WindowFileManager.OpenNewWindow(channels[0], "Hue", String.Empty);
+            WindowFileManager.OpenNewWindow(channels[1], "Saturation", String.Empty);
+            WindowFileManager.OpenNewWindow(channels[2], "Value", String.Empty);
         }
         public static void ConvertRgbToLab(int index)
         {
             Image<Lab, Byte> labimg = new(WindowFileManager.OpenedImagesList[index].CollectivePage.ImagePage.ColorImage.Width, WindowFileManager.OpenedImagesList[index].CollectivePage.ImagePage.ColorImage.Height);
             CvInvoke.CvtColor(WindowFileManager.OpenedImagesList[index].CollectivePage.ImagePage.ColorImage, labimg, ColorConversion.Bgr2Lab);
             Image<Gray, Byte>[] channels = labimg.Split();
-            WindowFileManager.OpenNewWindow(channels[0], WindowFileManager.OpenedImagesList[index].CollectivePageWindow.Title + " L", String.Empty);
-            WindowFileManager.OpenNewWindow(channels[1], WindowFileManager.OpenedImagesList[index].CollectivePageWindow.Title + " a", String.Empty);
-            WindowFileManager.OpenNewWindow(channels[2], WindowFileManager.OpenedImagesList[index].CollectivePageWindow.Title + " b", String.Empty);
+            string title = WindowFileManager.OpenedImagesList[index].CollectivePage.Title;
+            WindowFileManager.OpenNewWindow(channels[0], "L", String.Empty);
+            WindowFileManager.OpenNewWindow(channels[1], "a", String.Empty);
+            WindowFileManager.OpenNewWindow(channels[2], "b", String.Empty);
 
         }
         public static void SplitChannels(int index)
         {
             Image<Gray, Byte>[] channels = WindowFileManager.OpenedImagesList[index].CollectivePage.ImagePage.ColorImage.Split();
-            WindowFileManager.OpenNewWindow(channels[0], WindowFileManager.OpenedImagesList[index].CollectivePageWindow.Title + " Blue", String.Empty);
-            WindowFileManager.OpenNewWindow(channels[1], WindowFileManager.OpenedImagesList[index].CollectivePageWindow.Title + " Green", String.Empty);
-            WindowFileManager.OpenNewWindow(channels[2], WindowFileManager.OpenedImagesList[index].CollectivePageWindow.Title + " Red", String.Empty);
+            string title = WindowFileManager.OpenedImagesList[index].CollectivePage.Title;
+            WindowFileManager.OpenNewWindow(channels[0], "Blue", String.Empty);
+            WindowFileManager.OpenNewWindow(channels[1], "Green", String.Empty);
+            WindowFileManager.OpenNewWindow(channels[2], "Red", String.Empty);
         }
         public static void HistEqualization(int index)
         {
@@ -312,7 +315,7 @@ namespace APOMaui
                     WindowFileManager.OpenedImagesList[index1].CollectivePage.ImagePage.GrayImage = res;
                     return;
             }
-            string title = WindowFileManager.OpenedImagesList[index1].CollectivePage.ImagePage.GetTitle + " " + arg.ToString() + " " + WindowFileManager.OpenedImagesList[index2].CollectivePage.ImagePage.GetTitle;
+            string title = WindowFileManager.OpenedImagesList[index1].CollectivePage.Title + " " + arg.ToString() + " " + WindowFileManager.OpenedImagesList[index2].CollectivePage.Title;
             WindowFileManager.OpenNewWindow(res, title, String.Empty);
         }
         public static void TwoStage233(int index, BorderType border, Matrix<float> stage1, Matrix<float> stage2)

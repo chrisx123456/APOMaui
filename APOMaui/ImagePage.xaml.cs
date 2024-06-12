@@ -3,7 +3,9 @@ using Emgu.CV;
 using Emgu.CV.Structure;
 using SkiaSharp;
 using SkiaSharp.Views.Maui;
+using SkiaSharp.Views.Maui.Controls;
 using System.Diagnostics;
+using System.Drawing.Imaging;
 namespace APOMaui;
 
 public partial class ImagePage : ContentPage, IDisposable
@@ -14,12 +16,7 @@ public partial class ImagePage : ContentPage, IDisposable
     private Image<Gray, Byte>? grayImage;
     public ImageSource ImageSource { get; set; }
 
-    string title;
     public string path;
-    public string GetTitle
-    {
-        get => title;
-    }
     public int index;
     double imgScale;
     public ImgType? Type;
@@ -69,8 +66,7 @@ public partial class ImagePage : ContentPage, IDisposable
     public ImagePage(Image<Bgr, Byte> img, int index, string title)
     {
         InitializeComponent();
-        
-        this.title = title;
+        this.Title = title;
         this.Type = ImgType.RGB;
         this.colorImage = img;
         this.index = index;
@@ -83,7 +79,7 @@ public partial class ImagePage : ContentPage, IDisposable
     public ImagePage(Image<Gray, Byte> img, int index, string title)
     {
         InitializeComponent();
-        this.title = title;
+        this.Title = title;
         this.Type = ImgType.Gray;
         this.grayImage = img;
         this.index = index;
@@ -102,22 +98,44 @@ public partial class ImagePage : ContentPage, IDisposable
         this.ClearLogicalChildren();
     }
 
+    public static ImageSource Exp(Image<Bgr, Byte> img)
+    {
+        int width = img.Width;
+        int height = img.Height;
+        SKBitmap bitmap = new SKBitmap(width, height, SKColorType.Rgb888x, SKAlphaType.Unpremul);
+        Stopwatch sw = Stopwatch.StartNew();
+        byte[,,] data = img.Data;
+        Parallel.For(0, height, y =>
+        {
+            for (int x = 0; x < width; x++)
+            {
+                byte b = data[y, x, 0];
+                byte g = data[y, x, 1];
+                byte r = data[y, x, 2];
+                bitmap.SetPixel(x, y, new SKColor(r, g, b));
+            }
+        });
+        sw.Stop();
+        Debug.WriteLine($"CZASSSSS = {sw.Elapsed}");
+        return null;
+    }
+
+
     public static ImageSource EmguImgToImageSource(Image<Bgr, Byte> img)
     {
-
-        System.Drawing.Bitmap bitmap = Emgu.CV.BitmapExtension.ToBitmap(img);
-        MemoryStream stream = new();
-        bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Bmp);
-        stream.Position = 0;
-        return ImageSource.FromStream(() => stream);
+        string imagePath = Path.Combine(FileSystem.CacheDirectory, $"{Guid.NewGuid()}.bmp");
+        img.Save(imagePath);
+        ImageSource src;
+        src = ImageSource.FromFile(imagePath);
+        return src;
     }
     public static ImageSource EmguImgToImageSource(Image<Gray, Byte> img)
     {
-        System.Drawing.Bitmap bitmap = Emgu.CV.BitmapExtension.ToBitmap(img);
-        MemoryStream stream = new();
-        bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Bmp);
-        stream.Position = 0;
-        return ImageSource.FromStream(() => stream);
+        string imagePath = Path.Combine(FileSystem.CacheDirectory, $"{Guid.NewGuid()}.bmp");
+        img.Save(imagePath);
+        ImageSource src;
+        src = ImageSource.FromFile(imagePath);
+        return src;
     }
     public void ToggleDrawBox(bool value)
     {
@@ -163,15 +181,21 @@ public partial class ImagePage : ContentPage, IDisposable
     }
     private void ZoomIn(object sender, EventArgs e)
     {
-        WindowFileManager.OpenedImagesList[index].CollectivePageWindow.Height += (int)((20 * imgScale) + 0.5); // Approx. Height
-        WindowFileManager.OpenedImagesList[index].CollectivePageWindow.Width += 20;
+        if(WindowFileManager.OpenedImagesList[index].CollectivePageWindow != null)
+        {
+            WindowFileManager.OpenedImagesList[index].CollectivePageWindow.Height += (int)((20 * imgScale) + 0.5); // Approx. Height
+            WindowFileManager.OpenedImagesList[index].CollectivePageWindow.Width += 20;
+        }
         winImgBox.WidthRequest = winImgBox.Width + 20;
 
     }
     private void ZoomOut(object sender, EventArgs e)
     {
-        WindowFileManager.OpenedImagesList[index].CollectivePageWindow.Height -= (int)((20 * imgScale) + 0.5); // Approx. Height
-        WindowFileManager.OpenedImagesList[index].CollectivePageWindow.Width -= 20;
+        if(WindowFileManager.OpenedImagesList[index].CollectivePageWindow != null)
+        {
+            WindowFileManager.OpenedImagesList[index].CollectivePageWindow.Height -= (int)((20 * imgScale) + 0.5); // Approx. Height
+            WindowFileManager.OpenedImagesList[index].CollectivePageWindow.Width -= 20;
+        }
         winImgBox.WidthRequest = winImgBox.Width - 20;
     }
     private void Undo(object sender, EventArgs e)
@@ -390,6 +414,7 @@ public partial class ImagePage : ContentPage, IDisposable
         }
         else return image;
     }
+
 
 
 }

@@ -7,6 +7,7 @@
     Shell.NavBarIsVisible="True"
     Shell.FlyoutBehavior="Flyout"
     Shell.FlyoutWidth="280"
+    Shell.ForegroundColor="MediumVioletRed"
     Title="APOMaui">
     <FlyoutItem Title="File" Route="MainPage">
         <Tab>
@@ -48,7 +49,7 @@
             <ShellContent ContentTemplate="{DataTemplate local:OperationsTab}"/>
         </Tab>
     </FlyoutItem>
-   
+    
     <MenuItem x:Name="ShellClose" Text="Close" StyleClass="ShellClose" Clicked="OnCloseClicked"/>
 
     <MenuItem x:Name="ShellCloseAll" Text="Close All" StyleClass="ShellClose" Clicked="OnCloseAllClicked"/>

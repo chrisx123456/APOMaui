@@ -6,7 +6,13 @@
         {
             InitializeComponent();
             Emgu.CV.Platform.Maui.MauiInvoke.Init();
+#if ANDROID
+            WindowFileManager.AndroidImageView = new AndroidTabbedPage();
+            Window window = new Window(WindowFileManager.AndroidImageView);
+            Application.Current?.OpenWindow(window);
+#endif
         }
+
         private void OnFileButtonClicked(object sender, EventArgs e)
         {
             if (FileTab.IsVisible)
@@ -67,6 +73,39 @@
             int index = (int)WindowFileManager.selectedWindow;
             ImageProc.CompressRLE(index);
         }
+        protected override async void OnAppearing()
+        {
+            base.OnAppearing();
+#if ANDROID
+            if(!await CheckNeededPermissions())
+            {
+                await DisplayAlert("Permissions alert", "Not all permissions granted", "Quit");
+                Application.Current?.Quit();
+            }
+#endif
+        }
+#if ANDROID
+        private async Task<bool> CheckNeededPermissions()
+        {
+            PermissionStatus camera = await CheckPermission<Permissions.Camera>();
+            PermissionStatus read = await CheckPermission<Permissions.StorageRead>();
+            PermissionStatus write = await CheckPermission<Permissions.StorageWrite>();
+            return IsGranted(camera) && IsGranted(read) && IsGranted(write);
+        }
+        private async Task<PermissionStatus> CheckPermission<TPermission>() where TPermission : Microsoft.Maui.ApplicationModel.Permissions.BasePermission, new()
+        {
+            PermissionStatus status = await Microsoft.Maui.ApplicationModel.Permissions.CheckStatusAsync<TPermission>();
+            if (status != PermissionStatus.Granted)
+            {
+                status = await Microsoft.Maui.ApplicationModel.Permissions.RequestAsync<TPermission>();
+            }
+            return status;
+        }
+        private static bool IsGranted(PermissionStatus status)
+        {
+            return status == PermissionStatus.Granted || status == PermissionStatus.Limited;
+        }
+#endif
     }
 
 }

@@ -7,12 +7,13 @@ public partial class CollectivePage : TabbedPage, IDisposable
     public HistogramChart? HistogramChart { get; private set; }
     public AnalysisResultPage? AnalysisResultPage { get; private set; }
     public ProfileLineChart? ProfileLineChart { get; private set; }
-    public CollectivePage(ImagePage imagepage)
+    public CollectivePage(ImagePage imagepage, string title)
     {
         InitializeComponent();
         imagepage.Title = "Image"; 
         imagepage.IconImageSource = "imageico.png";
         this.ImagePage = imagepage;
+        this.Title = title;
         this.CurrentPageChanged += PageChanged;
         this.Children.Insert(0, imagepage);
     }
@@ -52,36 +53,43 @@ public partial class CollectivePage : TabbedPage, IDisposable
     }
     public void RemoveCurrPage()
     {
-        switch (currPage)
+        if(this.CurrentPage is ImagePage)
         {
-            case 0:
+#if WINDOWS
                 Application.Current?.CloseWindow(WindowFileManager.OpenedImagesList[this.ImagePage.index].CollectivePageWindow);
-                break;
-            case 1:
-                if (this.HistogramChart != null)
-                {
-                    this.Children.Remove(this.HistogramChart);
-                    this.HistogramChart.Dispose();
-                    this.HistogramChart = null;
-                }
-                break;
-            case 2:
-                if (this.ProfileLineChart != null)
-                {
-                    this.Children.Remove(this.ProfileLineChart);
-                    this.ProfileLineChart.Dispose();
-                    this.ProfileLineChart = null;
-                }
-                break;
-            case 3:
-                if (this.AnalysisResultPage != null)
-                {
-                    this.Children.Remove(this.AnalysisResultPage);
-                    this.AnalysisResultPage.Dispose();
-                    this.AnalysisResultPage = null;
-                }
-                break;
+#endif
+#if ANDROID
+            WindowFileManager.OnCloseImagePage(this.ImagePage.index);
+#endif
         }
+        if(this.CurrentPage is HistogramChart)
+        {
+            if (this.HistogramChart != null)
+            {
+                this.Children.Remove(this.HistogramChart);
+                this.HistogramChart.Dispose();
+                this.HistogramChart = null;
+            }
+        }
+        if(this.CurrentPage is ProfileLineChart)
+        {
+            if (this.ProfileLineChart != null)
+            {
+                this.Children.Remove(this.ProfileLineChart);
+                this.ProfileLineChart.Dispose();
+                this.ProfileLineChart = null;
+            }
+        }
+        if(this.CurrentPage is AnalysisResultPage)
+        {
+            if (this.AnalysisResultPage != null)
+            {
+                this.Children.Remove(this.AnalysisResultPage);
+                this.AnalysisResultPage.Dispose();
+                this.AnalysisResultPage = null;
+            }
+        }
+        CollectivePage_SizeChanged(new object(), new EventArgs()); // Re-render just in case
     }
     public void Dispose()
     {
@@ -99,7 +107,9 @@ public partial class CollectivePage : TabbedPage, IDisposable
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
+#if WINDOWS
         WindowFileManager.OnCloseImagePage(this.ImagePage.index);
+#endif
     }
 
 }

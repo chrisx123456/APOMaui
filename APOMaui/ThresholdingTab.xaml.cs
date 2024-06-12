@@ -35,7 +35,7 @@ public partial class ThresholdingTab : ContentPage
         //this.ThreshTypePicker.SelectedIndex = 0;
         if (WindowFileManager.selectedWindow != null)
 		{
-			if (WindowFileManager.selectedWindow!= null && WindowFileManager.OpenedImagesList[(int)WindowFileManager.selectedWindow].CollectivePage.ImagePage.Type == ImgType.Gray)
+			if(WindowFileManager.OpenedImagesList[(int)WindowFileManager.selectedWindow].CollectivePage.ImagePage.Type == ImgType.Gray)
 			{
                 this._imgindex = WindowFileManager.selectedWindow;
                 this._img = WindowFileManager.OpenedImagesList[(int)_imgindex].CollectivePage.ImagePage.GrayImage.Clone();

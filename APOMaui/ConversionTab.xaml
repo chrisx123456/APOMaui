@@ -7,5 +7,7 @@
         <Button x:Name="ButtonGrayScale" Text="RGB to Grayscale 8bit" Clicked="OnButtonGrayScaleClick" StyleClass="MainPageButton"/>
         <Button x:Name="ButtonHSV" Text="RGB To HSV Channels" Clicked="OnButtonHSVClick" StyleClass="MainPageButton"/>
         <Button x:Name="ButtonLab" Text="RGB To Lab Channels" Clicked="OnButtonLabClick" StyleClass="MainPageButton"/>
+        
     </VerticalStackLayout>
+    
 </ContentPage>

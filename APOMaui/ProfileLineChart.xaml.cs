@@ -21,7 +21,9 @@ public partial class ProfileLineChart : ContentPage, IDisposable
         {
             new Axis
             {
+            
                 MinLimit = 0,
+                MaxLimit = 255,
                 TextSize = 12,
                 Padding = new LiveChartsCore.Drawing.Padding(2d)
             }
@@ -31,6 +33,7 @@ public partial class ProfileLineChart : ContentPage, IDisposable
             new Axis
             {
                 MinLimit = 0,
+                MaxLimit = 255,
                 TextSize = 12,
                 Padding = new LiveChartsCore.Drawing.Padding(2d)
             }

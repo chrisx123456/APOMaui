@@ -4,12 +4,14 @@
              x:Class="APOMaui.ProfileLineChart"
              Title="ProfileLineChart"
              xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.Maui;assembly=LiveChartsCore.SkiaSharpView.Maui">
-    <StackLayout Orientation="Horizontal">
-        <Grid WidthRequest="700">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
             <lvc:CartesianChart 
                   Series="{Binding Series}"
-                  x:Name="myChart">
+                  x:Name="myChart"
+                  Grid.Column="0">
             </lvc:CartesianChart>
         </Grid>
-    </StackLayout>
 </ContentPage>

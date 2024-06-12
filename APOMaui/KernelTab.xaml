@@ -3,7 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="APOMaui.KernelTab"
              Title="Filters">
-    <ScrollView>
+    
+    <ScrollView HorizontalOptions="Center" VerticalOptions="Start">
         <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Start">
             <HorizontalStackLayout HorizontalOptions="Center" VerticalOptions="Start">
                 <Label Text="Custom Kernel: " VerticalOptions="Center"/>
@@ -14,17 +15,17 @@
                 <CheckBox IsChecked="False" x:Name="IsTwoStage" VerticalOptions="Center" CheckedChanged="IsTwoStageCheckedChanged"/>
             </HorizontalStackLayout>
             <Label x:Name ="EdgePickerLabel" Text="Edge Options" FontSize="12" HorizontalOptions="Center" VerticalOptions="Center"/>
-            <Picker x:Name="EdgePicker" MinimumHeightRequest="30" HeightRequest="30" FontSize="13" SelectedIndexChanged="OnEdgePickerSelectedIndexChanged"/>
+            <Picker x:Name="EdgePicker" MinimumHeightRequest="30" HeightRequest="40" FontSize="13" SelectedIndexChanged="OnEdgePickerSelectedIndexChanged"/>
             <Label x:Name ="FilterPickerLabel" Text="Pick Filter" FontSize="12" HorizontalOptions="Center" VerticalOptions="Center"/>
-            <Picker x:Name="FilterPicker" MinimumHeightRequest="30" HeightRequest="30" FontSize="13" SelectedIndexChanged="OnFilterPickerSelectedIndexChanged"/>
+            <Picker x:Name="FilterPicker" MinimumHeightRequest="30" HeightRequest="40" FontSize="13" SelectedIndexChanged="OnFilterPickerSelectedIndexChanged" />
             <Label x:Name ="SizePickerLabel" Text="Pick Size" FontSize="12" HorizontalOptions="Center" VerticalOptions="Center" IsVisible="False"/>
-            <Picker x:Name="SizePicker" MinimumHeightRequest="30" HeightRequest="30" FontSize="13" SelectedIndexChanged="OnSizePickerSelectedIndexChanged" IsVisible="False"/>
+            <Picker x:Name="SizePicker" MinimumHeightRequest="30" HeightRequest="40" FontSize="13" SelectedIndexChanged="OnSizePickerSelectedIndexChanged" IsVisible="False"/>
 
             <Label x:Name ="Stage1PickerLabel" Text="Stage 1 Filter" FontSize="12" HorizontalOptions="Center" VerticalOptions="Center" IsVisible="False"/>
-            <Picker x:Name="Stage1Picker" MinimumHeightRequest="30" HeightRequest="30" FontSize="13" SelectedIndexChanged="OnStage1PickerSelectedIndexChanged" IsVisible="False"/>
+            <Picker x:Name="Stage1Picker" MinimumHeightRequest="30" HeightRequest="40" FontSize="13" SelectedIndexChanged="OnStage1PickerSelectedIndexChanged" IsVisible="False"/>
 
             <Label x:Name ="Stage2PickerLabel" Text="Stage 2 Filter" FontSize="12" HorizontalOptions="Center" VerticalOptions="Center" IsVisible="False"/>
-            <Picker x:Name="Stage2Picker" MinimumHeightRequest="30" HeightRequest="30" FontSize="13" SelectedIndexChanged="OnStage2PickerSelectedIndexChanged" IsVisible="False"/>
+            <Picker x:Name="Stage2Picker" MinimumHeightRequest="30" HeightRequest="40" FontSize="13" SelectedIndexChanged="OnStage2PickerSelectedIndexChanged" IsVisible="False"/>
 
             <VerticalStackLayout>
                 <HorizontalStackLayout>

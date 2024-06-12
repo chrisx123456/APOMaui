@@ -5,11 +5,11 @@
              Title="Morphological operations">
     <VerticalStackLayout Margin="0,10,0,0" VerticalOptions="Start" HorizontalOptions="Center">
         <Label x:Name ="MorphPickerLabel" Text="Morph. Operation" FontSize="12" HorizontalOptions="Center" VerticalOptions="Center"/>
-        <Picker x:Name="MorphPicker" MinimumHeightRequest="30" HeightRequest="30" FontSize="13" SelectedIndexChanged="OnMorphPickerSelectedIndexChanged"/>
+        <Picker x:Name="MorphPicker" MinimumHeightRequest="30" HeightRequest="40" FontSize="13" SelectedIndexChanged="OnMorphPickerSelectedIndexChanged"/>
         <Label x:Name ="StructPickerLabel" Text="Structuring element" FontSize="12" HorizontalOptions="Center" VerticalOptions="Center"/>
-        <Picker x:Name="StructPicker" MinimumHeightRequest="30" HeightRequest="30" FontSize="13" SelectedIndexChanged="OnStructPickerSelectedIndexChanged"/>
+        <Picker x:Name="StructPicker" MinimumHeightRequest="30" HeightRequest="40" FontSize="13" SelectedIndexChanged="OnStructPickerSelectedIndexChanged"/>
         <Label x:Name ="EdgePickerLabel" Text="Edge Options" FontSize="12" HorizontalOptions="Center" VerticalOptions="Center"/>
-        <Picker x:Name="EdgePicker" MinimumHeightRequest="30" HeightRequest="30" FontSize="13" SelectedIndexChanged="OnEdgePickerSelectedIndexChanged"/>
+        <Picker x:Name="EdgePicker" MinimumHeightRequest="30" HeightRequest="40" FontSize="13" SelectedIndexChanged="OnEdgePickerSelectedIndexChanged"/>
         <Button x:Name="ButtonMorph" Text="Execute" Clicked="OnMorphButtonClicked" StyleClass="MainPageButton"/>
     </VerticalStackLayout>
 </ContentPage>

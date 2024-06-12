@@ -51,7 +51,7 @@ public partial class TwoArgumentTab : ContentPage
 		Dictionary<string, int> res = new();
         foreach (WindowImageObject wio in WindowFileManager.OpenedImagesList)
 		{
-			string s = wio.CollectivePage.ImagePage.GetTitle;
+			string s = wio.CollectivePage.Title;
 			int i = wio.CollectivePage.ImagePage.index;
 			res.Add(s, i);
 		}

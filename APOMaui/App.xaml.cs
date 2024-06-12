@@ -1,5 +1,4 @@
-﻿
-namespace APOMaui
+﻿namespace APOMaui
 {
     public partial class App : Application
     {
@@ -8,8 +7,8 @@ namespace APOMaui
             InitializeComponent();
 
             MainPage = new AppShell();
-
         }
+
 
 #if WINDOWS
         protected override Window CreateWindow(IActivationState? activationState)
@@ -23,11 +22,11 @@ namespace APOMaui
             window.Width = newWidth;
             window.Height = newHeight;
 
-            window.MaximumWidth = newWidth;
-            window.MaximumHeight = newHeight;
+            //window.MaximumWidth = newWidth;
+            //window.MaximumHeight = newHeight;
 
-            window.MinimumHeight = newHeight;
-            window.MinimumWidth = newWidth;
+            //window.MinimumHeight = newHeight;
+            //window.MinimumWidth = newWidth;
             return window;
         }
 
