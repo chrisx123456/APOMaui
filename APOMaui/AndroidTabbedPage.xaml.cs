@@ -10,6 +10,9 @@ public partial class AndroidTabbedPage : TabbedPage
 	{
 		InitializeComponent();
         WindowFileManager.OnImageSelectionChanged += Refresh;
+		//WindowFileManager.OnImageClosingOpeningEvent += Refresh;
+		WindowFileManager.OnImageClosingEvent += Refresh;
+		WindowFileManager.OnImageOpeningEvent += Refresh;
 		this.CurrentPageChanged += PageChanged;
 	}
 	public void Refresh()

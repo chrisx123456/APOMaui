@@ -13,9 +13,17 @@ namespace APOMaui
     {
         public async static void CompressRLE(int index)
         {
-            Image<Gray, Byte> image = WindowFileManager.OpenedImagesList[index].CollectivePage.ImagePage.GrayImage;
+            byte[] data;
+            if(WindowFileManager.OpenedImagesList[index].CollectivePage.ImagePage.ColorImage != null)
+            {
+                data = WindowFileManager.OpenedImagesList[index].CollectivePage.ImagePage.ColorImage.Bytes;
+            }
+            else
+            {
+                data = WindowFileManager.OpenedImagesList[index].CollectivePage.ImagePage.GrayImage.Bytes;
+            }
+
             var compressed = new List<(byte, byte)>();
-            byte[] data = image.Bytes;
             byte currPixel = data[0];
             byte samePixelCount = 1;
             for(int i = 0; i < data.Length-1; i++)
@@ -34,11 +42,11 @@ namespace APOMaui
 
             }
             compressed.Add((currPixel, samePixelCount)); //Last Pixel
-            int orgSize = image.Bytes.Length;
-            int compressedSize = compressed.Count * (sizeof(byte) + sizeof(ushort));
+            int orgSize = data.Length;
+            int compressedSize = compressed.Count * (sizeof(byte) + sizeof(byte));
             double sk = (double)orgSize / (double)compressedSize; //??
             string msg = $"Original size: {orgSize} Bytes\n\nCompressed size: {compressedSize} Bytes\n\nSK: {sk}";
-            await Application.Current.MainPage.DisplayAlert("SK", msg, "Ok");
+            await Application.Current.MainPage.DisplayAlert("CR", msg, "Ok");
         }
         public static int[] CalcHistValues(byte[] rawData)
         {
@@ -289,6 +297,7 @@ namespace APOMaui
         {
             Image<Gray, Byte> img1 = WindowFileManager.OpenedImagesList[index1].CollectivePage.ImagePage.GrayImage;
             Image<Gray, Byte> img2 = WindowFileManager.OpenedImagesList[index2].CollectivePage.ImagePage.GrayImage;
+            if (img1.Height != img2.Height || img1.Width != img2.Width) throw new Exception("Images are different sized");
             Image<Gray, Byte> res = new(img1.Width, img1.Height);
             switch (arg)
             {
@@ -621,15 +630,6 @@ namespace APOMaui
             AnalysisResultPage arp = new AnalysisResultPage(results);
             WindowFileManager.OpenedImagesList[index].CollectivePage.ImagePage.ColorImage = new Image<Bgr, Byte>(cntImg);
             WindowFileManager.OpenedImagesList[index].CollectivePage.SetUpAnalysisResult(arp);
-            //Window w = new Window
-            //{
-            //    Page = arp,
-            //    Height = 300,
-            //    Width = 700
-            //};
-            //OpenNewWindowWinIMG(new Image<Bgr, Byte>(cntImg), $"{title} Contours");
-            //Application.Current.OpenWindow(w);
-            //CvInvoke.Imshow("sd", cntImg);
         }
         public static void Thresh(Image<Gray, Byte> img, int index, ThreshType type, int t1, int t2)
         {

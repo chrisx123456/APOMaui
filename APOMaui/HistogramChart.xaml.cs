@@ -27,18 +27,18 @@ public partial class HistogramChart : ContentPage, IDisposable
         {
             new Axis
             {
-                MinLimit = 0,
-                TextSize = 12,
-                Padding = new LiveChartsCore.Drawing.Padding(2d)
+                MinLimit = -1d,
+                TextSize = 12d,
+                Padding = new LiveChartsCore.Drawing.Padding(4d)
             }
         };
         this.myChart.YAxes = new List<Axis>
         {
             new Axis
             {
-                MinLimit = 0,
-                TextSize = 12,
-                Padding = new LiveChartsCore.Drawing.Padding(2d)
+                MinLimit = -1d,
+                TextSize = 12d,
+                Padding = new LiveChartsCore.Drawing.Padding(4d)
             }
         };
     }

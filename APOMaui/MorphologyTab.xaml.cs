@@ -143,7 +143,12 @@ public partial class MorphologyTab : ContentPage
             await DisplayAlert("Alert", "Selected image is not GrayScale", "Ok");
             return;
         }
-		if (_borderType == null || _structElement == null || (_morphOp == null && _morphOpExtend==null))
+		if(_borderType == BorderType.Wrap)
+		{
+            await DisplayAlert("Alert", @"BorderType ""Wrap"" is not supported by EmguCv", "Ok");
+			return;
+        }
+        if (_borderType == null || _structElement == null || (_morphOp == null && _morphOpExtend==null))
         {
             await DisplayAlert("Alert", "Border / Struct. element / Morhp.op not selected", "Ok");
             return;

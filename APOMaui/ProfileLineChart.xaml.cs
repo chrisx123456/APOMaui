@@ -22,20 +22,19 @@ public partial class ProfileLineChart : ContentPage, IDisposable
             new Axis
             {
             
-                MinLimit = 0,
-                MaxLimit = 255,
+                MinLimit = -1d,          
                 TextSize = 12,
-                Padding = new LiveChartsCore.Drawing.Padding(2d)
+                Padding = new LiveChartsCore.Drawing.Padding(4d)
             }
         };
         this.myChart.YAxes = new List<Axis>
         {
             new Axis
             {
-                MinLimit = 0,
-                MaxLimit = 255,
+                MinLimit = -1d,
                 TextSize = 12,
-                Padding = new LiveChartsCore.Drawing.Padding(2d)
+                Padding = new LiveChartsCore.Drawing.Padding(4d)
+                
             }
         };
     }

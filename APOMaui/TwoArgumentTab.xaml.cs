@@ -16,7 +16,9 @@ public partial class TwoArgumentTab : ContentPage
         OperationPicker.ItemsSource = _operations;
 		_imageList = GetImagesList();
 		AddPickersItems();
-        WindowFileManager.OnImageClosingOpeningEvent += this.UpdatePickersItems;
+        //WindowFileManager.OnImageClosingOpeningEvent += this.UpdatePickersItems;
+		WindowFileManager.OnImageOpeningEvent += this.UpdatePickersItems;
+		WindowFileManager.OnImageClosingEvent += this.UpdatePickersItems;
         //Zmienic w kernelach zeby wsm tak samo sie do pickera dodawalo jak tutaj
 
     }
@@ -32,6 +34,9 @@ public partial class TwoArgumentTab : ContentPage
 	}
 	private void ResetPickersItems()
 	{
+		OperationPicker.SelectedIndex = -1;
+		Img1Picker.SelectedIndex = -1;
+		Img2Picker.SelectedIndex = -1;
 		Img1Picker.Items.Clear();
         Img2Picker.Items.Clear();
 		_selectedImage1 = null;
@@ -129,16 +134,38 @@ public partial class TwoArgumentTab : ContentPage
                 await DisplayAlert("Alert", "Weight 2 value not valid", "Ok");
                 return;
             }
-            ImageProc.TwoArgsOperations((int)_selectedImage1, (int)_selectedImage2, (TwoArgsOps)_selectedOperation, w1, w2);
+			try
+			{
+                ImageProc.TwoArgsOperations((int)_selectedImage1, (int)_selectedImage2, (TwoArgsOps)_selectedOperation, w1, w2);
+            }
+            catch(Exception ex)
+			{
+				await DisplayAlert("Alert", ex.Message, "Ok");
+			}
         }
 		else if(_selectedOperation == TwoArgsOps.NOT)
 		{
-            ImageProc.TwoArgsOperations((int)_selectedImage1, (int)_selectedImage1, (TwoArgsOps)_selectedOperation, -1, -1);
+			try
+			{
+                ImageProc.TwoArgsOperations((int)_selectedImage1, (int)_selectedImage1, (TwoArgsOps)_selectedOperation, -1, -1);
+            }
+            catch (Exception ex)
+			{
+                await DisplayAlert("Alert", ex.Message, "Ok");
+            }
         }
         else
 		{
-			ImageProc.TwoArgsOperations((int)_selectedImage1, (int)_selectedImage2, (TwoArgsOps)_selectedOperation, -1, -1);
-		}
+			try
+			{
+                ImageProc.TwoArgsOperations((int)_selectedImage1, (int)_selectedImage2, (TwoArgsOps)_selectedOperation, -1, -1);
+            }
+			catch(Exception ex)
+			{
+                await DisplayAlert("Alert", ex.Message, "Ok");
+            }
+
+        }
 		
     }
 

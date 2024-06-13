@@ -4,13 +4,17 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace APOMaui
 {
     internal static class WindowFileManager
     {
-        public static event Action? OnImageClosingOpeningEvent;
+        public static event Action? BeforeClosingEvent;
+        //public static event Action? OnImageClosingOpeningEvent;
+        public static event Action? OnImageOpeningEvent;
+        public static event Action? OnImageClosingEvent;
         public static event Action? OnImageSelectionChanged;
 
         public static AndroidTabbedPage? AndroidImageView;
@@ -37,9 +41,9 @@ namespace APOMaui
                 case true:
                     if (DeviceInfo.Platform == DevicePlatform.WinUI)
                     {
-                        string filename = await Application.Current.MainPage.DisplayPromptAsync("File Name", "Type File Name");
-                        string extension = await Application.Current.MainPage.DisplayActionSheet("File extension", null, null, new string[] { ".bmp", ".jpg", ".png" });
-                        if (filename == null || filename == String.Empty || extension == null || extension == String.Empty)
+
+                        string filename = await Application.Current.MainPage.DisplayPromptAsync("File Name", "Type File Name + extension(.bmp/.jpg etc.)");
+                        if (filename == null || filename == String.Empty)
                         {
                             await Application.Current.MainPage.DisplayAlert("Alert", "Invalid filename/extension", "Cancel");
                             return;
@@ -49,7 +53,7 @@ namespace APOMaui
                         if (fp.IsSuccessful)
                         {
                             path = fp.Folder.Path;
-                            string fullPath = path + "\\" + filename + extension;
+                            string fullPath = path + "\\" + filename;
                             if (OpenedImagesList[index].CollectivePage.ImagePage.ColorImage != null && OpenedImagesList[index].CollectivePage.ImagePage.Type == ImgType.RGB)
                             {
                                 OpenedImagesList[index].CollectivePage.ImagePage.ColorImage.Save(fullPath);
@@ -77,12 +81,13 @@ namespace APOMaui
                 {
                     { DevicePlatform.Android, new[] { "image/*", "image/bmp" } },
                     { DevicePlatform.WinUI, new[] { ".bmp", ".jpg", ".jpeg", ".png", ".gif", ".tiff", ".ico", ".svg", ".webp" } }, // Windows
+                    
                 });
                 FileResult? result = await FilePicker.PickAsync(new PickOptions
                 {
                     FileTypes = customFileType,
                     PickerTitle = "Choose File",
-                 
+                    
                 });
                 
                 if (result == null) return;
@@ -140,18 +145,21 @@ namespace APOMaui
             OpenedImagesList.Add(windowImageObject);
             ChangeSelectedImagePage(OpenedImagesList.Count - 1);
             Application.Current?.OpenWindow(newWindow);
-            OnImageClosingOpeningEvent?.Invoke();
+            //OnImageClosingOpeningEvent?.Invoke();
+            OnImageOpeningEvent?.Invoke();
 #endif
 #if ANDROID
             WindowImageObject windowImageObject = new(collectivePage);
             AndroidImageView?.AddPage(collectivePage);
             OpenedImagesList.Add(windowImageObject);
             ChangeSelectedImagePage(OpenedImagesList.Count - 1);
-            OnImageClosingOpeningEvent?.Invoke();
+            //OnImageClosingOpeningEvent?.Invoke();
+            OnImageOpeningEvent?.Invoke();
 #endif
         }
         public static void OnCloseImagePage(int index) //To kurwa to w ogole jest do zmiany
         {
+            BeforeClosingEvent?.Invoke();
             System.Diagnostics.Debug.WriteLine($"Closing Collective View: {index}");
             selectedWindow = null;
             AndroidImageView?.RemovePage(OpenedImagesList[index].CollectivePage);
@@ -162,7 +170,8 @@ namespace APOMaui
             OpenedImagesList[index].Dispose();
             OpenedImagesList.RemoveAt(index);
             GC.Collect();
-            OnImageClosingOpeningEvent?.Invoke();
+            //OnImageClosingOpeningEvent?.Invoke();
+            OnImageClosingEvent?.Invoke();
         }
         public static void ChangeSelectedImagePage(int index)
         {

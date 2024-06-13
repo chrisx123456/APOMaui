@@ -4,13 +4,14 @@
              x:Class="APOMaui.OperationsTab"
              Title="Other">
     <VerticalStackLayout>
-        <Button x:Name="ButtonSplit" Text="Split RGB" Clicked="OnButtonSplitClick" StyleClass="MainPageButton"/>
         <Button x:Name="ButtonNegative" Text="Negative" Clicked="OnButtonNegativeClick" StyleClass="MainPageButton"/>
         <Button x:Name="ButtonPosterize" Text="Posterize" Clicked="OnButtonPosterizeClick" StyleClass="MainPageButton"/>
         <Button x:Name="ButtonHough" Text="Hough Lines" Clicked="OnButtonHoughClick" StyleClass="MainPageButton"/>
         <Button x:Name="ButtonPyr" Text="Pyramid" Clicked="OnButtonPyrClick" StyleClass="MainPageButton"/>
-        <Button x:Name="ButtonInpaint" Text="Inpaint" Clicked="OnButtonInpaintClick" StyleClass="MainPageButton"/>
+        <Button x:Name="ButtonInpaint" Text="Inpaint" Clicked="OnButtonInpaintClick" StyleClass="MainPageButton" IsEnabled="False"/>
         <Button x:Name="ButtonAnalize" Text="Analize" Clicked="OnButtonAnalizeClick" StyleClass="MainPageButton"/>
+        <Button x:Name="ButtonRLE" Text="RLE" Clicked="OnRLEButtonClicked" StyleClass="MainPageButton"/>
+
 
 
 

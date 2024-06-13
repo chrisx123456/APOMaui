@@ -6,6 +6,21 @@ public partial class ConversionTab : ContentPage
 	{
 		InitializeComponent();
 	}
+    public async void OnButtonSplitClick(object sender, EventArgs e)
+    {
+        if (WindowFileManager.selectedWindow == null)
+        {
+            await DisplayAlert("Alert", "None image is selected!", "Ok");
+            return;
+        }
+        int index = (int)WindowFileManager.selectedWindow;
+        if (WindowFileManager.OpenedImagesList[index].CollectivePage.ImagePage.Type != ImgType.RGB)
+        {
+            await DisplayAlert("Alert", "Selected image is not RGB", "Ok");
+            return;
+        }
+        ImageProc.SplitChannels(index);
+    }
     public async void OnButtonGrayScaleClick(object sender, EventArgs e)
     {
         if (WindowFileManager.selectedWindow == null)
