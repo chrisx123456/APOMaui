@@ -46,7 +46,47 @@
 		<AppInstallerUri>E:\Dupa</AppInstallerUri>
 		<HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<PackageCertificateThumbprint>B01E644BE57D87C865A16DE1BE4F1D420F3A06A1</PackageCertificateThumbprint>
+		<PackageCertificateThumbprint>80BE81356FA4CD3F36D6C32FEB540C5F7D2D3416</PackageCertificateThumbprint>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-android|AnyCPU'">
+	  <JavaMaximumHeapSize>3G</JavaMaximumHeapSize>
+	  <ApplicationTitle>APOMaui</ApplicationTitle>
+	  <ApplicationDisplayVersion>1.1</ApplicationDisplayVersion>
+	  <ApplicationVersion>2</ApplicationVersion>
+	  <AndroidPackageFormat>apk</AndroidPackageFormat>
+	  <AndroidLinkTool>r8</AndroidLinkTool>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-android|AnyCPU'">
+	  <JavaMaximumHeapSize>3G</JavaMaximumHeapSize>
+	  <ApplicationTitle>APOMaui</ApplicationTitle>
+	  <ApplicationDisplayVersion>1.1</ApplicationDisplayVersion>
+	  <ApplicationVersion>2</ApplicationVersion>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-ios|AnyCPU'">
+	  <ApplicationTitle>APOMaui</ApplicationTitle>
+	  <ApplicationDisplayVersion>1.1</ApplicationDisplayVersion>
+	  <ApplicationVersion>2</ApplicationVersion>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-windows10.0.19041.0|AnyCPU'">
+	  <ApplicationTitle>APOMaui</ApplicationTitle>
+	  <ApplicationDisplayVersion>1.1</ApplicationDisplayVersion>
+	  <ApplicationVersion>2</ApplicationVersion>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-ios|AnyCPU'">
+	  <ApplicationTitle>APOMaui</ApplicationTitle>
+	  <ApplicationDisplayVersion>1.1</ApplicationDisplayVersion>
+	  <ApplicationVersion>2</ApplicationVersion>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-windows10.0.19041.0|AnyCPU'">
+	  <ApplicationTitle>APOMaui</ApplicationTitle>
+	  <ApplicationDisplayVersion>1.1</ApplicationDisplayVersion>
+	  <ApplicationVersion>2</ApplicationVersion>
 	</PropertyGroup>
 
 	<ItemGroup>

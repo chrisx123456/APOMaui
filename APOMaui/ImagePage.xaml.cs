@@ -98,29 +98,6 @@ public partial class ImagePage : ContentPage, IDisposable
         this.ClearLogicalChildren();
     }
 
-    public static ImageSource Exp(Image<Bgr, Byte> img)
-    {
-        int width = img.Width;
-        int height = img.Height;
-        SKBitmap bitmap = new SKBitmap(width, height, SKColorType.Rgb888x, SKAlphaType.Unpremul);
-        Stopwatch sw = Stopwatch.StartNew();
-        byte[,,] data = img.Data;
-        Parallel.For(0, height, y =>
-        {
-            for (int x = 0; x < width; x++)
-            {
-                byte b = data[y, x, 0];
-                byte g = data[y, x, 1];
-                byte r = data[y, x, 2];
-                bitmap.SetPixel(x, y, new SKColor(r, g, b));
-            }
-        });
-        sw.Stop();
-        Debug.WriteLine($"CZASSSSS = {sw.Elapsed}");
-        return null;
-    }
-
-
     public static ImageSource EmguImgToImageSource(Image<Bgr, Byte> img)
     {
         string imagePath = Path.Combine(FileSystem.CacheDirectory, $"{Guid.NewGuid()}.bmp");

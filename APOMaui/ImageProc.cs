@@ -170,7 +170,7 @@ namespace APOMaui
             img.Dispose();
 
         }
-        public static void HistStretchInRange(int index, byte p1, byte p2, byte q3, byte q4) //TODO: Optimize//fix
+        public static void HistStretchInRange(int index, byte p1, byte p2, byte q3, byte q4) 
         {
             Image<Gray, Byte> img = WindowFileManager.OpenedImagesList[index].CollectivePage.ImagePage.GrayImage;
             byte[] rawData = img.Bytes;
@@ -356,7 +356,6 @@ namespace APOMaui
             int[] res = new int[it.Count];
             for(int i = 0; i < it.Count; i++)
             {
-                //chuj wie czy yx czy xy
                 res[i] = data[it.Pos.Y, it.Pos.X, 0];
                 it.MoveNext();
             }
@@ -410,7 +409,7 @@ namespace APOMaui
             Image<Gray, byte> thresh = gray.CopyBlank();
             CvInvoke.Threshold(gray, thresh, 0, 255, Emgu.CV.CvEnum.ThresholdType.BinaryInv | Emgu.CV.CvEnum.ThresholdType.Otsu);
 
-            Matrix<byte> kernel = new Matrix<byte>(new Byte[3, 3] { { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 } }); //https://stackoverflow.com/a/33646626/4926757
+            Matrix<byte> kernel = new Matrix<byte>(new Byte[3, 3] { { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 } }); 
             Image<Gray, Byte> opening = thresh.MorphologyEx(Emgu.CV.CvEnum.MorphOp.Open, kernel, new Point(-1, -1), 2, Emgu.CV.CvEnum.BorderType.Default, new MCvScalar());
             Image<Gray, Byte> sureBg = opening.Dilate(3);
 
@@ -436,7 +435,7 @@ namespace APOMaui
             Mat zeros = markers - markers; 
             zeros.CopyTo(markers, unknown); 
 
-            //Mat finalMarkers = new Mat(); //????
+            //Mat finalMarkers = new Mat();
             CvInvoke.Watershed(img, markers);
 
             Mat mask = new Mat();
@@ -446,7 +445,7 @@ namespace APOMaui
 
             WindowFileManager.OpenedImagesList[index].CollectivePage.ImagePage.GrayImage = mask.ToImage<Gray, Byte>();
 
-        } //Chyba dziala, na pewno musze dodac komenatrze i zrozumiec co tu sie wgle dzieje
+        } 
         public static void HoughLines(int index)
         {
             Image<Gray, Byte> img = WindowFileManager.OpenedImagesList[index].CollectivePage.ImagePage.GrayImage;
@@ -640,7 +639,7 @@ namespace APOMaui
                     CvInvoke.Threshold(img, res, t1, t2, ThresholdType.Binary);
                     break;
                 case ThreshType.ADAPTIVE:
-                    CvInvoke.AdaptiveThreshold(img, res, 255, AdaptiveThresholdType.GaussianC, ThresholdType.Binary, 3, 1); //Ostatnie idk co to jest
+                    CvInvoke.AdaptiveThreshold(img, res, 255, AdaptiveThresholdType.GaussianC, ThresholdType.Binary, 3, 0); 
                     break;
                 case ThreshType.OTSU:
                     CvInvoke.Threshold(img, res, 0, 255, ThresholdType.Otsu);

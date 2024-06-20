@@ -27,10 +27,9 @@ public partial class ThresholdingTab : ContentPage
 	}
 	protected override void OnDisappearing()
 	{
-		base.OnDisappearing();
-		OnButtonThreshCancelClicked(new object(), new EventArgs());
-
-	}
+		base.OnDisappearing(); 
+        if(WindowFileManager.OpenedImagesList.Count != 0) OnButtonThreshCancelClicked(new object(), new EventArgs());
+    }
     private void UpdateInternalImage()
 	{
 		System.Diagnostics.Debug.WriteLine("Thresh Updating img");

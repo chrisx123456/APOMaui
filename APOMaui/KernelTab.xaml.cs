@@ -360,6 +360,7 @@ public partial class KernelTab : ContentPage
             for(int col = 0; col < size; col++)
             {
                 Entry e = new Entry();
+                e.Keyboard = Keyboard.Numeric;
                 e.IsEnabled = editable;
                 e.SetDynamicResource(Entry.StyleProperty, "EntryKernel");
                 grid.Add(e, col, row);

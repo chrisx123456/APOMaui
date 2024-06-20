@@ -12,7 +12,6 @@ namespace APOMaui
     internal static class WindowFileManager
     {
         public static event Action? BeforeClosingEvent;
-        //public static event Action? OnImageClosingOpeningEvent;
         public static event Action? OnImageOpeningEvent;
         public static event Action? OnImageClosingEvent;
         public static event Action? OnImageSelectionChanged;
@@ -39,35 +38,38 @@ namespace APOMaui
                     }
                     break;
                 case true:
-                    if (DeviceInfo.Platform == DevicePlatform.WinUI)
+                    string filename = await Application.Current.MainPage.DisplayPromptAsync("File Name", "Type File Name + extension(.bmp/.jpg etc.)");
+                    if (filename == null || filename == String.Empty)
                     {
+                        await Application.Current.MainPage.DisplayAlert("Alert", "Invalid filename/extension", "Cancel");
+                        return;
+                    }
+                    var fp = await FolderPicker.Default.PickAsync();
+                    string path;
+                    if (fp.IsSuccessful)
+                    {
+                        path = fp.Folder.Path;
+                        string fullPath = String.Empty;
+#if WINDOWS
+                        fullPath = path + "\\" + filename;
+#endif
+#if ANDROID
+                        fullPath = path + "/" + filename;
+#endif
 
-                        string filename = await Application.Current.MainPage.DisplayPromptAsync("File Name", "Type File Name + extension(.bmp/.jpg etc.)");
-                        if (filename == null || filename == String.Empty)
+                        if (OpenedImagesList[index].CollectivePage.ImagePage.ColorImage != null && OpenedImagesList[index].CollectivePage.ImagePage.Type == ImgType.RGB)
                         {
-                            await Application.Current.MainPage.DisplayAlert("Alert", "Invalid filename/extension", "Cancel");
-                            return;
+                            OpenedImagesList[index].CollectivePage.ImagePage.ColorImage.Save(fullPath);
                         }
-                        var fp = await FolderPicker.Default.PickAsync();
-                        string path;
-                        if (fp.IsSuccessful)
+                        if (OpenedImagesList[index].CollectivePage.ImagePage.GrayImage != null && OpenedImagesList[index].CollectivePage.ImagePage.Type == ImgType.Gray)
                         {
-                            path = fp.Folder.Path;
-                            string fullPath = path + "\\" + filename;
-                            if (OpenedImagesList[index].CollectivePage.ImagePage.ColorImage != null && OpenedImagesList[index].CollectivePage.ImagePage.Type == ImgType.RGB)
-                            {
-                                OpenedImagesList[index].CollectivePage.ImagePage.ColorImage.Save(fullPath);
-                            }
-                            if (OpenedImagesList[index].CollectivePage.ImagePage.GrayImage != null && OpenedImagesList[index].CollectivePage.ImagePage.Type == ImgType.Gray)
-                            {
-                                OpenedImagesList[index].CollectivePage.ImagePage.GrayImage.Save(fullPath);
-                            }
+                            OpenedImagesList[index].CollectivePage.ImagePage.GrayImage.Save(fullPath);
                         }
-                        else
-                        {
-                            await Application.Current.MainPage.DisplayAlert("Alert", "Path not valid", "Cancel");
-                            return;
-                        }
+                    }
+                    else
+                    {
+                        await Application.Current.MainPage.DisplayAlert("Alert", "Path not valid", "Cancel");
+                        return;
                     }
                     break;
             }
@@ -157,7 +159,7 @@ namespace APOMaui
             OnImageOpeningEvent?.Invoke();
 #endif
         }
-        public static void OnCloseImagePage(int index) //To kurwa to w ogole jest do zmiany
+        public static void OnCloseImagePage(int index) 
         {
             BeforeClosingEvent?.Invoke();
             System.Diagnostics.Debug.WriteLine($"Closing Collective View: {index}");

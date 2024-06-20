@@ -39,7 +39,7 @@
             <ShellContent ContentTemplate="{DataTemplate local:MorphologyTab}" />
         </Tab>
     </FlyoutItem>
-    <FlyoutItem Title="Thresholding">
+    <FlyoutItem Title="Thresholding" x:Name="ThreshBtn">
         <Tab>
             <ShellContent ContentTemplate="{DataTemplate local:ThresholdingTab}" />
         </Tab>

@@ -9,6 +9,20 @@ namespace APOMaui
         public AppShell()
         {
             InitializeComponent();
+            ThereshTabActivate();
+            WindowFileManager.OnImageOpeningEvent += ThereshTabActivate;
+            WindowFileManager.OnImageClosingEvent += ThereshTabActivate;
+        }
+        private void ThereshTabActivate()
+        {
+            if(WindowFileManager.OpenedImagesList.Count == 0)
+            {
+                this.ThreshBtn.IsEnabled = false;
+            }
+            else
+            {
+                this.ThreshBtn.IsEnabled = true;
+            }
         }
 
         private void OnCloseAllClicked(object sender, EventArgs e)
