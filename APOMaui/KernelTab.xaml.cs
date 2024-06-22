@@ -392,7 +392,8 @@ public partial class KernelTab : ContentPage
                 list[i].Text = kernel[krow, kcol].ToString();
                 kcol++;
             }
-        } else
+        } 
+        else
         {
             foreach (Entry e in list) e.Text = null;
         }
@@ -426,7 +427,7 @@ public partial class KernelTab : ContentPage
     private float[,] Get5x5Kernel(bool fill)
     {
         if (_stage1SelectedFilter == null || _stage2SelectedFilter == null) return null;
-        foreach (Entry e in _entries3) e.Text = null;
+        if (fill) foreach (Entry e in _entries3) e.Text = null;
         Matrix<float> stage1 = new Matrix<float>(_filtersDictionary[_stage1SelectedFilter]);
         Matrix<float> stage2 = new Matrix<float>(_filtersDictionary[_stage2SelectedFilter]);
         CvInvoke.CopyMakeBorder(stage1, stage1, 1, 1, 1, 1, BorderType.Constant, new Emgu.CV.Structure.MCvScalar(0, 0, 0, 0));

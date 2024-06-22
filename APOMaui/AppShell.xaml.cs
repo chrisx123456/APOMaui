@@ -16,7 +16,9 @@ namespace APOMaui
         {
             if(WindowFileManager.selectedWindow ==  null) return;
             int index = (int)WindowFileManager.selectedWindow;
+#if WINDOWS
             if(WindowFileManager.OpenedImagesList[index].CollectivePageWindow != null) Application.Current?.CloseWindow(WindowFileManager.OpenedImagesList[index].CollectivePageWindow);
+#endif
 #if ANDROID
             WindowFileManager.OnCloseImagePage(index);
 #endif

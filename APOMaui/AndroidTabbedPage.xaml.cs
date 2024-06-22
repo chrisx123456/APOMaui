@@ -14,6 +14,7 @@ public partial class AndroidTabbedPage : TabbedPage
 		WindowFileManager.OnImageClosingEvent += Refresh;
 		WindowFileManager.OnImageOpeningEvent += Refresh;
 		this.CurrentPageChanged += PageChanged;
+		this.CurrentPageChanged += TabbedPage_SizeChanged; //Refresh
 	}
 	public void Refresh()
 	{
@@ -25,8 +26,7 @@ public partial class AndroidTabbedPage : TabbedPage
 	}
 	public void RemovePage(CollectivePage page)
 	{
-		this.Children.Remove(page);
-		PageChanged(new object(), new EventArgs());
+        this.Children.Remove(page);
 	}
 
     private void TabbedPage_SizeChanged(object sender, EventArgs e)
@@ -41,6 +41,7 @@ public partial class AndroidTabbedPage : TabbedPage
 	{
 		if(this.CurrentPage != null)
 		{
+			Debug.WriteLine("ATP");
             WindowFileManager.ChangeSelectedImagePage(((CollectivePage)this.CurrentPage).ImagePage.index);
         }
     }

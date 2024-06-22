@@ -155,7 +155,6 @@ namespace APOMaui
             AndroidImageView?.AddPage(collectivePage);
             OpenedImagesList.Add(windowImageObject);
             ChangeSelectedImagePage(OpenedImagesList.Count - 1);
-            //OnImageClosingOpeningEvent?.Invoke();
             OnImageOpeningEvent?.Invoke();
 #endif
         }
@@ -163,11 +162,12 @@ namespace APOMaui
         {
             System.Diagnostics.Debug.WriteLine($"Closing Collective View: {index}");
             selectedWindow = null;
-            AndroidImageView?.RemovePage(OpenedImagesList[index].CollectivePage);
+            CollectivePage toRemove = OpenedImagesList[index].CollectivePage;
             for (int i = index; i < OpenedImagesList.Count; i++)
             {
                 OpenedImagesList[i].CollectivePage.ImagePage.index--;
             }
+            AndroidImageView?.RemovePage(toRemove);
             OpenedImagesList[index].Dispose();
             OpenedImagesList.RemoveAt(index);
             GC.Collect();

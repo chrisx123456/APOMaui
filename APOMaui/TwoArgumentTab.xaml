@@ -5,11 +5,11 @@
              Title="Two-argument operations">
     <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Start" Margin="0,10,0,0" WidthRequest="200">
         <Label x:Name ="OperationLabel" Text="Operation" FontSize="12" HorizontalOptions="Center" VerticalOptions="Center"/>
-        <Picker x:Name="OperationPicker" MinimumHeightRequest="30" HeightRequest="30" FontSize="13" SelectedIndexChanged="OnOperationPickerSelectedIndexChanged"/>
+        <Picker x:Name="OperationPicker" MinimumHeightRequest="30" HeightRequest="40" FontSize="13" SelectedIndexChanged="OnOperationPickerSelectedIndexChanged"/>
         <Label x:Name ="Img1Label" Text="Image 1" FontSize="12" HorizontalOptions="Center" VerticalOptions="Center"/>
-        <Picker x:Name="Img1Picker" MinimumHeightRequest="30" HeightRequest="30" FontSize="13" SelectedIndexChanged="OnImg1PickerSelectedIndexChanged"/>
+        <Picker x:Name="Img1Picker" MinimumHeightRequest="30" HeightRequest="40" FontSize="13" SelectedIndexChanged="OnImg1PickerSelectedIndexChanged"/>
         <Label x:Name ="Img2Label" Text="Image 2" FontSize="12" HorizontalOptions="Center" VerticalOptions="Center"/>
-        <Picker x:Name="Img2Picker" MinimumHeightRequest="30" HeightRequest="30" FontSize="13" SelectedIndexChanged="OnImg2PickerSelectedIndexChanged"/>
+        <Picker x:Name="Img2Picker" MinimumHeightRequest="30" HeightRequest="40" FontSize="13" SelectedIndexChanged="OnImg2PickerSelectedIndexChanged"/>
         <Button x:Name="ButtonTwoArgument" Text="Execute" Clicked="OnTwoArgumentButtonClicked" StyleClass="MainPageButton"/>
     </VerticalStackLayout>
 </ContentPage>

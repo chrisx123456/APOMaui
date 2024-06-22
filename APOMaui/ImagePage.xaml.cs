@@ -102,6 +102,13 @@ public partial class ImagePage : ContentPage, IDisposable
         }
         this.ClearLogicalChildren();
     }
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+#if ANDROID
+        //WindowFileManager.ChangeSelectedImagePage(this.index);
+#endif
+    }
 
     public ImageSource EmguImgToImageSource(Image<Bgr, Byte> img)
     {
