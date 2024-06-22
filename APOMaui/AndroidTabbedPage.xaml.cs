@@ -26,6 +26,7 @@ public partial class AndroidTabbedPage : TabbedPage
 	public void RemovePage(CollectivePage page)
 	{
 		this.Children.Remove(page);
+		PageChanged(new object(), new EventArgs());
 	}
 
     private void TabbedPage_SizeChanged(object sender, EventArgs e)
@@ -34,7 +35,6 @@ public partial class AndroidTabbedPage : TabbedPage
 		{
             this.CurrentPage.HeightRequest = this.Height;
             this.CurrentPage.HeightRequest = -1;
-			Debug.WriteLine("Resizing fix test!!!!!!!!!!!!!!!!!!"); //dodac te picker 40px w reszcie miejsc
         }
     }
     public void PageChanged(object sender, EventArgs e)

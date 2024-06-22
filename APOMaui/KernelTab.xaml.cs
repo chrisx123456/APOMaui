@@ -335,7 +335,12 @@ public partial class KernelTab : ContentPage
         SizePicker.SelectedIndex = -1;
         Stage1Picker.SelectedIndex = -1;
         Stage2Picker.SelectedIndex = -1;
-        //Re-enabling events
+        _selectedBorder = null;
+         _selectedFilter = null;
+        _selectedBuiltInFilter = null;
+        _stage1SelectedFilter = null;
+        _stage2SelectedFilter = null;
+    //Re-enabling events
         FilterPicker.SelectedIndexChanged += OnFilterPickerSelectedIndexChanged;
         SizePicker.SelectedIndexChanged += OnSizePickerSelectedIndexChanged;
         EdgePicker.SelectedIndexChanged += OnEdgePickerSelectedIndexChanged;

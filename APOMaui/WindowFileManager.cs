@@ -11,10 +11,10 @@ namespace APOMaui
 {
     internal static class WindowFileManager
     {
-        public static event Action? BeforeClosingEvent;
         public static event Action? OnImageOpeningEvent;
         public static event Action? OnImageClosingEvent;
         public static event Action? OnImageSelectionChanged;
+        public static event Action? RGBToGrayConvertedEvent;
 
         public static AndroidTabbedPage? AndroidImageView;
         public static List<WindowImageObject> OpenedImagesList = new();
@@ -161,7 +161,6 @@ namespace APOMaui
         }
         public static void OnCloseImagePage(int index) 
         {
-            BeforeClosingEvent?.Invoke();
             System.Diagnostics.Debug.WriteLine($"Closing Collective View: {index}");
             selectedWindow = null;
             AndroidImageView?.RemovePage(OpenedImagesList[index].CollectivePage);
@@ -184,6 +183,7 @@ namespace APOMaui
         public static void RaiseEventRGB2GrayConversion()
         {
             OnImageSelectionChanged?.Invoke();
+            RGBToGrayConvertedEvent?.Invoke();
         }
     }
 }

@@ -122,6 +122,13 @@ public partial class TwoArgumentTab : ContentPage
             await DisplayAlert("Alert", "Selected image 1/2 is not GrayScale", "Ok");
             return;
         }
+#if ANDROID
+        if (WindowFileManager.OpenedImagesList.Count >= 5)
+        {
+            await DisplayAlert("Alert", "Cannot open more than 5 photos", "Ok");
+            return;
+        }
+#endif
         if (_selectedOperation == TwoArgsOps.BLEND)
 		{
             if (!double.TryParse(await DisplayPromptAsync("Weight 1", "Type Weigt 1 value"), out double w1) && w1 >= 0 && w1 <= 1)

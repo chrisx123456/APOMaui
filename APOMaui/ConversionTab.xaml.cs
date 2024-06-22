@@ -13,6 +13,13 @@ public partial class ConversionTab : ContentPage
             await DisplayAlert("Alert", "None image is selected!", "Ok");
             return;
         }
+#if ANDROID
+        if(WindowFileManager.OpenedImagesList.Count >= 3)
+        {
+            await DisplayAlert("Alert", "Cannot open more than 5 photos", "Ok");
+            return;
+        }
+#endif
         int index = (int)WindowFileManager.selectedWindow;
         if (WindowFileManager.OpenedImagesList[index].CollectivePage.ImagePage.Type != ImgType.RGB)
         {
@@ -43,6 +50,13 @@ public partial class ConversionTab : ContentPage
             await DisplayAlert("Alert", "None image is selected!", "Ok");
             return;
         }
+#if ANDROID
+        if (WindowFileManager.OpenedImagesList.Count >= 3)
+        {
+            await DisplayAlert("Alert", "Cannot open more than 5 photos", "Ok");
+            return;
+        }
+#endif
         int index = (int)WindowFileManager.selectedWindow;
         if (WindowFileManager.OpenedImagesList[index].CollectivePage.ImagePage.Type != ImgType.RGB)
         {
@@ -58,6 +72,13 @@ public partial class ConversionTab : ContentPage
             await DisplayAlert("Alert", "None image is selected!", "Ok");
             return;
         }
+#if ANDROID
+        if (WindowFileManager.OpenedImagesList.Count >= 3)
+        {
+            await DisplayAlert("Alert", "Cannot open more than 5 photos", "Ok");
+            return;
+        }
+#endif
         int index = (int)WindowFileManager.selectedWindow;
         if (WindowFileManager.OpenedImagesList[index].CollectivePage.ImagePage.Type != ImgType.RGB)
         {

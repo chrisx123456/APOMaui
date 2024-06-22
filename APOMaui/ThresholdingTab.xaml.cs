@@ -1,75 +1,99 @@
 using Emgu.CV;
 using Emgu.CV.Structure;
+using System.Diagnostics;
 using System.Reflection;
 
 namespace APOMaui;
 
 public partial class ThresholdingTab : ContentPage
 {
+    private Dictionary<string, int> _imageList = new Dictionary<string, int>();
     private static List<string> _types = new List<string> { "Manual", "Adaptive", "Otsu" };
     private ThreshType? _selected = null;
     private Image<Gray, Byte>? _img = null;
-	//private int? _imgindex = null;
+	private int? _imgindex = null;
 	private int _slider1Value = 0;
     private int _slider2Value = 0;
     public ThresholdingTab()
 	{
 		InitializeComponent();
         this.ThreshTypePicker.SelectedIndex = 0;
+        _imageList = GetImagesList();
         AddPickersItems();
-        UpdateInternalImage();
         ResetSlider();
-        WindowFileManager.BeforeClosingEvent += this.UpdateInternalImage; //Cancel preview etc.
-        //WindowFileManager.OnImageClosingOpeningEvent += this.DisableAll;
-        WindowFileManager.OnImageClosingEvent += this.DisableAll; //disable all when img closed
-        WindowFileManager.OnImageOpeningEvent += this.UpdateInternalImage; //when new image updare, but it's doubled i think cuz' when new img is opened, index changes so selection event fires
-        WindowFileManager.OnImageSelectionChanged += this.UpdateInternalImage; //New img selected
+        SetAll(false);
+        WindowFileManager.OnImageClosingEvent += Update;
+        WindowFileManager.OnImageOpeningEvent += Update;
+        WindowFileManager.RGBToGrayConvertedEvent += Update;
 	}
 	protected override void OnDisappearing()
 	{
-		base.OnDisappearing(); 
-        if(WindowFileManager.OpenedImagesList.Count != 0) OnButtonThreshCancelClicked(new object(), new EventArgs());
+		base.OnDisappearing();
+        OnButtonThreshCancelClicked(new object(), new EventArgs());
+        SetAll(false);
+
+    }
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+
+    }
+    private void Update()
+    {
+        _imageList.Clear();
+        _imageList = GetImagesList();
+        AddPickersItems();
+        _imgindex = null;
+        _img = null;
+        _selected = null;
+        this.ThreshTypePicker.SelectedIndex = 0;
+        this.imgPicker.SelectedIndexChanged -= imgPicker_SelectedIndexChanged;
+        this.imgPicker.SelectedIndex = -1;
+        this.imgPicker.SelectedIndexChanged += imgPicker_SelectedIndexChanged;
+        ResetSlider();
+
+    }
+    private void imgPicker_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        OnButtonThreshCancelClicked(sender, new EventArgs());
+        this._imgindex = _imageList[imgPicker.SelectedItem.ToString()];
+        SetAll(true);
+        UpdateInternalImage();
+    }
+
+    private Dictionary<string, int> GetImagesList()
+    {
+        Dictionary<string, int> res = new();
+        foreach (WindowImageObject wio in WindowFileManager.OpenedImagesList)
+        {
+            if(wio.CollectivePage.ImagePage.Type == ImgType.Gray)
+            {
+                string s = wio.CollectivePage.Title;
+                int i = wio.CollectivePage.ImagePage.index;
+                res.Add(s, i);
+            }
+        }
+        return res;
+    }
+    private void AddPickersItems()
+    {
+        this.ThreshTypePicker.Items.Clear();
+        this.imgPicker.Items.Clear();
+        foreach (string type in _types)
+        {
+            this.ThreshTypePicker.Items.Add(type);
+        }
+        foreach (string s in _imageList.Keys)
+        {
+            this.imgPicker.Items.Add(s);
+        }
     }
     private void UpdateInternalImage()
 	{
-		System.Diagnostics.Debug.WriteLine("Thresh Updating img");
-        ResetSlider();
-        OnButtonThreshCancelClicked(new object(), new EventArgs()); //Sets this interal image in ImagePage, in this case resets the base image
-        if (WindowFileManager.selectedWindow != null && WindowFileManager.OpenedImagesList[(int)WindowFileManager.selectedWindow].CollectivePage.ImagePage.Type == ImgType.Gray)
-		{
-            this._img = WindowFileManager.OpenedImagesList[(int)WindowFileManager.selectedWindow].CollectivePage.ImagePage.GrayImage.Clone();
-			this.ThreshTypePicker.IsEnabled = true;
-            this.Slider1.IsEnabled = true;
-            this.Slider2.IsEnabled = true;
-            this.ButtonThreshAccept.IsEnabled = true;
-			this.ButtonThreshCancel.IsEnabled = true;
-			this.ButtonThreshPreview.IsEnabled = true;
-        }
-        else DisableAll();
+        this._img = WindowFileManager.OpenedImagesList[(int)this._imgindex].CollectivePage.ImagePage.GrayImage.Clone();
     }
-    private void AcceptImage()
-    {
-        System.Diagnostics.Debug.WriteLine("Thresh Updating MAIN img");
-        ResetSlider();
-        if (WindowFileManager.selectedWindow != null && WindowFileManager.OpenedImagesList[(int)WindowFileManager.selectedWindow].CollectivePage.ImagePage.Type == ImgType.Gray)
-        {
-            this._img = WindowFileManager.OpenedImagesList[(int)WindowFileManager.selectedWindow].CollectivePage.ImagePage.GrayImage.Clone();
-            this.ThreshTypePicker.IsEnabled = true;
-            this.Slider1.IsEnabled = true;
-            this.Slider2.IsEnabled = true;
-            this.ButtonThreshAccept.IsEnabled = true;
-            this.ButtonThreshCancel.IsEnabled = true;
-            this.ButtonThreshPreview.IsEnabled = true;
-            OnButtonThreshCancelClicked(new object(), new EventArgs()); //Sets this interal image in ImagePage
-        }
-    }
-	private void AddPickersItems()
-	{
-		foreach (string type in _types)
-		{
-			this.ThreshTypePicker.Items.Add(type);
-		}
-	}
+
+
 	private void OnSlider1ValueChanged(object sender, ValueChangedEventArgs e)
 	{
 		int val = (int)e.NewValue;
@@ -87,25 +111,39 @@ public partial class ThresholdingTab : ContentPage
 
     private  void OnButtonThreshPreviewClicked(object sender, EventArgs e)
 	{
-        if (WindowFileManager.selectedWindow == null || WindowFileManager.OpenedImagesList[(int)WindowFileManager.selectedWindow].CollectivePage.ImagePage.Type == ImgType.RGB)
-        {
-            return;
-        }
-        if (this._img != null && WindowFileManager.selectedWindow != null && this._selected != null)
+        if (this._img != null && this._imgindex != null && this._selected != null)
         {
             switch (_selected)
             {
                 case ThreshType.MANUAL:
-                    ImageProc.Thresh(this._img, (int)WindowFileManager.selectedWindow, ThreshType.MANUAL, _slider1Value, _slider2Value);
+                    ImageProc.Thresh(this._img, (int)_imgindex, ThreshType.MANUAL, _slider1Value, _slider2Value);
                     break;
                 case ThreshType.ADAPTIVE:
-                    ImageProc.Thresh(this._img, (int)WindowFileManager.selectedWindow, ThreshType.ADAPTIVE, -1, -1);
+                    ImageProc.Thresh(this._img, (int)_imgindex, ThreshType.ADAPTIVE, -1, -1);
                     break;
                 case ThreshType.OTSU:
-                    ImageProc.Thresh(this._img, (int)WindowFileManager.selectedWindow, ThreshType.OTSU, -1, -1);
+                    ImageProc.Thresh(this._img, (int)_imgindex, ThreshType.OTSU, -1, -1);
                     break;
             }
         }
+    }
+    private void OnButtonThreshCancelClicked(object sender, EventArgs e)
+    {
+        if (this._imgindex != null && this._img != null)
+        {
+            WindowFileManager.OpenedImagesList[(int)_imgindex].CollectivePage.ImagePage.GrayImage = this._img.Clone();
+        }
+        ResetSlider();
+    }
+    private void OnButtonThreshAcceptClicked(object sender, EventArgs e)
+    {
+        if (this._imgindex == null)
+        {
+            return;
+        }
+        OnButtonThreshPreviewClicked(sender, e);
+        WindowFileManager.OpenedImagesList[(int)this._imgindex].CollectivePage.ImagePage.GrayImage = this._img.Clone();
+        UpdateInternalImage();
     }
     private void OnThreshTypePickerIndexChanged(object sender, EventArgs e)
 	{
@@ -133,29 +171,13 @@ public partial class ThresholdingTab : ContentPage
 			case "Otsu":
 				_selected = ThreshType.OTSU;
                 break;
+            default:
+                return;
+               
 		}
 	}
-	private void OnButtonThreshCancelClicked(object sender, EventArgs e)
-	{
-        if(WindowFileManager.selectedWindow == null || WindowFileManager.OpenedImagesList[(int)WindowFileManager.selectedWindow].CollectivePage.ImagePage.Type == ImgType.RGB)
-        {
-            return;
-        }
-        if (this._img != null && WindowFileManager.selectedWindow != null)
-		{
-            WindowFileManager.OpenedImagesList[(int)WindowFileManager.selectedWindow].CollectivePage.ImagePage.GrayImage = this._img.Clone();
-		}
-		ResetSlider();
-    }
-    private void OnButtonThreshAcceptClicked(object sender, EventArgs e)
-    {
-        if (WindowFileManager.selectedWindow == null || WindowFileManager.OpenedImagesList[(int)WindowFileManager.selectedWindow].CollectivePage.ImagePage.Type == ImgType.RGB)
-        {
-            return;
-        }
-        OnButtonThreshPreviewClicked(sender, e);
-        AcceptImage();
-    }
+
+
 	private void ResetSlider()
 	{
 		this.Slider1.ValueChanged -= OnSlider1ValueChanged;
@@ -172,15 +194,25 @@ public partial class ThresholdingTab : ContentPage
         this.Slider1.ValueChanged += OnSlider1ValueChanged;
         this.Slider2.ValueChanged += OnSlider2ValueChanged;
     }
-	private void DisableAll()
+	private void SetAll(bool disableOrEnable)
 	{
-        System.Diagnostics.Debug.WriteLine("Thresh nulling img");
-        this.Slider1.IsEnabled = false;
-        this.Slider2.IsEnabled = false;
-        this.ThreshTypePicker.IsEnabled = false;
-        this.ButtonThreshAccept.IsEnabled = false;
-        this.ButtonThreshCancel.IsEnabled = false;
-		this.ButtonThreshPreview.IsEnabled = false;
-        this._img = null;
+        this.Slider1.IsEnabled = disableOrEnable;
+        this.Slider2.IsEnabled = disableOrEnable;
+        this.ThreshTypePicker.IsEnabled = disableOrEnable;
+        this.ButtonThreshAccept.IsEnabled = disableOrEnable;
+        this.ButtonThreshCancel.IsEnabled = disableOrEnable;
+		this.ButtonThreshPreview.IsEnabled = disableOrEnable;
+        if (!disableOrEnable)
+        {
+            this._selected = null;
+            this._imgindex = null;
+            this._img = null;
+            this.imgPicker.SelectedIndexChanged -= imgPicker_SelectedIndexChanged;
+            this.imgPicker.SelectedIndex = -1;
+            this.ThreshTypePicker.SelectedIndex = 0;
+            this.imgPicker.SelectedIndexChanged += imgPicker_SelectedIndexChanged;
+        }
     }
+
+
 }

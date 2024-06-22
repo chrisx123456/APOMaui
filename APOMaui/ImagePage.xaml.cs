@@ -14,6 +14,7 @@ public partial class ImagePage : ContentPage, IDisposable
     private Image<Gray, Byte>? backupGray;
     private Image<Bgr, Byte>? colorImage;
     private Image<Gray, Byte>? grayImage;
+    private string? _cacheImageSourcePath = null;
     public ImageSource ImageSource { get; set; }
 
     public string path;
@@ -95,20 +96,34 @@ public partial class ImagePage : ContentPage, IDisposable
         if(backupGray != null) backupGray.Dispose();
         if(colorImage != null) colorImage.Dispose();
         if(grayImage != null) grayImage.Dispose();
+        if(_cacheImageSourcePath != null)
+        {
+            File.Delete(_cacheImageSourcePath);
+        }
         this.ClearLogicalChildren();
     }
 
-    public static ImageSource EmguImgToImageSource(Image<Bgr, Byte> img)
+    public ImageSource EmguImgToImageSource(Image<Bgr, Byte> img)
     {
+        if(this._cacheImageSourcePath != null)
+        {
+            File.Delete(this._cacheImageSourcePath);
+        }
         string imagePath = Path.Combine(FileSystem.CacheDirectory, $"{Guid.NewGuid()}.bmp");
+        this._cacheImageSourcePath = imagePath;
         img.Save(imagePath);
         ImageSource src;
         src = ImageSource.FromFile(imagePath);
         return src;
     }
-    public static ImageSource EmguImgToImageSource(Image<Gray, Byte> img)
+    public ImageSource EmguImgToImageSource(Image<Gray, Byte> img)
     {
+        if (this._cacheImageSourcePath != null)
+        {
+            File.Delete(this._cacheImageSourcePath);
+        }
         string imagePath = Path.Combine(FileSystem.CacheDirectory, $"{Guid.NewGuid()}.bmp");
+        this._cacheImageSourcePath = imagePath;
         img.Save(imagePath);
         ImageSource src;
         src = ImageSource.FromFile(imagePath);

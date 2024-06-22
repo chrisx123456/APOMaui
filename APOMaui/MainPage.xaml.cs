@@ -13,19 +13,16 @@
 #endif
         }
 
-        private void OnFileButtonClicked(object sender, EventArgs e)
+        private async void OnOpenButtonClicked(object sender, EventArgs e)
         {
-            if (FileTab.IsVisible)
+#if ANDROID
+            if(WindowFileManager.OpenedImagesList.Count >= 5)
             {
-                FileTab.IsVisible = false;
-            } else FileTab.IsVisible = true;
-            //Application.Current.OpenWindow(new Window(new MainPage()));
-        }
-
-        private void OnOpenButtonClicked(object sender, EventArgs e)
-        {
+                await DisplayAlert("Alert", "Cannot open more than 5 photos", "Ok");
+                return;
+            }
+#endif
             WindowFileManager.CreateImagePage();
-            //Main.OpenPhotoInNewWindow();
         }
         private async void OnSaveButtonClicked(object sender, EventArgs e)
         {
