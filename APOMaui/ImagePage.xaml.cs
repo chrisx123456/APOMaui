@@ -103,7 +103,7 @@ public partial class ImagePage : ContentPage, IDisposable
     {
         base.OnAppearing();
 #if ANDROID
-        //WindowFileManager.ChangeSelectedImagePage(this.index);
+        WindowFileManager.AndroidImageView?.Refresh();
 #endif
     }
 

@@ -40,6 +40,7 @@ public partial class ThresholdingTab : ContentPage
     }
     private void Update()
     {
+        SetAll(false);
         _imageList.Clear();
         _imageList = GetImagesList();
         AddPickersItems();
@@ -142,7 +143,7 @@ public partial class ThresholdingTab : ContentPage
             return;
         }
         OnButtonThreshPreviewClicked(sender, e);
-        WindowFileManager.OpenedImagesList[(int)this._imgindex].CollectivePage.ImagePage.GrayImage = this._img.Clone();
+        //WindowFileManager.OpenedImagesList[(int)this._imgindex].CollectivePage.ImagePage.GrayImage = this._img.Clone();
         UpdateInternalImage();
     }
     private void OnThreshTypePickerIndexChanged(object sender, EventArgs e)
