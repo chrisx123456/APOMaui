@@ -23,6 +23,7 @@ public partial class AndroidTabbedPage : TabbedPage
 	public void AddPage(CollectivePage page)
 	{
 		this.Children.Add(page);
+
 	}
 	public void RemovePage(CollectivePage page)
 	{

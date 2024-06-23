@@ -1,11 +1,11 @@
 ﻿
 using Emgu.CV;
 using Emgu.CV.Structure;
+using Microsoft.Maui.Controls;
+using Microsoft.Maui.Graphics.Platform;
 using SkiaSharp;
-using SkiaSharp.Views.Maui;
-using SkiaSharp.Views.Maui.Controls;
 using System.Diagnostics;
-using System.Drawing.Imaging;
+using System.Drawing;
 namespace APOMaui;
 
 public partial class ImagePage : ContentPage, IDisposable
@@ -22,8 +22,9 @@ public partial class ImagePage : ContentPage, IDisposable
     double imgScale;
     public ImgType? Type;
 
-    private SKPoint? previousPoint;
-
+    private bool _readyToDraw = false;
+    private System.Drawing.Point p1 = new System.Drawing.Point();
+    private System.Drawing.Point p2 = new System.Drawing.Point();
     public Image<Bgr, Byte> ColorImage
     {
         get
@@ -73,8 +74,6 @@ public partial class ImagePage : ContentPage, IDisposable
         this.index = index;
         this.ImageSource = EmguImgToImageSource(colorImage);
         this.imgScale = (double)img.Height / (double)img.Width;
-        ToggleDrawBox(false);
-        //setDrawBoxSize(img.Width, img.Height);
         BindingContext = this;
     }
     public ImagePage(Image<Gray, Byte> img, int index, string title)
@@ -86,8 +85,6 @@ public partial class ImagePage : ContentPage, IDisposable
         this.index = index;
         this.ImageSource = EmguImgToImageSource(grayImage);
         this.imgScale = (double)img.Height / (double)img.Width;
-        //setDrawBoxSize(img.Width, img.Height);
-        ToggleDrawBox(false);
         BindingContext = this;
 
     }
@@ -136,20 +133,8 @@ public partial class ImagePage : ContentPage, IDisposable
         src = ImageSource.FromFile(imagePath);
         return src;
     }
-    public void ToggleDrawBox(bool value)
-    {
-        drawBox.IsVisible = value;
-        drawBox.IsEnabled = value;
-    }
-    public bool GetDrawBoxState()
-    {
-        return drawBox.IsVisible && drawBox.IsEnabled;
-    }
-    private void setDrawBoxSize(int w, int h)
-    {
-        this.drawBox.HeightRequest = h;
-        this.drawBox.WidthRequest = w;
-    }
+
+
     public void OnSetGrayImage(Image<Gray, Byte> value)
     {
         BindingContext = null;
@@ -206,14 +191,28 @@ public partial class ImagePage : ContentPage, IDisposable
             backupGray = null;
         }
     }
-    private void ProfileLine(object sender, EventArgs e)
+    private async void ProfileLine(object sender, EventArgs e)
     {
+        System.Drawing.Point p1Draw = new System.Drawing.Point();
+        System.Drawing.Point p2Draw = new System.Drawing.Point();
+
+        winImgBox.GestureRecognizers.Clear();
         if (grayImage == null) return;
+        if (_readyToDraw)
+        {
+            string res = await DisplayActionSheet("Profile Line", null, null, new string[] { "Accept", "Cancel" });
+            if(res == "Accept")
+            {
+                ImageProc.ProfileLine(index, p1, p2);        
+                _readyToDraw = false;
+            }
+            _readyToDraw = false;
+            this.DrawBox.Source = null;
+            return;
+        }
         int c = 0;
         TapGestureRecognizer tgr = new TapGestureRecognizer();
         winImgBox.GestureRecognizers.Add(tgr);
-        System.Drawing.Point p1 = new System.Drawing.Point();
-        System.Drawing.Point p2 = new System.Drawing.Point();
         tgr.Tapped += (s, e) =>
         {
 
@@ -223,18 +222,10 @@ public partial class ImagePage : ContentPage, IDisposable
             Microsoft.Maui.Graphics.Point? tapPos = e.GetPosition(img);
             if (img != null && tapPos != null && grayImage != null)
             {
-                // Rozmiar obrazka
-                var imageSize = new System.Drawing.Size((int)img.Width, (int)img.Height);
-
-                // Rozmiar obrazu źródłowego
-                var sourceSize = new System.Drawing.Size(grayImage.Width, grayImage.Height);
-
-                // Współrzędne piksela w obrazie źródłowym
-                var pixelX = (int)(tapPos?.X * (sourceSize.Width / (double)imageSize.Width));
-
-                var pixelY = (int)(tapPos?.Y * (sourceSize.Height / (double)imageSize.Height));
-
-                //Wyświetlenie współrzędnych piksela
+                double scale = Math.Max(winImgBox.Width / grayImage.Width,
+                      winImgBox.Height / grayImage.Height);
+                int pixelX = (int)(tapPos?.X / scale);
+                int pixelY = (int)(tapPos?.Y / scale);
                 Debug.WriteLine($"Pozycja kliknięcia: X={tapPos?.X}, Y={tapPos?.Y}");
                 Debug.WriteLine($"Współrzędne piksela: X={pixelX}, Y={pixelY}");
                 c++;
@@ -242,29 +233,56 @@ public partial class ImagePage : ContentPage, IDisposable
                 {
                     p1.X = pixelX;
                     p1.Y = pixelY;
+                    p1Draw.X = (int)tapPos?.X;
+                    p1Draw.Y = (int)tapPos?.Y;
                 }
                 if (c == 2)
                 {
                     p2.X = pixelX;
                     p2.Y = pixelY;
-                    ImageProc.ProfileLine(index, p1, p2);
+                    p2Draw.X = (int)tapPos?.X;
+                    p2Draw.Y = (int)tapPos?.Y;
+                    DrawLine(p2Draw.X, p2Draw.Y, p1Draw.X, p1Draw.Y);
+                    _readyToDraw = true;
                     this.winImgBox.GestureRecognizers.Clear();
+                    
                 }
             }
 
         };
         
     }
-    private void GrabCut(object sender, EventArgs e)
+
+    private async void GrabCut(object sender, EventArgs e)
     {
-        this.winImgBox.GestureRecognizers.Clear();
+        System.Drawing.Point p1Draw = new System.Drawing.Point();
+        System.Drawing.Point p2Draw = new System.Drawing.Point();
+
+        winImgBox.GestureRecognizers.Clear();
         if (colorImage == null) return;
+        if (_readyToDraw)
+        {
+            string res = await DisplayActionSheet("Grab Cut", null, null, new string[] { "Accept", "Cancel" });
+            if (res == "Accept")
+            {
+                int width = Math.Abs(p2.X - p1.X);
+                int height = Math.Abs(p2.Y - p1.Y);
+                int x = Math.Min(p1.X, p2.X);
+                int y = Math.Min(p1.Y, p2.Y);
+                System.Drawing.Rectangle rectangle = new System.Drawing.Rectangle(x, y, width, height);
+                Debug.WriteLine("Calling GrabCut in main");
+
+                ImageProc.GrabCut(index, rectangle);
+                _readyToDraw = false;
+            }
+            _readyToDraw = false;
+            this.DrawBox.Source = null;
+            return;
+        }
         int c = 0;
         Debug.WriteLine("GrabCut click");
         TapGestureRecognizer tgr = new TapGestureRecognizer();
         winImgBox.GestureRecognizers.Add(tgr);
-        System.Drawing.Point p1 = new System.Drawing.Point();
-        System.Drawing.Point p2 = new System.Drawing.Point();
         tgr.Tapped += (s, e) =>
         {
 
@@ -274,19 +292,10 @@ public partial class ImagePage : ContentPage, IDisposable
             Microsoft.Maui.Graphics.Point? tapPos = e.GetPosition(img);
             if (img != null && tapPos != null && colorImage != null)
             {
-                
-                // Rozmiar obrazka
-                var imageSize = new System.Drawing.Size((int)img.Width, (int)img.Height);
-
-                // Rozmiar obrazu źródłowego
-                var sourceSize = new System.Drawing.Size(colorImage.Width, colorImage.Height);
-
-                // Współrzędne piksela w obrazie źródłowym
-                var pixelX = (int)(tapPos?.X * (sourceSize.Width / (double)imageSize.Width));
-
-                var pixelY = (int)(tapPos?.Y * (sourceSize.Height / (double)imageSize.Height));
-
-                //Wyświetlenie współrzędnych piksela
+                double scale = Math.Max(winImgBox.Width / colorImage.Width,
+                      winImgBox.Height / colorImage.Height);
+                int pixelX = (int)(tapPos?.X / scale);
+                int pixelY = (int)(tapPos?.Y / scale);
                 Debug.WriteLine($"Pozycja kliknięcia: X={tapPos?.X}, Y={tapPos?.Y}");
                 Debug.WriteLine($"Współrzędne piksela: X={pixelX}, Y={pixelY}");
                 c++;
@@ -294,126 +303,81 @@ public partial class ImagePage : ContentPage, IDisposable
                 {
                     p1.X = pixelX;
                     p1.Y = pixelY;
+                    p1Draw.X = (int)tapPos?.X;
+                    p1Draw.Y = (int)tapPos?.Y;
                 }
                 if (c == 2)
                 {
                     p2.X = pixelX;
                     p2.Y = pixelY;
-                    int width = Math.Abs(p2.X - p1.X);
-                    int height = Math.Abs(p2.Y - p1.Y);
-
-                    // Znajdujemy lewy górny róg prostokąta
-                    int x = Math.Min(p1.X, p2.X);
-                    int y = Math.Min(p1.Y, p2.Y);
-
-                    // Tworzymy Rectangle na podstawie obliczonych wartości
-                    System.Drawing.Rectangle rectangle = new System.Drawing.Rectangle(x, y, width, height);
-                    Debug.WriteLine("Calling GrabCut in main");
-
-                    ImageProc.GrabCut(index, rectangle);
+                    p2Draw.X = (int)tapPos?.X;
+                    p2Draw.Y = (int)tapPos?.Y;
+                    DrawSquare(p1Draw.X, p1Draw.Y, p2Draw.X, p2Draw.Y);
+                    _readyToDraw = true;
                     this.winImgBox.GestureRecognizers.Clear();
                 }
             }
 
         };
     }
-    void OnPaintSurface(object sender, SKPaintSurfaceEventArgs e)
+    private void DrawLine(float startX, float startY, float endX, float endY)
     {
-        SKSurface surface = e.Surface;
-        SKCanvas canvas = surface.Canvas;
-    }
-    public void OnPaint(object sender, SKTouchEventArgs e)
-    {
-        e.Handled = true;
-        switch (e.ActionType)
+        int width = (int)this.winImgBox.Width;
+        int height = (int)this.winImgBox.Height;
+        SKBitmap bitmap = new SKBitmap(width, height, false);
+        using (SKCanvas canvas = new SKCanvas(bitmap))
         {
-            case SKTouchAction.Pressed:
-                Debug.WriteLine("Pressed");
-                previousPoint = null;
-                previousPoint = e.Location; // Ustaw bieżący punkt na początkowy
-                e.Handled = true;
-                break;
-            case SKTouchAction.Moved:
-                e.Handled = true;
-                if (previousPoint.HasValue)
-                {
-                    DrawLine(previousPoint.Value, e.Location); // Narysuj linię między poprzednim punktem a bieżącym punktem
-                    previousPoint = e.Location; // Ustaw bieżący punkt na poprzedni
-                    Debug.WriteLine("Moved");
-                    drawBox.InvalidateSurface();
-                }
-                break;
-            case SKTouchAction.Cancelled:
-                Debug.WriteLine("Cancelled");
-                return;
-            case SKTouchAction.Exited:
-                Debug.WriteLine("Exited");
-                break;
-            case SKTouchAction.Entered:
-                Debug.WriteLine("Entered");
-                break;
-            case SKTouchAction.Released:
-                Debug.WriteLine("Rel");
-                e.Handled = true;
-                drawBox.InvalidateSurface();
-                previousPoint = null; // Zresetuj poprzedni punkt po zwolnieniu dotyku
-                break;
-        }
-        e.Handled = true;
-    }
-    private void DrawLine(SKPoint startPoint, SKPoint endPoint)
-    {
-        // Narysuj linię między dwoma punktami na płótnie SKCanvasView
-        drawBox.PaintSurface += (s, args) =>
-        {
-            using (var paint = new SKPaint())
+            canvas.Clear(SKColors.Transparent);
+            var paint = new SKPaint
             {
-                paint.Color = SKColors.White;
-                paint.Style = SKPaintStyle.Fill;
-                paint.StrokeWidth = 10;
-
-                args.Surface.Canvas.DrawLine(startPoint, endPoint, paint);
-            }
-        };
-
+                Style = SKPaintStyle.Stroke,
+                Color = SKColors.Red,
+                StrokeWidth = 2.5f
+            };
+            canvas.DrawLine(startX, startY, endX, endY, paint);
+        }
+        var imageSource = ConvertSKBitmapToImageSource(bitmap);
+        this.DrawBox.Source = imageSource;
     }
-    public async Task<Image<Gray, Byte>> GetImageFromCanvas()
+    private void DrawSquare(float startX, float startY, float endX, float endY)
     {
-        var img = await drawBox.CaptureAsync();
-        Stream s = await img.OpenReadAsync();
-        s.Position = 0;
-        SKBitmap skb = SKBitmap.Decode(s);
-        Image<Gray, Byte> res = ConvertSKBitmapToGrayByteImage(skb);
-        //Main.OpenNewWindowWinIMG(res, "Test");
-        return res;
-
-    }
-    public Image<Gray, Byte> ConvertSKBitmapToGrayByteImage(SKBitmap skBitmap)
-    {
-        var image = new Image<Gray, byte>(skBitmap.Width, skBitmap.Height, new Gray(0));
-            for (int y = 0; y < skBitmap.Height; y++)
+        int width = (int)this.winImgBox.Width;
+        int height = (int)this.winImgBox.Height;
+        SKBitmap bitmap = new SKBitmap(width, height, false);
+        using (SKCanvas canvas = new SKCanvas(bitmap))
+        {
+            canvas.Clear(SKColors.Transparent);
+            var paint = new SKPaint
             {
-                for (int x = 0; x < skBitmap.Width; x++)
-                {
-                    var color = skBitmap.GetPixel(x, y);
-
-                    byte grayValue = (byte)((color.Red + color.Green + color.Blue) / 3);
-
-                    image[y, x] = new Gray(grayValue);
-                }
+                Style = SKPaintStyle.Stroke,
+                Color = SKColors.Red,
+                StrokeWidth = 2.5f
+            };
+            SKRect rect = new SKRect(
+                Math.Min(startX, endX),
+                Math.Min(startY, endY),
+                Math.Max(startX, endX),
+                Math.Max(startY, endY)
+            );
+            canvas.DrawRect(rect, paint);
         }
-
-        if (colorImage != null)
-        {
-            return image.Resize(colorImage.Width, colorImage.Height, Emgu.CV.CvEnum.Inter.NearestExact);
-        }
-        else if (grayImage != null)
-        {
-            return image.Resize(grayImage.Width, grayImage.Height, Emgu.CV.CvEnum.Inter.NearestExact);
-        }
-        else return image;
+        var imageSource = ConvertSKBitmapToImageSource(bitmap);
+        this.DrawBox.Source = imageSource;
     }
 
+    private ImageSource ConvertSKBitmapToImageSource(SKBitmap skBitmap)
+    {
+        var image = SKImage.FromBitmap(skBitmap);
+        var data = image.Encode(SKEncodedImageFormat.Png, 100);
+        return ImageSource.FromStream(() => new MemoryStream(data.ToArray()));
+    }
 
-
+    private void winImgBox_SizeChanged(object sender, EventArgs e)
+    {
+        if (winImgBox != null && DrawBox != null)
+        {
+            DrawBox.WidthRequest = winImgBox.Width;
+            DrawBox.HeightRequest = winImgBox.Height;
+        }
+    }
 }

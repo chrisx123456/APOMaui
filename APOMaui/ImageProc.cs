@@ -554,30 +554,6 @@ namespace APOMaui
             }
         public static async void Inpainting(int index)
         {
-            if (!WindowFileManager.OpenedImagesList[index].CollectivePage.ImagePage.GetDrawBoxState())
-            {
-                WindowFileManager.OpenedImagesList[index].CollectivePage.ImagePage.ToggleDrawBox(true);
-            }
-            else
-            {
-                Debug.WriteLine("Getting Canvas Image");
-                Image<Gray, Byte> mask = await WindowFileManager.OpenedImagesList[index].CollectivePage.ImagePage.GetImageFromCanvas();
-                //CvInvoke.Imshow("dsd", mask);
-                if (WindowFileManager.OpenedImagesList[index].CollectivePage.ImagePage.ColorImage != null)
-                {
-                    Image<Bgr, Byte> img = WindowFileManager.OpenedImagesList[index].CollectivePage.ImagePage.ColorImage;
-                    Image<Bgr, Byte> res = new(img.Size);
-                    //CvInvoke.Inpaint(img, mask, res, 3.0, InpaintType.Telea);
-                    //Main.OpenedImagesWindowsList[index].winImg.ColorImage = res;
-                }
-                else if(WindowFileManager.OpenedImagesList[index].CollectivePage.ImagePage.GrayImage != null)
-                {
-                    Image<Gray, Byte> img = WindowFileManager.OpenedImagesList[index].CollectivePage.ImagePage.GrayImage;
-                    Image<Gray, Byte> res = new(img.Size);
-                    //CvInvoke.Inpaint(img, mask, res, 3.0, InpaintType.Telea);
-                    //Main.OpenedImagesWindowsList[index].winImg.GrayImage = res;
-                }
-            }
 
         }
         public static void AnalizeImage(int index)

@@ -551,7 +551,9 @@ public partial class KernelTab : ContentPage
                 ImageProc.MedianFilter(index, ksize, border, (int)(ksize / 2));
                 break;
             default:
-                ImageProc.ApplyKernel(index, _selectedFilter, border);
+                float[,] kernelCopy = new float[3, 3];
+                Array.Copy(_selectedFilter, kernelCopy, _selectedFilter.Length);
+                ImageProc.ApplyKernel(index, kernelCopy, border);
                 break;
         }
     }

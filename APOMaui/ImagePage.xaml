@@ -23,16 +23,12 @@
             <Label x:Name="scaleLabel" Margin="6" Padding="4" Text="" FontSize="20" FontAttributes="Bold" VerticalOptions="Center" HorizontalOptions="Center"/>
             <!-- Dodaj kolejne przyciski według potrzeb -->
         </StackLayout>
-        <Image x:Name="winImgBox" Grid.Row="1" Source="{Binding ImageSource}" HorizontalOptions="Center" VerticalOptions="Center" Margin="0,0,0,20"/>
-        <skia:SKCanvasView          
-            PaintSurface="OnPaintSurface"
-            Touch="OnPaint"
-            EnableTouchEvents="True"
-            MinimumHeightRequest="200"
-            MinimumWidthRequest="200"
-            x:Name="drawBox" 
-            Grid.Row="1"
-            />
+        <Grid Grid.Row="1">
+            <Image x:Name="winImgBox" Source="{Binding ImageSource}" HorizontalOptions="Center" VerticalOptions="Center" Margin="0,0,0,20" SizeChanged="winImgBox_SizeChanged"/>
+            <Image x:Name="DrawBox" HorizontalOptions="Center" VerticalOptions="Center" Margin="0,0,0,20"/>
+
+        </Grid>
+
     </Grid>
 
 
